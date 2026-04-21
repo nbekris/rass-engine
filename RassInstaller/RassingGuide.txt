@@ -1,0 +1,13 @@
+Guide for RASSING (Packaging installer files):
+
+You will need to copy over Assets files and GameRass.exe from your Release folder.
+
+Place Assets and GameRass.exe right in INSTALLERFILES directory and replace current
+
+Usually, Assets and the GameRass.exe are located in -
+ .\build\output\x64\Release where the root is the Visual Studio project directory.
+ 
+ NOTE:: After installation, you will need to run the game .exe with admin permissions if
+ you installed in ProgramFiles
+
+Happy RASSING!

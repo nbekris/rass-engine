@@ -1,0 +1,41 @@
+{
+	"Entity": {
+		"Name": "DoorSwitchHeld",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.85, 0.85, 0.85 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/lock_yellow.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": ""
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.85, 0.85, 0.85 ],
+				"IsTrigger": false
+			},
+			"PhysicsBody": {
+				"IsKinematic": true,
+				"Mass": 0.0
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			},
+			"Door": {
+				"Type": "Switch"
+			},
+			"SpriteSwapper": {
+				"Paths": [
+					"Assets/Textures/lock_yellow.png",
+					"Assets/Textures/lock_yellow_open.png"
+				]
+			}
+		}
+	}
+}

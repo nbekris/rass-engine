@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "level1Plat_Background",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 0,
+    "Collidable": true
+  }
+}

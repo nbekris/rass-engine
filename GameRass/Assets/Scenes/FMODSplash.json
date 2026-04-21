@@ -1,0 +1,11 @@
+{
+	"Scene": {
+		"Name": "FMODSplash",
+		"Entities": [
+			{
+				"Path": "SplashForFMOD",
+				"Position": [ 0.0, 0.0, 0.0 ]
+			}
+		]
+	}
+}

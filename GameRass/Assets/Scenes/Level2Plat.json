@@ -1,0 +1,160 @@
+{
+	"Scene": {
+		"Name": "Level2Plat",
+		"Entities": [
+			{
+				"Path": "Player",
+				"Position": [ 7.0, 27.5, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Camera": {
+							"Position": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"Offset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowSpeed": 8.0,
+							"ZoomLerpSpeed": 3.0,
+							"Zoom": [
+								0.35,
+								0.35,
+								0.35
+							],
+							"CameraWindowSize": [
+								1.0,
+								2.0,
+								1.0
+							],
+							"CameraWindowOffset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowMode": "Push"
+						},
+				"ShootingController": {
+				"CrosshairName": "Crosshair",
+				"ArmName": "Arm",
+				"ActiveWeaponIndex": 1,
+				"Weapons": [
+					{
+						"BulletArchetype": "Bullet1",
+						"GunTexturePath": "Assets/Textures/raygunBlaster.png",
+						"RecoilStrength": 0.0,
+						"FireRate": 0.2,
+						"BulletsPerShot": 1,
+						"SpreadAngle": 0.0,
+						"FireCooldownTime": 0.3,
+						"FireAudioFile": "pistol2.wav",
+						"CameraMode": "AimLookAhead",
+						"AimDriftStrength": 2.0,
+						"AimExploreRadius": 3.0,
+						"AimExploreZoomOut": 0.3,
+						"Locked": true
+					},
+					{
+						"BulletArchetype": "Bullet2",
+						"GunTexturePath": "Assets/Textures/shotgunBlaster.png",
+						"RecoilStrength": 12.0,
+						"FireRate": 0.8,
+						"BulletsPerShot": 5,
+						"SpreadAngle": 0.35,
+						"FireCooldownTime": 1.0,
+						"FireAudioFile": "shotgun2.wav",
+						"CameraMode": "Tight",
+						"Locked": false
+					}
+				]
+				}
+					}
+				}
+
+
+			},
+			{
+				"Path": "WeaponUnlocker0",
+				"Position": [ 56.0, 21.5, 0.0 ]
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,0.0,0,0]
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,33.0,0,0]
+			},
+			{
+				"Path": "TipsTextEntity"
+			},
+			{
+				"Path": "FlipOrigin",
+				"Position": [ 1.0, 2.0, 0.0 ]
+			},
+			{
+				"Path": "Crosshair"
+			},
+			{
+				"Path": "Arm"
+			},
+			{
+				"Path": "Level2PlatCollision",
+				"Position": [ 0.0, 0.0, 0.0 ]
+			},
+			{
+				"Path": "Level2PlatBackground",
+				"Position": [ 0.0, 0.0, -0.9 ]
+			},
+						{
+				"Path": "Level2PlatCkp",
+				"Position": [ 0.0, 0.0, 0.0 ]
+			},
+			{
+				"Path": "Goal",
+				"Position": [ 95.7, 28.6, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"SceneTransition": {
+							"NextScene": "Level2Puzzle"
+						}
+					}
+				}
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 41.75, 20.5, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 52.75, 25.0, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 36.0, 27.0, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 76.55, 25.5, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 76.85, 25.5, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 83.4, 29.5, 0.0 ]
+			},
+
+			{
+				"Path": "Background"
+			},
+			{
+				"Path": "MusicRock2Lead"
+			}
+		]
+	}
+}

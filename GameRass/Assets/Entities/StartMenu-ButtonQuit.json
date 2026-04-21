@@ -1,0 +1,18 @@
+{
+	"Entity": {
+		"Name": "StartMenu-ButtonQuit",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, -0.5, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"Button": {
+				"Text": "Quit",
+				"Size": [ 200.0, 50.0 ],
+				"Pivot": [ 0.5, 0.5 ]
+			},
+			"ShowConfirmQuitOnClick": {}
+		}
+	}
+}

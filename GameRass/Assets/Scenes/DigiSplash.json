@@ -1,0 +1,11 @@
+{
+	"Scene": {
+		"Name": "DigiSplash",
+		"Entities": [
+			{
+				"Path": "Splash",
+				"Position": [ 0.0, 0.0, 0.0 ]
+			}
+		]
+	}
+}

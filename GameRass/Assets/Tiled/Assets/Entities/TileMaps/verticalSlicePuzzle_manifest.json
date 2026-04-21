@@ -1,0 +1,13 @@
+{
+  "MapName": "verticalSlicePuzzle",
+  "Layers": [
+    {
+      "TileMapData": "verticalSlicePuzzle_Background",
+      "Collidable": true
+    },
+    {
+      "TileMapData": "verticalSlicePuzzle_Level",
+      "Collidable": false
+    }
+  ]
+}

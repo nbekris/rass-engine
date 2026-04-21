@@ -1,0 +1,11 @@
+{
+  "TileSet": {
+    "Name": "PlatformTileSet",
+    "TexturePath": "Textures/KenneyTileMap3.png",
+    "TileWidth": 1,
+    "TileHeight": 1,
+    "UseSpriteAtlas": true,
+    "SpriteAtlasColumns": 16,
+    "SpriteAtlasRows": 16
+  }
+}

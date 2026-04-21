@@ -1,0 +1,22 @@
+{
+	"Entity": {
+		"Name": "Arm",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.4, 0.0, -0.1 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.75, 0.75, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/transparent.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "",
+				"FilterLinear": false,
+				"RenderLayer": 2
+			}
+		}
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"Entity": {
+		"Name": "SplashForFMOD",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 2.0, 1.0, 2.0 ]
+			},
+			"Sprite": {
+				"TexturePath": "Assets/Textures/fmod.png"
+			},
+			"TimedSceneTransition": {
+				"SceneDuration": 1.0,
+				"NextScene": "StartMenu",
+				"SceneToBypassTo": "StartMenu"
+			},
+			"SpriteFader": {
+				"FadeDuration": 0.5
+			}
+		}
+	}
+}

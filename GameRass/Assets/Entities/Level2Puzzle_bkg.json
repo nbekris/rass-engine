@@ -1,0 +1,21 @@
+{
+	"Entity": {
+		"Name": "Level2Puzzle_bkg",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -3.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"TileMap": {
+				"TileMapData": "level2Puzzle_Background",
+				"FilterLinear": false,
+				"UsePhysicsCollider": false,
+				"RenderOrder": -3
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

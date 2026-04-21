@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "level2Puzzle_Background",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 0,
+    "Collidable": true
+  }
+}

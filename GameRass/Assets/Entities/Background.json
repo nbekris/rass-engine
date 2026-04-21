@@ -1,0 +1,25 @@
+{
+	"Entity": {
+		"Name": "Background",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 3.7, 3.1, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/BackgroundTrees.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"RenderLayer": 0,
+				"ParallaxTiling": [ 1.5, 1.5 ],
+				"FilterLinear":true
+			},
+			"ParallaxController":{
+				"ParallaxFactor":[ 0.05, 0.05, 0.0 ]
+			}
+		}
+	}
+}

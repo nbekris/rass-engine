@@ -1,0 +1,18 @@
+{
+	"Entity": {
+		"Name": "PauseMenu-ButtonExit",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, -0.8, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"Button": {
+				"Text": "Exit",
+				"Size": [ 200.0, 50.0 ],
+				"Pivot": [ 0.5, 0.5 ]
+			},
+			"ShowConfirmExitOnClick": {}
+		}
+	}
+}

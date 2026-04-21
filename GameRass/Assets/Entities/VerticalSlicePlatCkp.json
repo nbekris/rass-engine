@@ -1,0 +1,24 @@
+{
+	"Entity": {
+		"Name": "VerticalSlicePlatCkp",
+		"Components": {
+			"Transform": {
+				"Translation": [ 10.0, 30.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.9, 0.9, 0.9 ]
+			},
+			"TileMap": {
+				"TileMapData": "verticalSlicePlat_Checkpoints",
+				"FilterLinear": false,
+				"UsePhysicsCollider": false,
+				"RenderOrder": -1
+			},
+			"TileCheckPoint": {
+				"CheckpointTileIndex": 191
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "verticalSlicePuzzle_Level",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 2,
+    "Collidable": false
+  }
+}

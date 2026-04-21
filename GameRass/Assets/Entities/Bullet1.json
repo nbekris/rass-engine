@@ -1,0 +1,45 @@
+{
+	"Entity": {
+		"Name": "Bullet1",
+		"Components": {
+			"Transform": {
+				"Translation": [ 6.0, 3.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.5, 0.5, 0.5 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/Bullet1.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "",
+				"FilterLinear": true
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.2, 0.2, 0.2 ]
+			},
+			"PhysicsBody": {
+				"Mass": 0.01,
+				"Friction": 0.01,
+				"UseGravity": false,
+				"IsKinematic": true
+			},
+			"BulletBehavior": {
+				"Damage": 30,
+				"DestroyOnImpact": true,
+				"CanCrossColliders": false,
+				"IsEnemyBullet": false,
+				"DestroyTiles": true,
+				"TileDestroySoundFile": "tileDestroy1.wav",
+				"Lifetime": 2.0,
+				"Bounces": 0,
+				"Speed": 12.0,
+				"DestroyableTileTypes": [
+					{ "Index": 43 }
+				]
+			}
+		}
+	}
+}

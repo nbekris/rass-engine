@@ -1,0 +1,24 @@
+{
+	"Entity": {
+		"Name": "Level1PlatCkp",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.6, 0.6, 0.6 ]
+			},
+			"TileMap": {
+				"TileMapData": "level1Platform_Checkpoints",
+				"FilterLinear": false,
+				"UsePhysicsCollider": false,
+				"RenderOrder": -1
+			},
+			"TileCheckPoint": {
+				"CheckpointTileIndex": 191
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

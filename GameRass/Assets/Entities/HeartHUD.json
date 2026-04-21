@@ -1,0 +1,22 @@
+{
+	"Entity": {
+		"Name": "HeartHUD",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -0.9 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.2, 0.2, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/hud_heart.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "",
+				"FilterLinear": true,
+				"RenderLayer": 3
+			}
+		}
+	}
+}

@@ -1,0 +1,142 @@
+{
+	"Entity": {
+		"Name": "VerticalSlicePuzzle",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"TileMap": {
+				"TileMapData": "verticalSlicePuzzle_Level",
+				"FilterLinear": false,
+				"UsePhysicsCollider": true,
+				"RenderOrder": -1
+			},
+			"TileDoor": {
+				"Doors": [
+					{
+						"BindTo": 999001,
+						"Tiles": [
+							{
+								"Col": 13,
+								"Row": 25
+							},
+							{
+								"Col": 14,
+								"Row": 25
+							}
+						]
+					},
+					{
+						"BindTo": 999002,
+						"Tiles": [
+							{
+								"Col": 13,
+								"Row": 23
+							},
+							{
+								"Col": 14,
+								"Row": 23
+							},
+							{
+								"Col": 13,
+								"Row": 21
+							},
+							{
+								"Col": 14,
+								"Row": 21
+							},
+							{
+								"Col": 26,
+								"Row": 23
+							},
+							{
+								"Col": 27,
+								"Row": 23
+							},
+							{
+								"Col": 31,
+								"Row": 23
+							},
+							{
+								"Col": 32,
+								"Row": 23
+							},
+							{
+								"Col": 29,
+								"Row": 25,
+								"Open": true
+							},
+							{
+								"Col": 29,
+								"Row": 26,
+								"Open": true
+							},
+							{
+								"Col": 29,
+								"Row": 21,
+								"Open": true
+							},
+							{
+								"Col": 29,
+								"Row": 20,
+								"Open": true
+							},
+							{
+								"Col": 31,
+								"Row": 18
+							},
+							{
+								"Col": 32,
+								"Row": 18
+							}
+						]
+					},
+					{
+						"BindTo": 999003,
+						"Tiles": [
+							{
+								"Col": 34,
+								"Row": 21
+							},
+							{
+								"Col": 34,
+								"Row": 20
+							}
+						]
+					},
+					{
+						"BindTo": 999006,
+						"Tiles": [
+							{
+								"Col": 26,
+								"Row": 28
+							},
+							{
+								"Col": 27,
+								"Row": 28
+							}
+						]
+					},
+					{
+						"BindTo": 999005,
+						"Tiles": [
+							{
+								"Col": 31,
+								"Row": 28
+							},
+							{
+								"Col": 32,
+								"Row": 28
+							}
+						]
+					}
+				]
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

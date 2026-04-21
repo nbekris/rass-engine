@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "level2Platform_Collision",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 0,
+    "Collidable": true
+  }
+}

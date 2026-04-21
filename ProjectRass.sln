@@ -1,0 +1,41 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProjectRassTests", "Tests\ProjectRassTests.vcxproj", "{DC2A93BE-4F48-4B70-8468-0F804F06665D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProjectRassEngine", "Source\ProjectRassEngine.vcxproj", "{8755B03B-86ED-43E8-8EED-BE6BB51AAF97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD7E25BB-8637-4AB8-88CE-0CBB0F415513}"
+	ProjectSection(SolutionItems) = preProject
+		Common.props = Common.props
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameRass", "GameRass\GameRass.vcxproj", "{2672C1C5-C8B7-4A86-94BC-B0C50AD667C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC2A93BE-4F48-4B70-8468-0F804F06665D}.Debug|x64.ActiveCfg = Debug|x64
+		{DC2A93BE-4F48-4B70-8468-0F804F06665D}.Debug|x64.Build.0 = Debug|x64
+		{DC2A93BE-4F48-4B70-8468-0F804F06665D}.Release|x64.ActiveCfg = Release|x64
+		{DC2A93BE-4F48-4B70-8468-0F804F06665D}.Release|x64.Build.0 = Release|x64
+		{8755B03B-86ED-43E8-8EED-BE6BB51AAF97}.Debug|x64.ActiveCfg = Debug|x64
+		{8755B03B-86ED-43E8-8EED-BE6BB51AAF97}.Debug|x64.Build.0 = Debug|x64
+		{8755B03B-86ED-43E8-8EED-BE6BB51AAF97}.Release|x64.ActiveCfg = Release|x64
+		{8755B03B-86ED-43E8-8EED-BE6BB51AAF97}.Release|x64.Build.0 = Release|x64
+		{2672C1C5-C8B7-4A86-94BC-B0C50AD667C7}.Debug|x64.ActiveCfg = Debug|x64
+		{2672C1C5-C8B7-4A86-94BC-B0C50AD667C7}.Debug|x64.Build.0 = Debug|x64
+		{2672C1C5-C8B7-4A86-94BC-B0C50AD667C7}.Release|x64.ActiveCfg = Release|x64
+		{2672C1C5-C8B7-4A86-94BC-B0C50AD667C7}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F06DD4EF-3667-43B9-8EC8-08810952385B}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,21 @@
+{
+	"Entity": {
+		"Name": "Level1PlatBackground",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.6, 0.6, 0.6 ]
+			},
+			"TileMap": {
+				"TileMapData": "level1Platform_Background",
+				"FilterLinear": false,
+				"UsePhysicsCollider": false,
+				"RenderOrder": -2
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

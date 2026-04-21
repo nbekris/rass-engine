@@ -1,0 +1,23 @@
+{
+	"Entity": {
+		"Name": "SplashLogo",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 2.0, 0.5, 2.0 ]
+			},
+			"Sprite": {
+				"TexturePath": "Assets/Textures/DigiPen_RGB_Black.jpg"
+			},
+			"TimedSceneTransition": {
+				"SceneDuration": 1.0,
+				"NextScene": "FMODSplash",
+				"SceneToBypassTo": "StartMenu"
+			},
+			"SpriteFader": {
+				"FadeDuration":  0.5
+			}
+		}
+	}
+}

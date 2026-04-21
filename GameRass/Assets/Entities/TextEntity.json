@@ -1,0 +1,24 @@
+{
+	"Entity": {
+		"Name": "TextEntity",
+		"Components": {
+			"Transform": {
+				"Translation": [-1.0, 0.8, 0.0],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 0.0, 0.0, 0.0 ],
+				"TexturePath": "Assets/Textures/Roboto_Mono_white.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "FPS:",
+				"RenderLayer": 3
+			},
+			"DebugDrawer": {
+				"ShowFPS": true
+			}
+		}
+	}
+}

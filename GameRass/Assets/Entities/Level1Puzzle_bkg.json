@@ -1,0 +1,21 @@
+{
+	"Entity": {
+		"Name": "Level1Puzzle",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -2.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"TileMap": {
+				"TileMapData": "level1Puzzle_Background",
+				"FilterLinear": false,
+				"UsePhysicsCollider": false,
+				"RenderOrder": -2
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

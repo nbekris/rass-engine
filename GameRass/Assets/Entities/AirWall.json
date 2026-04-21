@@ -1,0 +1,31 @@
+{
+	"Entity": {
+		"Name": "AirWall",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.5, 0.5, 0.5 ]
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 1.0,100.0, 0.5 ],
+				"IsTrigger": false
+			},
+						"Trigger": {
+				"ColliderType": "Box",
+				"Size": [ 1.0,100.0, 0.5 ]
+			},
+						"PhysicsBody" : {
+				"Mass" : 10000.0,
+				"Friction" : 0.0,
+				"UseGravity" : false,
+ 				"GravityScale" : 0.00,
+				"IsKinematic" : true
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

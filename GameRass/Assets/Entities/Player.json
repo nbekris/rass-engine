@@ -1,0 +1,187 @@
+{
+	"Entity": {
+		"Name": "Player",
+		"Components": {
+			"Transform": {
+				"Translation": [
+					-1.0,
+					0.0,
+					0.0
+				],
+				"Rotation": 0.0,
+				"Scale": [
+					0.6,
+					0.6,
+					0.6
+				]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [
+					1.0,
+					1.0,
+					1.0
+				],
+				"TexturePath": "Assets/Textures/RassWalk.png",
+				"NumCols": 3,
+				"NumRows": 2,
+				"DisplayText": "",
+				"FilterLinear": false
+			},
+			"Animation": {
+				"FrameCount": 6,
+				"FrameDuration": 0.1,
+				"IsLooping": true,
+				"IsRunning": true
+			},
+			"AnimationController": {
+				"Animations": [
+						{
+							"StateName": "Idle",
+							"TexturePath": "Assets/Textures/RassIdle.png",
+							"NumCols": 1,
+							"NumRows": 1,
+							"FrameCount": 1,
+							"FrameDuration": 0.5,
+							"IsLooping": true
+						},
+						{
+							"StateName": "Walking",
+							"TexturePath": "Assets/Textures/RassWalk.png",
+							"NumCols": 3,
+							"NumRows": 2,
+							"FrameCount": 6,
+							"FrameDuration": 0.1,
+							"IsLooping": true
+						},
+						{
+							"StateName": "Jumping",
+							"TexturePath": "Assets/Textures/RassJump.png",
+							"NumCols": 1,
+							"NumRows": 1,
+							"FrameCount": 1,
+							"FrameDuration": 1.0,
+							"IsLooping": false
+						},
+						{
+							"StateName": "Falling",
+							"TexturePath": "Assets/Textures/RassJump.png",
+							"NumCols": 1,
+							"NumRows": 1,
+							"FrameCount": 1,
+							"FrameDuration": 1.0,
+							"IsLooping": false
+						},
+						{
+							"StateName": "Backdash",
+							"TexturePath": "Assets/Textures/RassWalk.png",
+							"NumCols": 3,
+							"NumRows": 2,
+							"FrameCount": 6,
+							"FrameDuration": 0.05,
+							"IsLooping": false
+						}
+					]
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [
+					0.4,
+					0.6,
+					0.6
+				]
+			},
+			"PhysicsBody": {},
+			"IsKinematicMidFlip": {},
+			"Movement": {
+				"JumpAudioFile": "MonkeJump1.wav",
+				"LandAudioFile": "Land.wav",
+				"FootstepAudioFile": "Land.wav",
+				"FootstepInterval": 0.35,
+				"JumpVelocity": 9.0,
+				"MoveSpeed": 4.0,
+				"DetectGround": false,
+				"FakeGroundJump": true
+			},
+			"Camera": {
+				"Position": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"Offset": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"FollowSpeed": 8.0,
+				"ZoomLerpSpeed": 3.0,
+				"Zoom": [
+					0.35,
+					0.35,
+					0.35
+				],
+				"CameraWindowSize": [
+					3.0,
+					2.0,
+					1.0
+				],
+				"CameraWindowOffset": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"FollowMode": "Push"
+			},
+			"HealthComponent": {
+				"MaxHealth": 8,
+				"Health": 8,
+				"FlashDuration": 0.2,
+				"IsPlayer":true,
+				"DamageAudioFile": "RassDeath.wav"
+			},
+			"PushPullController": {
+				"GrabAudioFile" : "grab.wav"
+			},
+			"ShootingController": {
+				"CrosshairName": "Crosshair",
+				"ArmName": "Arm",
+				"ActiveWeaponIndex": 1,
+				"Weapons": [
+					{
+						"BulletArchetype": "Bullet1",
+						"GunTexturePath": "Assets/Textures/raygunBlaster.png",
+						"RecoilStrength": 0.0,
+						"FireRate": 0.2,
+						"BulletsPerShot": 1,
+						"SpreadAngle": 0.0,
+						"FireCooldownTime": 0.3,
+						"FireAudioFile": "pistol2.wav",
+						"CameraMode": "AimLookAhead",
+						"AimDriftStrength": 2.0,
+						"AimExploreRadius": 3.0,
+						"AimExploreZoomOut": 0.3,
+						"Locked": false
+
+					},
+					{
+						"BulletArchetype": "Bullet2",
+						"GunTexturePath": "Assets/Textures/shotgunBlaster.png",
+						"RecoilStrength": 12.0,
+						"FireRate": 0.8,
+						"BulletsPerShot": 5,
+						"SpreadAngle": 0.35,
+						"FireCooldownTime": 1.0,
+						"FireAudioFile": "shotgun2.wav",
+						"CameraMode": "Tight",
+						"Locked": false
+
+					}
+				]
+			},
+			"CursorMode": {
+				"Visible": false
+			}
+		}
+	}
+}

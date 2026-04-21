@@ -1,0 +1,85 @@
+{
+	"Entity": {
+		"Name": "Monkey1",
+		"Components": {
+			"Transform": {
+				"Translation": [ -1.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.6, 0.6, 0.6 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/MonkeyWalk.png",
+				"NumCols": 3,
+				"NumRows": 3,
+				"DisplayText": "",
+				"FilterLinear": false
+			},
+			"Animation": {
+				"FrameCount": 8,
+				"FrameDuration": 0.1,
+				"IsLooping": true,
+				"IsRunning": true
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.5, 0.5, 0.5 ]
+			},
+			"PhysicsBody": {
+				"Mass": 1.0,
+				"IsKinematic": false
+			},
+			"Movement": {
+				"JumpAudioFile": "MonkeJump1.wav",
+				"JumpVelocity": 10.0,
+				"MoveSpeed": 3.0
+			},
+			"AudioSource": {
+				"FileName": "MonkeJump1.wav",
+				"Volume": 1.0,
+				"Pitch": 1.0,
+				"IsLooping": false,
+				"IsSpatial": false
+			},
+			"Camera": {
+				"Position": [ 0.0, 0.0, 0.0 ],
+				"Offset": [ 0.5, 0.0, 0.0 ],
+				"FollowSpeed": 4.0,
+				"Zoom": [ 0.5, 0.5, 0.5 ]
+			},
+			"HealthComponent": {
+				"MaxHealth": 100,
+				"Health": 100,
+				"FlashDuration": 0.2,
+				"DamageAudioFile": "enemyDmg.ogg"
+			},
+			"ShootingController": {
+				"CrosshairName": "Crosshair",
+				"ArmName": "Arm",
+				"CameraAimOffsetStrength": 1.0,
+				"Weapons": [
+					{
+						"BulletArchetype": "Bullet1",
+						"GunTexturePath": "Assets/Textures/Arm.png",
+						"RecoilStrength": 1.0,
+						"FireRate": 0.2,
+						"BulletsPerShot": 1,
+						"SpreadAngle": 0.0,
+						"FireCooldownTime": 1.0
+
+					},
+					{
+						"BulletArchetype": "Bullet2",
+						"GunTexturePath": "Assets/Textures/Shotgun.png",
+						"RecoilStrength": 12.0,
+						"FireRate": 0.8,
+						"BulletsPerShot": 5,
+						"SpreadAngle": 0.35,
+						"FireCooldownTime": 1.0
+					}
+				]
+			}
+		}
+	}
+}

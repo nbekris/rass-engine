@@ -1,0 +1,17 @@
+{
+  "MapName": "level4Puzzle",
+  "Layers": [
+    {
+      "TileMapData": "level4Puzzle_Background",
+      "Collidable": true
+    },
+    {
+      "TileMapData": "level4Puzzle_Checkpoints",
+      "Collidable": false
+    },
+    {
+      "TileMapData": "level4Puzzle_Level",
+      "Collidable": false
+    }
+  ]
+}

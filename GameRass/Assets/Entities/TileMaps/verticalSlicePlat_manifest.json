@@ -1,0 +1,13 @@
+{
+  "MapName": "verticalSlicePlat",
+  "Layers": [
+    {
+      "TileMapData": "verticalSlicePlat_Collision",
+      "Collidable": true
+    },
+    {
+      "TileMapData": "verticalSlicePlat_Background",
+      "Collidable": false
+    }
+  ]
+}

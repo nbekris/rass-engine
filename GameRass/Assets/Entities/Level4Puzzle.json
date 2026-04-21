@@ -1,0 +1,135 @@
+{
+	"Entity": {
+		"Name": "Level4Puzzle",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"TileMap": {
+				"TileMapData": "level4Puzzle_Level",
+				"FilterLinear": false,
+				"UsePhysicsCollider": true,
+				"RenderOrder": -1
+			},
+			"TileDoor": {
+				"Doors": [
+					{
+						"BindTo": 999001,
+						"Tiles": [
+							{
+								"Col": 11,
+								"Row": 21
+							},
+							{
+								"Col": 11,
+								"Row": 22
+							}
+						]
+					},
+					{
+						"BindTo": 999002,
+						"Tiles": [
+							{
+								"Col": 18,
+								"Row": 21
+							},
+							{
+								"Col": 18,
+								"Row": 22
+							},
+							{
+								"Col": 21,
+								"Row": 21
+							}
+						]
+					},
+					{
+						"BindTo": 999003,
+						"Tiles": [
+							{
+								"Col": 18,
+								"Row": 23
+							}
+						]
+					},
+					{
+						"BindTo": 999004,
+						"Tiles": [
+							{
+								"Col": 21,
+								"Row": 12,
+								"Open": true
+							},
+							{
+								"Col": 20,
+								"Row": 11
+							},
+							{
+								"Col": 20,
+								"Row": 10
+							}
+						]
+					},
+					{
+						"BindTo": 999010,
+						"Tiles": [
+							{
+								"Col": 27,
+								"Row": 10
+							},
+							{
+								"Col": 27,
+								"Row": 11
+							}
+						]
+					},
+					{
+						"BindTo": 999011,
+						"Tiles": [
+							{
+								"Col": 28,
+								"Row": 10
+							},
+							{
+								"Col": 28,
+								"Row": 11
+							}
+						]
+					},
+					{
+						"BindTo": 999099,
+						"Tiles": [
+							{
+								"Col": 18,
+								"Row": 9
+							},
+							{
+								"Col": 18,
+								"Row": 12,
+								"Open": true
+							},
+							{
+								"Col": 18,
+								"Row": 14
+							}
+						]
+					},
+					{
+						"BindTo": 999020,
+						"Tiles": [
+							{
+								"Col": 15,
+								"Row": 14
+							}
+						]
+					}
+				]
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "level4Puzzle_Checkpoints",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 1,
+    "Collidable": false
+  }
+}

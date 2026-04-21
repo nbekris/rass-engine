@@ -1,0 +1,122 @@
+{
+	"Entity": {
+		"Name": "TileEntity",
+		"Components": {
+			"Transform": {
+				"Translation": [ 10.0, 30.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.9, 0.9, 0.9 ]
+			},
+			"TileMap": {
+				"TileMapData": "verticalSlicePlat_Collision",
+				"FilterLinear": false,
+				"UsePhysicsCollider": true,
+				"RenderOrder": 0
+			},
+			"TileDoor": {
+				"Doors": [
+					{
+						"BindTo": 999776,
+						"Tiles": [
+							{
+								"Col": 8,
+								"Row": 40
+							},
+							{
+								"Col": 15,
+								"Row": 34
+							},
+							{
+								"Col": 16,
+								"Row": 34
+							},
+							{
+								"Col": 17,
+								"Row": 34
+							},
+							{
+								"Col": 22,
+								"Row": 34
+							},
+							{
+								"Col": 23,
+								"Row": 34
+							},
+							{
+								"Col": 24,
+								"Row": 34
+							},
+							{
+								"Col": 25,
+								"Row": 34
+							},
+							{
+								"Col": 41,
+								"Row": 25
+							},
+							{
+								"Col": 41,
+								"Row": 26
+							},
+							{
+								"Col": 41,
+								"Row": 27
+							},
+							{
+								"Col": 41,
+								"Row": 28
+							},
+							{
+								"Col": 41,
+								"Row": 29
+							},
+							{
+								"Col": 41,
+								"Row": 30
+							},
+							{
+								"Col": 41,
+								"Row": 31
+							},
+							{
+								"Col": 41,
+								"Row": 32
+							},
+							{
+								"Col": 41,
+								"Row": 33
+							},
+							{
+								"Col": 41,
+								"Row": 34
+							},
+							{
+								"Col": 41,
+								"Row": 35
+							},
+							{
+								"Col": 41,
+								"Row": 36
+							},
+							{
+								"Col": 41,
+								"Row": 37
+							},
+							{
+								"Col": 41,
+								"Row": 38
+							},
+							{
+								"Col": 41,
+								"Row": 39
+							}
+						]
+					}
+				]
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

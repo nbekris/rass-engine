@@ -1,0 +1,21 @@
+{
+	"Entity": {
+		"Name": "Level2PlatCollision",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.5, 0.5, 0.5 ]
+			},
+			"TileMap": {
+				"TileMapData": "level2Platform_Collision",
+				"FilterLinear": false,
+				"UsePhysicsCollider": true,
+				"RenderOrder": 0
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

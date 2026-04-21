@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup Label="Globals">
+		<VCProjectVersion>18.0</VCProjectVersion>
+		<Keyword>Windows Project</Keyword>
+		<ProjectGuid>{2672c1c5-c8b7-4a86-94bc-b0c50ad667c7}</ProjectGuid>
+		<RootNamespace>GameRass</RootNamespace>
+		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<IncludePath>$(SolutionDir)Source;$(SolutionDir)Libraries\FMOD\core\inc;$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<IncludePath>$(SolutionDir)Source;$(SolutionDir)Libraries\FMOD\core\inc;$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Link>
+			<AdditionalDependencies>glbindingd.lib;glfw3dll.lib;fmodL_vc.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>$(SolutionDir)Libraries\FMOD\core\lib\x64;$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022;$(SolutionDir)Libraries\glbinding\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<PostBuildEvent>
+			<Command>
+				copy /Y "$(SolutionDir)Libraries\glbinding\*.dll" "$(OutDir)" &gt;nul 2&gt;&amp;1
+				xcopy "$(SolutionDir)Libraries\FMOD\core\lib\x64\*.dll" "$(OutDir)" /y /d &gt;nul 2&gt;&amp;1
+				xcopy "$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022\*.dll" "$(OutDir)" /y /d
+				xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /y /d /e /i &gt;nul 2&gt;&amp;1
+			</Command>
+		</PostBuildEvent>
+	</ItemDefinitionGroup>
+
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<Link>
+			<AdditionalDependencies>glbinding.lib;glfw3dll.lib;fmod_vc.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>$(SolutionDir)Libraries\FMOD\core\lib\x64;$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022;$(SolutionDir)Libraries\glbinding\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<PostBuildEvent>
+			<Command>
+				copy /Y "$(SolutionDir)Libraries\glbinding\*.dll" "$(OutDir)" &gt;nul 2&gt;&amp;1
+				xcopy "$(SolutionDir)Libraries\FMOD\core\lib\x64\*.dll" "$(OutDir)" /y /d &gt;nul 2&gt;&amp;1
+				xcopy "$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022\*.dll" "$(OutDir)" /y /d
+				xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /y /d /e /i &gt;nul 2&gt;&amp;1
+			</Command>
+		</PostBuildEvent>
+	</ItemDefinitionGroup>
+
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<ConformanceMode>true</ConformanceMode>
+			<AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ClCompile>
+	</ItemDefinitionGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v145</PlatformToolset>
+		<CharacterSet>Unicode</CharacterSet>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v145</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+		<CharacterSet>Unicode</CharacterSet>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<ClCompile>
+			<PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+		</ClCompile>
+	</ItemDefinitionGroup>
+
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<ClCompile>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+		</ClCompile>
+	</ItemDefinitionGroup>
+
+</Project>

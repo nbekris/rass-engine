@@ -1,0 +1,20 @@
+{
+	"Entity": {
+		"Name": "Floor",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, -0.8, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 10.0, 1.0, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 0.5, 0.5 ],
+				"TexturePath": "Assets/Textures/floor.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": ""
+			}
+		}
+	}
+}

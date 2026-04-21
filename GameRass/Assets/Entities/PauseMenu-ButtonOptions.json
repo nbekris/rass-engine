@@ -1,0 +1,18 @@
+{
+	"Entity": {
+		"Name": "PauseMenu-ButtonOptions",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.2, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"Button": {
+				"Text": "Options",
+				"Size": [ 200.0, 50.0 ],
+				"Pivot": [ 0.5, 0.5 ]
+			},
+			"ShowOptionsOnClick": {}
+		}
+	}
+}

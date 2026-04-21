@@ -1,0 +1,42 @@
+{
+	"Entity": {
+		"Name": "WeaponUnlocker0",
+		"Components": {
+            "Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/raygunBlaster.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "",
+				"FilterLinear": false,
+				"RenderLayer": 2
+			},
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.5, 0.5, 0.5 ]
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.5, 0.5, 0.5 ],
+				"IsTrigger": true
+			},
+            "Trigger": {
+				"ColliderType": "Box",
+				"Size": [ 1.0,1.0, 0.5 ]
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			},
+            "SinRotate": {
+				"Magnitude": 2,
+				"Interval": 2.0
+			},
+			"WeaponUnlocker": {
+				"WeaponID": 0
+			},
+			"DisableTriggerMidFlip": {}
+		}
+	}
+}

@@ -1,0 +1,228 @@
+{
+	"Scene": {
+		"Name": "Level4Puzzle",
+		"Entities": [
+			{
+				"Path": "Player",
+				"Position": [ 8.5, 21.0, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Camera": {
+							"Position": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"Offset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowSpeed": 8.0,
+							"ZoomLerpSpeed": 3.0,
+							"Zoom": [
+								0.3,
+								0.3,
+								0.3
+							],
+							"CameraWindowSize": [
+								1.0,
+								2.0,
+								1.0
+							],
+							"CameraWindowOffset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowMode": "Push"
+						}
+					}
+				}
+
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,0.0,0,0]
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,33.0,0,0]
+			},
+			{
+				"Path": "TipsTextEntity"
+			},
+			{
+				"Path": "TipsTextEntity2"
+			},
+			{
+				"Path": "FlipOrigin",
+				"Position": [ 8.5, 21.0, 0.0 ]
+			},
+			{
+				"Path": "Crosshair"
+			},
+			{
+				"Path": "Arm"
+			},
+			{
+				"Path": "Level4Puzzle",
+				"Position": [ 0.0, 0.0, -1.0 ]
+			},
+			{
+				"Path": "Level4Puzzle_ckp",
+				"Position": [ 0.0, 0.0, -2.0 ]
+			},
+			{
+				"Path": "Level4Puzzle_bkg",
+				"Position": [ 0.0, 0.0, -3.0 ]
+			},
+			{
+				"Path": "Goal",
+				"Position": [ 30.0, 11.0, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"SceneTransition": {
+							"NextScene": "Credits"
+						}
+					}
+				}
+			},
+			{
+				"Path": "Background"
+			},
+			{
+				"Path": "Box",
+				"Position": [ 7.5, 21.0, 0.0 ]
+			},
+			{
+				"Path": "SwitchHeld",
+				"UUID": 999001,
+				"Position": [ 10.0, 20.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchHeld",
+				"UUID": 999002,
+				"Position": [ 16.5, 20.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999003,
+				"Position": [ 16.5, 23.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": -180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999004,
+				"Position": [ 22.5, 10.25, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 13.0, 21.0, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 13.0, 23.0, 0.0 ]
+			},
+			{
+				"Path": "Box",
+				"Position": [ 20.0, 20.5, 0.0 ]
+			},
+			{
+				"Path": "SwitchHeld",
+				"UUID": 999010,
+				"Position": [ 24.0, 9.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchHeld",
+				"UUID": 999011,
+				"Position": [ 26.0, 9.25, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 19.5, 11.0, 0.0 ]
+			},
+			{
+				"Path": "Box",
+				"Position": [ 18.5, 8.5, 0.0 ]
+			},
+			{
+				"Path": "Box",
+				"Position": [ 12.5, 15.5, 0.0 ]
+			},
+			{
+				"Path": "SwitchToggle",
+				"UUID": 999099,
+				"Position": [ 17.0, 11.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": 180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "SwitchHeld",
+				"UUID": 999020,
+				"Position": [ 14.0, 14.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": 180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 14.0, 14.0, 0.0 ]
+			},
+			{
+				"Path": "SwitchToggle",
+				"Position": [ 17.0, 15.25, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 17.0, 16.0, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 12.5, 20.5, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 19.5, 20.5, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 12.5, 13.5, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 24.5, 11.5, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 10.5, 11.5, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 14.5, 11.5, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 16.5, 16.5, 0.0 ]
+			},
+			{
+				"Path": "MusicRockThinker"
+			}
+		]
+	}
+}

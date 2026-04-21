@@ -1,0 +1,42 @@
+{
+	"Entity": {
+		"Name": "Bullet2",
+		"Components": {
+			"Transform": {
+				"Translation": [ 6.0, 3.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [  1.0, 1.0,  1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/Bullet2.png",
+				"NumCols": 1,
+				"NumRows": 1,
+				"DisplayText": "",
+				"FilterLinear": true
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.2, 0.2, 0.2 ]
+			},
+			"PhysicsBody" : {
+				"Mass" : 0.01,
+				"Friction" : 0.0,
+				"UseGravity" : false,
+ 				"GravityScale" : 0.01,
+				"IsKinematic" : false
+			},
+			"BulletBehavior": {
+			"Damage": 10,
+			"DestroyOnImpact": true,
+			"CanCrossColliders": false,
+			"IsEnemyBullet": false,
+			"DestroyTiles": false,
+			"Lifetime": 2.0,
+			"Bounces": 3,
+			"Speed": 12.0
+}
+		}
+	}
+}

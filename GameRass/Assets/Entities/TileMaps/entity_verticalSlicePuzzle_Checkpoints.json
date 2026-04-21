@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "verticalSlicePuzzle_Checkpoints",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 1,
+    "Collidable": false
+  }
+}

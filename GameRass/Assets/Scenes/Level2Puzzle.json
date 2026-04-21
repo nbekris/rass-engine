@@ -1,0 +1,171 @@
+{
+	"Scene": {
+		"Name": "Level2Puzzle",
+		"Entities": [
+			{
+				"Path": "Player",
+				"Position": [ 12.5, 17.0, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Camera": {
+							"Position": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"Offset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowSpeed": 8.0,
+							"ZoomLerpSpeed": 3.0,
+							"Zoom": [
+								0.3,
+								0.3,
+								0.3
+							],
+							"CameraWindowSize": [
+								1.0,
+								2.0,
+								1.0
+							],
+							"CameraWindowOffset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowMode": "Push"
+						},
+				"ShootingController": {
+				"CrosshairName": "Crosshair",
+				"ArmName": "Arm",
+				"ActiveWeaponIndex": 1,
+				"Weapons": [
+					{
+						"BulletArchetype": "Bullet1",
+						"GunTexturePath": "Assets/Textures/raygunBlaster.png",
+						"RecoilStrength": 0.0,
+						"FireRate": 0.2,
+						"BulletsPerShot": 1,
+						"SpreadAngle": 0.0,
+						"FireCooldownTime": 0.3,
+						"FireAudioFile": "pistol2.wav",
+						"CameraMode": "AimLookAhead",
+						"AimDriftStrength": 2.0,
+						"AimExploreRadius": 3.0,
+						"AimExploreZoomOut": 0.3,
+						"Locked": false
+					},
+					{
+						"BulletArchetype": "Bullet2",
+						"GunTexturePath": "Assets/Textures/shotgunBlaster.png",
+						"RecoilStrength": 12.0,
+						"FireRate": 0.8,
+						"BulletsPerShot": 5,
+						"SpreadAngle": 0.35,
+						"FireCooldownTime": 1.0,
+						"FireAudioFile": "shotgun2.wav",
+						"CameraMode": "Tight",
+						"Locked": false
+					}
+				]
+				}
+					}
+				}
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,0.0,0,0]
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,33.0,0,0]
+			},
+			{
+				"Path": "TipsTextEntity"
+			},
+			{
+				"Path": "FlipOrigin",
+				"Position": [ 1.0, 2.0, 0.0 ]
+			},
+			{
+				"Path": "Crosshair"
+			},
+			{
+				"Path": "Arm"
+			},
+			{
+				"Path": "Level2Puzzle",
+				"Position": [ 0.0, 0.0, -1.0 ]
+			},
+			{
+				"Path": "Level2Puzzle_ckp",
+				"Position": [ 0.0, 0.0, -2.0 ]
+			},
+			{
+				"Path": "Level2Puzzle_bkg",
+				"Position": [ 0.0, 0.0, -3.0 ]
+			},
+			{
+				"Path": "Goal",
+				"Position": [ 24.5, 26.5, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"SceneTransition": {
+							"NextScene": "VerticalSlicePlat"
+						}
+					}
+				}
+			},
+			{
+				"Path": "Background"
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999001,
+				"Position": [ 14.5, 11.25, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 14.5, 11.5, 0.0 ]
+			},
+
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999002,
+				"Position": [ 26.5, 22.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": -180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 23.0, 27.5, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 21.5, 25.5, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 17.5, 20.5, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 28.0, 23.0, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 27.5, 22.5, 0.0 ]
+			},
+			{
+				"Path": "MusicRock2Lead"
+			}
+		]
+	}
+}

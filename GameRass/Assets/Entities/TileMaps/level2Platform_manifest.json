@@ -1,0 +1,13 @@
+{
+  "MapName": "level2Platform",
+  "Layers": [
+    {
+      "TileMapData": "level2Platform_Background",
+      "Collidable": true
+    },
+    {
+      "TileMapData": "level2Platform_Collision",
+      "Collidable": false
+    }
+  ]
+}

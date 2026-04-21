@@ -1,0 +1,27 @@
+{
+	"Scene": {
+		"Name": "OptionsMenu",
+		"Entities": [
+			{
+				"Path": "OptionsMenu-LabelTitle",
+				"Position": [ -0.7, 0.5, 0.0 ]
+			},
+			{
+				"Path": "OptionsMenu-ButtonBack",
+				"Position": [ 0.0, -0.7, 0.0 ]
+			},
+			{
+				"Path": "StrongholdBackground"
+			},
+			{
+				"Path": "MusicRockThinker"
+			},
+			{
+				"Path": "Menu"
+			},
+			{
+				"Path": "MenuCursor"
+			}
+		]
+	}
+}

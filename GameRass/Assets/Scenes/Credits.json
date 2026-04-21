@@ -1,0 +1,26 @@
+{
+	"Scene": {
+		"Name": "Credits",
+		"Entities": [
+			{
+				"Path": "CreditsMenu-ButtonBack",
+				"Position": [ 0.9, -0.6, 0.0 ]
+			},
+			{
+				"Path": "Background"
+			},
+			{
+				"Path": "CreditsBoard"
+			},
+			{
+				"Path": "MusicJazz"
+			},
+			{
+				"Path": "Menu"
+			},
+			{
+				"Path": "MenuCursor"
+			}
+		]
+	}
+}

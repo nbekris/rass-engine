@@ -1,0 +1,178 @@
+{
+	"Scene": {
+		"Name": "VerticalSlicePuzzle",
+		"Entities": [
+			{
+				"Path": "Player",
+				"Position": [ 12.0, 23.0, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Camera": {
+							"Position": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"Offset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowSpeed": 8.0,
+							"ZoomLerpSpeed": 3.0,
+							"Zoom": [
+								0.3,
+								0.3,
+								0.3
+							],
+							"CameraWindowSize": [
+								1.0,
+								2.0,
+								1.0
+							],
+							"CameraWindowOffset": [
+								0.0,
+								0.0,
+								0.0
+							],
+							"FollowMode": "Push"
+						}
+					}
+				}
+			},
+		{
+				"Path":"DeathArea",
+				"Position":[50.0,0.0,0,0]
+			},
+			{
+				"Path":"DeathArea",
+				"Position":[50.0,33.0,0,0]
+			},
+			{
+				"Path": "TipsTextEntity"
+			},
+			{
+				"Path": "FlipOrigin",
+				"Position": [ 1.0, 2.0, 0.0 ]
+			},
+			{
+				"Path": "Crosshair"
+			},
+			{
+				"Path": "Arm"
+			},
+			{
+				"Path": "VerticalSlicePuzzle",
+				"Position": [ 0.0, 0.0, -1.0 ]
+			},
+			{
+				"Path": "VerticalSlicePuzzle_ckp",
+				"Position": [ 0.0, 0.0, -2.0 ]
+			},
+			{
+				"Path": "VerticalSlicePuzzle_bkg",
+				"Position": [ 0.0, 0.0, -3.0 ]
+			},
+			{
+				"Path": "Goal",
+				"Position": [ 32.0, 16.5, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"SceneTransition": {
+							"NextScene": "Level4Puzzle"
+						}
+					}
+				}
+			},
+			{
+				"Path": "StrongholdBackground"
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999001,
+				"Position": [ 12.5, 20.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchToggle",
+				"UUID": 999002,
+				"Position": [ 16.5, 22.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchToggle",
+				"Position": [ 25.5, 24.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchToggle",
+				"Position": [ 27.5, 20.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": 180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "ZoomOutArea",
+				"Position": [ 23.5, 26.25, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"ZoomOutArea": {
+							"ZoomOutValue": 0.3
+						}
+					}
+				}
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 23.5, 26.5, 0.0 ]
+			},
+			{
+				"Path": "FlipToggle",
+				"Position": [ 35.5, 26.25, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 35.0, 26.5, 0.0 ]
+			},
+
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999003,
+				"Position": [ 36.5, 25.25, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 36.0, 20.5, 0.0 ]
+			},
+			{
+				"Path": "Saw2",
+				"Position": [ 36.5, 25.25, 0.0 ]
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999005,
+				"Position": [ 29.5, 29.75, 0.0 ],
+				"Overrides": {
+					"Components": {
+						"Transform": {
+							"Rotation": 180.0
+						}
+					}
+				}
+			},
+			{
+				"Path": "SwitchOnce",
+				"UUID": 999006,
+				"Position": [ 34.5, 16.25, 0.0 ]
+			},
+			{
+				"Path": "Bee2",
+				"Position": [ 23.0, 27.5, 0.0 ]
+			},
+			{
+				"Path": "MusicNasteroids"
+			}
+		]
+	}
+}

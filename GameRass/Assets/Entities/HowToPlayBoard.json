@@ -1,0 +1,15 @@
+{
+	"Entity": {
+		"Name": "HowToPlayBoard",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 2.5, 2.0, 2.0 ]
+			},
+			"Sprite": {
+				"TexturePath": "Assets/Textures/HowToPlayScreen.png"
+			}
+		}
+	}
+}

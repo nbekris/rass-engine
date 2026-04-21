@@ -1,0 +1,17 @@
+{
+	"Entity": {
+		"Name": "MusicRock2Lead",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"MusicFader": {
+				"FileName": "Rock2 + Lead.ogg",
+				"PlayOnInit": true,
+				"IsLooping": true
+			}
+		}
+	}
+}

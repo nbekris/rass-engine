@@ -1,0 +1,32 @@
+<Project>
+	<PropertyGroup Label="SolutionWideBuildDirs">
+		<OutDir>$(SolutionDir)build\output\$(Platform)\$(Configuration)\</OutDir>
+		<IntDir>$(SolutionDir)build\intermediate\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+		<EnableMSBuildWildcards>true</EnableMSBuildWildcards>
+	</PropertyGroup>
+
+	<PropertyGroup Label="SolutionWideIncludePaths">
+		<SolutionWideIncludeDirs>
+			$(SolutionDir)Libraries\imgui;
+			$(SolutionDir)Libraries\imgui\backends;
+			$(SolutionDir)Libraries\spdlog\include;
+			$(SolutionDir)Libraries\FMOD\core\inc;
+			$(SolutionDir)Libraries\glfw-3.4.bin.WIN64\include;
+			$(SolutionDir)Libraries\glbinding\include;
+			$(SolutionDir)Libraries\glm;
+			$(SolutionDir)Libraries\stb_image;
+			$(SolutionDir)Libraries
+		</SolutionWideIncludeDirs>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<ConformanceMode>true</ConformanceMode>
+			<AdditionalIncludeDirectories>$(SolutionWideIncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<LanguageStandard>stdcpp23</LanguageStandard>
+			<AdditionalOptions>/sdl /w34996 /utf-8 /MP8 %(AdditionalOptions)</AdditionalOptions>
+			<SDLCheck>true</SDLCheck>
+		</ClCompile>
+	</ItemDefinitionGroup>
+</Project>
+

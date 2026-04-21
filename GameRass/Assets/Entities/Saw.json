@@ -1,0 +1,48 @@
+{
+	"Entity": {
+		"Name": "Saw",
+		"Components": {
+			"Transform": {
+				"Translation": [ 1.0, -0.5, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.7, 0.7, 0.7 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/NewSaw.png",
+				"NumCols": 2,
+				"NumRows": 1,
+				"DisplayText": ""
+			},
+			"Animation": {
+				"FrameCount": 2,
+				"FrameDuration": 0.1,
+				"IsLooping": true,
+				"IsRunning": true
+			},
+			"HealthComponent": {
+				"MaxHealth": 100,
+				"Health": 100,
+				"FlashDuration": 0.2,
+				"DamageAudioFile": "enemyDmg.ogg"
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.4, 0.4, 0.4 ],
+				"IsTrigger": true
+			},
+			"Trigger": {
+				"ColliderType": "Box",
+				"Size": [ 0.4, 0.4, 0.4 ]
+			},
+			"SinTranslate": {
+				"Magnitude": [ 0.5, 0.0, 0.0 ],
+				"Interval": [ 2.0, 2.0, 2.0 ]
+			},
+			"EnemyBehavior": {
+				"ContactDamage": 10
+			}
+		}
+	}
+}

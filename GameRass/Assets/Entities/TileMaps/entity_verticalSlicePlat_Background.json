@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "verticalSlicePlat_Background",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 1,
+    "Collidable": false
+  }
+}

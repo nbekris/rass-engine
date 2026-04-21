@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Libraries\imgui\imgui.cpp" />
+    <ClCompile Include="Libraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Libraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Libraries\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Libraries\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Libraries\imgui\backends\imgui_impl_opengl3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Source\ProjectRassEngine.vcxproj">
+      <Project>{8755b03b-86ed-43e8-8eed-be6bb51aaf97}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Precompiled.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{3b587879-801c-4d38-9568-213d36744844}</ProjectGuid>
+    <RootNamespace>ProjectRass</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)Common.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)Libraries\FMOD\core\inc;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)Libraries\glfw-3.4.bin.WIN64\include</IncludePath>
+    <LibraryPath>$(ProjectDir)Libraries\FMOD\core\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022;$(ProjectDir)Libraries\glm\glm</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)Libraries\FMOD\core\inc;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)Libraries\glfw-3.4.bin.WIN64\include</IncludePath>
+    <LibraryPath>$(ProjectDir)Libraries\FMOD\core\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)Libraries\glfw-3.4.bin.WIN64\lib-vc2022;$(ProjectDir)Libraries\glm\glm</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);glfw3.lib;glbindingd.lib;glbinding-auxd.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\glbinding\lib</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(ProjectDir)Libraries\glbinding\*.dll" "$(OutDir)" &gt;nul 2&gt;&amp;1
+xcopy "$(SolutionDir)Libraries\FMOD\core\lib\x64\*.dll" "$(OutDir)" /y /d</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);glfw3.lib;glbindingd.lib;glbinding-auxd.lib;fmod_vc.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\glbinding\lib</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(ProjectDir)Libraries\glbinding\*.dll" "$(OutDir)" &gt;nul 2&gt;&amp;1
+xcopy "$(SolutionDir)Libraries\FMOD\core\lib\x64\*.dll" "$(OutDir)" /y /d</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

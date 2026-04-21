@@ -1,0 +1,75 @@
+{
+	"Entity": {
+		"Name": "Level2Puzzle",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -1.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"TileMap": {
+				"TileMapData": "level2Puzzle_Level",
+				"FilterLinear": false,
+				"UsePhysicsCollider": true,
+				"RenderOrder": -1
+			},
+			"TileDoor": {
+				"Doors": [
+					{
+						"BindTo": 999001,
+						"Tiles": [
+							{
+								"Col": 14,
+								"Row": 12,
+								"Open": true
+							},
+							{
+								"Col": 15,
+								"Row": 12,
+								"Open": true
+							},
+							{
+								"Col": 16,
+								"Row": 14,
+								"Open": true
+							},
+							{
+								"Col": 17,
+								"Row": 14,
+								"Open": true
+							},
+							{
+								"Col": 19,
+								"Row": 16
+							},
+							{
+								"Col": 19,
+								"Row": 17
+							}
+						]
+					},
+					{
+						"BindTo": 999002,
+						"Tiles": [
+							{
+								"Col": 20,
+								"Row": 26
+							},
+							{
+								"Col": 21,
+								"Row": 26
+							},
+							{
+								"Col": 22,
+								"Row": 26
+							}
+						]
+					}
+				]
+			},
+			"Flippable": {
+				"AnimateScaling": true
+			}
+		}
+	}
+}

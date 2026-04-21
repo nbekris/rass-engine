@@ -1,0 +1,62 @@
+{
+	"Entity": {
+		"Name": "Saw2",
+		"Components": {
+			"Transform": {
+				"Translation": [ 1.0, -0.5, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 0.6, 0.6, 0.6 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 1.0, 1.0, 1.0 ],
+				"TexturePath": "Assets/Textures/NewSaw.png",
+				"NumCols": 2,
+				"NumRows": 1,
+				"DisplayText": ""
+			},
+			"Animation": {
+				"FrameCount": 2,
+				"FrameDuration": 0.1,
+				"IsLooping": true,
+				"IsRunning": true
+			},
+			"HealthComponent": {
+				"MaxHealth": 50,
+				"Health": 50,
+				"FlashDuration": 0.2,
+				"DamageAudioFile": "enemyDmg.ogg"
+			},
+			"Collider": {
+				"ColliderType": "Box",
+				"Size": [ 0.4, 0.4, 0.4 ],
+				"IsTrigger": true
+			},
+			"Trigger": {
+				"ColliderType": "Box",
+				"Size": [ 0.4, 0.4, 0.4 ]
+			},
+			"PhysicsBody": {
+				"Friction": 0.0
+			},
+			"Flippable": {
+				"AnimateScaling": false
+			},
+			"IsKinematicMidFlip": {},
+			"EnemyBehavior": {
+				"ContactDamage": 10,
+				"PlayerContactDamage":1,
+				"Speed": 2.0,
+				"EnemyFlags": [
+					{ "Flag": "BackAndForth" }
+				]
+			},
+			"KnockbackComponent": {
+				"Duration": 0.3,
+				"ForceX": 5.0,
+				"ForceY": 3.0
+			},
+			"DisableTriggerMidFlip": {}
+		}
+	}
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Keep this file read-only to prevent IDE modifications. All project settings should be defined in ProjectRassEngine.props.
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8755b03b-86ed-43e8-8eed-be6bb51aaf97}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <!-- Your shared settings -->
+  <!-- Warn if the project file is writable -->
+  <Target Name="WarnIfProjectWritable" BeforeTargets="PrepareForBuild">
+    <Message Text="WARNING: ProjectRassEngine.vcxproj is writable. This file should remain read-only to prevent IDE modifications." Importance="high" Condition="!Exists('$(ProjectDir)ProjectRassEngine.vcxproj') OR '$([System.IO.File]::GetAttributes(`$(ProjectDir)ProjectRassEngine.vcxproj`))' != 'ReadOnly'" />
+  </Target>
+  <Import Project="$(SolutionDir)Common.props" />
+  <Import Project="$(ProjectDir)ProjectRassEngine.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <!-- Keep these if you want files to appear in Solution Explorer -->
+  <ItemGroup>
+    <ClInclude Include="**\*.h" />
+    <ClInclude Include="**\*.hpp" />
+  </ItemGroup>
+  
+  	<ItemGroup>
+		<ClCompile Include="**\*.cpp" Exclude="Precompiled.cpp;Main.cpp"/>
+	</ItemGroup>
+	
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

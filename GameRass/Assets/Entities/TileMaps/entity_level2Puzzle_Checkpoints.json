@@ -1,0 +1,8 @@
+{
+  "TileMap": {
+    "TileMapData": "level2Puzzle_Checkpoints",
+    "RenderLayer": "Transparent",
+    "RenderPriorityOffset": 1,
+    "Collidable": false
+  }
+}

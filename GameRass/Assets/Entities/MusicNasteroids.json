@@ -1,0 +1,17 @@
+{
+	"Entity": {
+		"Name": "MusicNasteroids",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"MusicFader": {
+				"FileName": "Nasteroids.ogg",
+				"PlayOnInit": true,
+				"IsLooping": true
+			}
+		}
+	}
+}

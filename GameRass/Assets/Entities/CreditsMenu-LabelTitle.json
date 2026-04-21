@@ -1,0 +1,19 @@
+{
+	"Entity": {
+		"Name": "CreditsMenu-LabelTitle",
+		"Components": {
+			"Transform": {
+				"Translation": [ -0.5, 0.5, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 2.0, 2.0, 2.0 ]
+			},
+			"Sprite": {
+				"Alpha": 1.0,
+				"Color": [ 0.0, 0.0, 0.0 ],
+				"TexturePath": "Assets/Textures/Roboto_Mono_white.png",
+				"DisplayText": "Credits",
+				"RenderLayer": 3
+			}
+		}
+	}
+}

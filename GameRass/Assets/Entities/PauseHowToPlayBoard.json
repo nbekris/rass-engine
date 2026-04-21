@@ -1,0 +1,16 @@
+{
+	"Entity": {
+		"Name": "PauseHowToPlayBoard",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 7.5, 4.0, 3.0 ]
+			},
+			"Sprite": {
+				"TexturePath": "Assets/Textures/HowToPlayScreen.png",
+				"RenderLayer": 4
+			}
+		}
+	}
+}

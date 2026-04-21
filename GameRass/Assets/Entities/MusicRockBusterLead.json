@@ -1,0 +1,17 @@
+{
+	"Entity": {
+		"Name": "MusicRockBusterLead",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"MusicFader": {
+				"FileName": "Rock Buster + Lead.ogg",
+				"PlayOnInit": true,
+				"IsLooping": true
+			}
+		}
+	}
+}

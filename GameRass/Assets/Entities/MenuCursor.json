@@ -1,0 +1,17 @@
+{
+	"Entity": {
+		"Name": "MenuCursor",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"MenuMouseFollower": {
+				"TexturePath": "Assets/Textures/Crosshair.png",
+				"CursorSize": 128.0
+			},
+			"MenuNavigator": {}
+		}
+	}
+}

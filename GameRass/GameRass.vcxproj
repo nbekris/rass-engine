@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2672c1c5-c8b7-4a86-94bc-b0c50ad667c7}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)Source\ProjectRassEngine.vcxproj">
+      <Project>{8755b03b-86ed-43e8-8eed-be6bb51aaf97}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <!-- Warn if the project file is writable -->
+  <Target Name="WarnIfProjectWritable" BeforeTargets="PrepareForBuild">
+    <Message Text="WARNING: GameRass.vcxproj is writable. This file should remain read-only to prevent IDE modifications." Importance="high" Condition="!Exists('$(ProjectDir)GameRass.vcxproj') OR '$([System.IO.File]::GetAttributes(`$(ProjectDir)GameRass.vcxproj`))' != 'ReadOnly'" />
+  </Target>
+  <Import Project="$(SolutionDir)Common.props" />
+  <Import Project="$(ProjectDir)GameRass.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <!-- Keep these if you want files to appear in Solution Explorer -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>Rass</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="**\*.h" />
+    <ClInclude Include="**\*.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\imgui.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\imgui_tables.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="$(SolutionDir)Libraries\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="**\*.cpp" Exclude="pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GameRass.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\RassIcon.ico" />
+    <Image Include="GameRass.ico" />
+    <Image Include="small.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
