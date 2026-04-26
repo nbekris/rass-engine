@@ -11,6 +11,7 @@
 #include <concepts>
 #include <string>
 #include <string_view>
+#include <numbers>
 
 namespace RassEngine {
 
@@ -42,5 +43,7 @@ static std::string RemoveNamespace(const std::string_view &nameClass) {
 	// Otherwise, return the substring after the last namespace
 	return toReturn.substr(index + 1);
 }
+
+static const float DEG_TO_RAD = std::numbers::pi_v<float> / 180.f;
 
 }

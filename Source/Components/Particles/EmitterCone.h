@@ -1,87 +1,45 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	EmitterCone.h
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		Behavior pattern for particle emission from a cone (or circle.)
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
 #pragma once
 
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
+#include <glm/vec3.hpp>
+#include <utility>
 
+#include "Cloneable.h"
+#include "Components/Transform.h"
 #include "EmitterShape.h"
-
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+#include "Particle.h"
+#include "Stream.h"
 
 namespace RassEngine::Components::Particles {
-// Forward Declarations:
 
-// Typedefs:
-
-// Class Definition:
 class EmitterCone : public EmitterShape {
-	// Public Constants and Enums:
 public:
-	static const char *KEY;
-	static const char *NAME;
-
 	// Constructors/Destructors:
-public:
 	EmitterCone(void);
-	EmitterCone(const EmitterCone *other);
+	EmitterCone(const EmitterCone& other);
 
 	// All objects need a virtual destructor to have their destructor called 
-	virtual ~EmitterCone(void) override;
-
-	// Public Static Functions:
-public:
+	virtual ~EmitterCone(void) override = default;
 
 	// Public Functions:
-public:
-	// @brief Shallow-copies this instance to a new pointer
-	EmitterCone *Clone() const override {
-		return new EmitterCone(this);
-	}
 
 	// @brief Read the properties of a EmitterShape component from a stream.
 	//
 	// @param stream = The data stream used for reading.
-	void Read(Stream &stream) override;
+	bool Read(Stream &stream) override;
 
 	// @brief Selects a random location of emission
 	//
 	// @param transform = The center of emit-shape
-	std::tuple<Vector2D, float> GetEmitTransform(const Transform *transform) const override;
+	std::tuple<glm::vec3, float> GetEmitTransform(const Transform &transform) const override;
 
 	// @brief Selects a velocity for the particle
 	//
 	// @param transform = The center of emit-shape
-	std::tuple<Vector2D, float> GetInitVelocities(const Particle &particle) const;
+	std::tuple<glm::vec3, float> GetInitVelocities(const Particle &particle) const override;
 
-	// Public Event Handlers
-public:
-
-	// Private Functions:
-private:
-
-	// Private Constants:
-private:
-
-	// Private Static Variables:
-private:
+	inline virtual std::unique_ptr<Component> Clone() const override {
+		return std::make_unique<EmitterCone>(static_cast<EmitterCone const &>(*this));
+	}
 
 	// Private Variables:
 private:
