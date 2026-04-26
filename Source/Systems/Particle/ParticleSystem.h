@@ -6,6 +6,8 @@
 
 #include "IParticleSystem.h"
 
+#include <string_view>
+
 namespace RassEngine::Systems {
 
 class ParticleSystem : public IParticleSystem {
