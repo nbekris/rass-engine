@@ -1,84 +1,54 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	ParticleManager.h
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		This component class is responsible for managing particles.
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
 #pragma once
-
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
 
 #include <functional>
 #include <vector>
 #include <tuple>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "Component.h"
+#include "Cloneable.h"
 #include "Particle.h"
 
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
+// Forward Declarations:
+namespace RassEngine {
+class Stream;
+}
 
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+namespace RassEngine::Graphics {
+class Mesh;
+}
+
+namespace RassEngine::Components {
+class Sprite;
+}
 
 namespace RassEngine::Components::Particles {
-// Forward Declarations:
-class Stream;
-class Mesh;
-class SpriteSource;
-
-// Typedefs:
 
 // Class Definition:
-class ParticleManager : public Component {
-	// Public Constants and Enums:
+class ParticleManager : public Cloneable<Component, ParticleManager> {
 public:
-	static const char *KEY;
-	static const char *NAME;
-
 	// Starting stats
-	typedef struct StartingStats {
+	struct StartingStats {
 		// The duration this particle is intended to remain alive
 		float lifetime{0};
 
 		// The "physics" value(s).
-		Vector2D velocity{};
+		glm::vec3 velocity{0.f, 0.f, 0.f};
 		float angularVelocityRad{0.f};
 
 		// The other starting stats
-		Color color = Color::White;
-		Vector2D scale = Vector2D{1.f, 1.f};
-	} StartingStats;
+		glm::vec4 color{1.f, 1.f, 1.f, 1.f};
+		glm::vec3 scale{1.f, 1.f, 1.f};
+	};
 
-	typedef std::function<void(const StartingStats &startingStats, Particle &particle)> particleUpdater;
+	using particleUpdater = std::function<void(const StartingStats &startingStats, Particle &particle)>;
 
-	// Constructors/Destructors:
-public:
 	ParticleManager(void);
 
 	// @brief This copy-constructor should perform a shallow copy of the data.
-	ParticleManager(const ParticleManager *other);
-
-	virtual ~ParticleManager(void) override {};
-
-	// Public Static Functions:
-public:
-
-	// Public Functions:
-public:
-	ParticleManager *Clone() const {
-		return new ParticleManager(this);
-	}
+	ParticleManager(const ParticleManager &other);
+	inline virtual ~ParticleManager(void) override = default;
 
 	// @brief Initialize the component.
 	// @brief [NOTE: Called when a new entity is initialized after creation.]
@@ -87,15 +57,8 @@ public:
 	// @return bool = true if initialization successful, otherwise false.
 	bool Initialize() override;
 
-	// @brief Update the component each frame.
-	//
-	// @param dt = Delta time (in seconds) of the last frame.
-	void Update(float dt) override;
-
-	// @brief Render the component each frame.
-	// @brief [NOTE: Modern engines handle rendering in a more complicated way.]
-	// @brief [NOTE: Some components are rendered only when debug drawing is enabled.]
-	void Render() const override;
+	// Inherited via Cloneable
+	const std::string_view &NameClass() const override;
 
 	// @brief Read the properties of a ParticleManager component from a stream.
 	// @brief Specific Steps:
@@ -105,29 +68,28 @@ public:
 	// @brief   Return to the original location in the tree (PopObject).
 	//
 	// @param stream = The data stream used for reading.
-	void Read(Stream &stream) override;
+	bool Read(Stream &stream) override;
 
 	// Return true if particleActive == 0.
-	bool IsEmpty() const {
+	inline bool IsEmpty() const {
 		return particleActive == 0;
 	}
 
 	// Return true if particleFree == 0.
-	bool IsFull() const {
+	inline bool IsFull() const {
 		return particleFree == 0;
 	}
 
 	// Allocate an unused particle, if possible.
 	std::tuple<StartingStats *, Particle *> AllocateParticle();
 
+	// TODO: replace this with an iterator
 	void ForEachActiveParticle(particleUpdater lambda);
 
-	// Public Event Handlers
-public:
-	typedef struct ParticleData {
+	struct ParticleData {
 		StartingStats starting{};
 		Particle current{};
-	} Data;
+	};
 
 	// Private Functions:
 private:
@@ -135,15 +97,6 @@ private:
 	// Kill an active particle.
 	// [NOTE: When areRecyclable is true, particles become "Free", instead of "Dead".]
 	void KillParticle(unsigned particleIndex);
-
-	// Private Constants:
-private:
-
-	// Private Static Variables:
-private:
-
-	// Private Variables:
-private:
 
 	// A sorted container for the available particles:
 	// Sorted with active particles first, followed by free, and finally, dead particles at the end
@@ -165,9 +118,9 @@ private:
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
 
-	const Mesh *mesh{nullptr};
+	const RassEngine::Graphics::Mesh *mesh{nullptr};
 
-	const SpriteSource *spriteSource{nullptr};
+	const RassEngine::Components::Sprite *spriteSource{nullptr};
 };
 
 }	// namespace

@@ -1,103 +1,32 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	ParticleManager.cpp
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		This component class is responsible for managing particles.
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-
 #include "Precompiled.h"
 #include "ParticleManager.h"
+
 #include "Component.h"
 #include "Entity.h"
 #include "Stream.h"
 #include "Utils.h"
-#include "MeshLibrary.h"
-#include "SpriteSourceLibrary.h"
-#include "Mesh.h"
-#include "SpriteSource.h"
-
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+//#include "MeshLibrary.h"
+//#include "SpriteSourceLibrary.h"
+#include "Graphics/Mesh.h"
+#include "Components/Sprite.h"
+#include "Systems/Logging/ILoggingSystem.h"
 
 namespace RassEngine::Components::Particles {
-//--------------------------------------------------------------------------
-// Public Constants:
-//--------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------
-// Public Static Variables:
-//--------------------------------------------------------------------------
-
-const char *ParticleManager::KEY = "Particles";
-const char *ParticleManager::NAME = "ParticleManager";
+//const char *ParticleManager::KEY = "Particles";
+//const char *ParticleManager::NAME = "ParticleManager";
 static const char *PARTICLE_MAX = "ParticleMax";
 static const char *IS_LOOPING = "IsLooping";
 
-//--------------------------------------------------------------------------
-// Public Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Static Constants:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Constants:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Static Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Constructors/Destructors:
-//--------------------------------------------------------------------------
-
-#pragma region Constructors
-
 ParticleManager::ParticleManager(void)
-	: Component() {}
+	: Cloneable<Component, ParticleManager>() {}
 
-ParticleManager::ParticleManager(const ParticleManager *other)
-	: Component(other)
-	, maxParticles(other->maxParticles)
-	, areRecyclable(other->areRecyclable)
-	, mesh(other->mesh)
-	, spriteSource(other->spriteSource) {}
-
-#pragma endregion Constructors
-
-//--------------------------------------------------------------------------
-// Public Static Functions:
-//--------------------------------------------------------------------------
-
-#pragma region Public Static Functions
-
-#pragma endregion Public Static Functions
-
-	//--------------------------------------------------------------------------
-	// Public Functions:
-	//--------------------------------------------------------------------------
-
-#pragma region Public Functions
+ParticleManager::ParticleManager(const ParticleManager &other)
+	: Cloneable<Component, ParticleManager>(other)
+	, maxParticles(other.maxParticles)
+	, areRecyclable(other.areRecyclable)
+	, mesh(other.mesh)
+	, spriteSource(other.spriteSource) {}
 
 bool ParticleManager::Initialize() {
 	// Reset everything
@@ -188,15 +117,12 @@ void ParticleManager::Render() const {
 	}
 }
 
-void ParticleManager::Read(Stream &stream) {
-	// Check for valid stream (optional).
-	Utils::IsStreamVerified(stream, KEY, NAME);
-
+bool ParticleManager::Read(Stream &stream) {
 	// Traverse down the tree to the "ParticleEmitter" object (PushNode).
-	stream.PushNode(KEY);
+	stream.PushNode(NAMEOF(ParticleManager));
 
-	Utils::ReadOptionalAttribute(stream, PARTICLE_MAX, maxParticles, NAME);
-	Utils::ReadOptionalAttribute(stream, IS_LOOPING, areRecyclable, NAME);
+	stream.Read(PARTICLE_MAX, maxParticles);
+	stream.Read(IS_LOOPING, areRecyclable);
 
 	// Read the name of the mesh.
 	std::string fileName;
@@ -247,18 +173,10 @@ void ParticleManager::ForEachActiveParticle(particleUpdater lambda) {
 	}
 }
 
-#pragma endregion Public Functions
-
-//--------------------------------------------------------------------------
-// Private Functions:
-//--------------------------------------------------------------------------
-
-#pragma region Private Functions
-
 void ParticleManager::KillParticle(unsigned particleIndex) {
-	DRAGON_ASSERT(particleActive > 0, "ParticleManager::KillParticle: no active particles to kill");
-	DRAGON_ASSERT(particleIndex < particleActive, "ParticleManager::KillParticle: attemtping to kill an inactive particle index");
-	DRAGON_ASSERT(particleIndex < particles.size(), "ParticleManager::KillParticle: attemtping to kill a non-existent particle index");
+	LOG_ASSERT(particleActive > 0, "ParticleManager::KillParticle: no active particles to kill");
+	LOG_ASSERT(particleIndex < particleActive, "ParticleManager::KillParticle: attemtping to kill an inactive particle index");
+	LOG_ASSERT(particleIndex < particles.size(), "ParticleManager::KillParticle: attemtping to kill a non-existent particle index");
 
 	const unsigned indexLastActiveParticle = particleActive - 1;
 
@@ -302,6 +220,9 @@ void ParticleManager::KillParticle(unsigned particleIndex) {
 	--particleActive;
 }
 
-#pragma endregion Private Functions
+const std::string_view &ParticleManager::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Components::Particles::ParticleManager);
+	return className;
+}
 
 }	// namespace

@@ -152,7 +152,7 @@ bool TweenCurve::Read(Stream &stream) {
 }
 
 const std::string_view &TweenCurve::NameClass() const {
-	static constexpr std::string_view className = NAMEOF(RassEngine::Components::HealthComponent);
+	static constexpr std::string_view className = NAMEOF(RassEngine::TweenCurve);
 	return className;
 }
 
