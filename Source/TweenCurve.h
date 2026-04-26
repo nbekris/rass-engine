@@ -1,33 +1,24 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	TweenCurve.h
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		Class for finding in-betweening values (usually between 0 and 1)
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
 #pragma once
 #include <vector>
 
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+#include <memory>
+#include <string_view>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
+#include "Object.h"
+#include "ICloneable.h"
+#include "ISerializable.h"
 
 namespace RassEngine {
 // Forward Declarations:
 class Stream;
-class Vector2D;
-class Color;
 
 // Class Definition:
-class TweenCurve {
+class TweenCurve : public Object, public ICloneable<TweenCurve>, public ISerializable<Stream> {
 public:
-	enum class Type : int {
+	enum class Type : unsigned char {
 		Linear = 0,
 		EaseInCircle,
 		EaseOutCircle,
@@ -35,23 +26,33 @@ public:
 	};
 
 private:
-	typedef struct KeyFrame {
+	struct KeyFrame {
 		Type type{Type::Linear};
 		float time{0.f};
 		float value{0.f};
-	} KeyFrame;
+	};
 
 public:
 	static float Calculate(const Type &algorithm, float startValue, float endValue, float time);
-	static Vector2D Calculate(const Type &algorithm, const Vector2D &startValue, const Vector2D &endValue, float time);
-	static Color Calculate(const Type &algorithm, const Color &startValue, const Color &endValue, float time);
+	static glm::vec2 Calculate(const Type &algorithm, const glm::vec2 &startValue, const glm::vec2 &endValue, float time);
+	static glm::vec3 Calculate(const Type &algorithm, const glm::vec3 &startValue, const glm::vec3 &endValue, float time);
+	static glm::vec4 Calculate(const Type &algorithm, const glm::vec4 &startValue, const glm::vec4 &endValue, float time);
 
-	TweenCurve() {};
+	TweenCurve() = default;
 	TweenCurve(const TweenCurve &other);
-	virtual ~TweenCurve() {};
+	virtual ~TweenCurve() = default;
 
 	float Calculate(float time) const;
-	void Read(Stream &stream);
+
+	// Inherited via Object
+	bool Initialize() override;
+	const std::string_view &NameClass() const override;
+
+	// Inherited via ICloneable
+	std::unique_ptr<TweenCurve> Clone() const override;
+
+	// Inherited via ISerializable
+	bool Read(Stream &stream) override;
 
 private:
 	float startingValue{1.f};

@@ -1,40 +1,20 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	TweenCurve.cpp
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		Class for finding in-betweening values (usually between 0 and 1)
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-
 #include "Precompiled.h"
+
+#include <memory>
+#include <string_view>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
 #include "TweenCurve.h"
 #include "Utils.h"
 #include "Stream.h"
-#include "Vector2D.h"
-#include "Color.h"
-
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
-
+#include "Systems/Logging/ILoggingSystem.h"
 
 namespace RassEngine {
-static const char *LOG_TWEEN_CURVE = "TweenCurve";
 static const char *START = "Start";
 static const char *KEYFRAMES = "KeyFrames";
-static const char *TYPE = "Type";
+static const std::string TYPE = RemoveNamespace(NAMEOF(TweenCurve::Type));
 static const char *TIME = "Time";
 static const char *VALUE = "Value";
 
@@ -73,20 +53,28 @@ float TweenCurve::Calculate(const Type &algorithm, float start, float end, float
 	return Lerp(start, end, time);
 }
 
-Vector2D TweenCurve::Calculate(const Type &algorithm, const Vector2D &start, const Vector2D &end, float time) {
+glm::vec2 TweenCurve::Calculate(const Type &algorithm, const glm::vec2 &start, const glm::vec2 &end, float time) {
 	// Update time
 	time = CalculateNewTime(algorithm, time);
 
 	// Lerp
-	return Vector2D(Lerp(start.x, end.x, time), Lerp(start.y, end.y, time));
+	return glm::vec2(Lerp(start.x, end.x, time), Lerp(start.y, end.y, time));
 }
 
-Color TweenCurve::Calculate(const Type &algorithm, const Color &start, const Color &end, float time) {
+glm::vec3 TweenCurve::Calculate(const Type &algorithm, const glm::vec3 &start, const glm::vec3 &end, float time) {
 	// Update time
 	time = CalculateNewTime(algorithm, time);
 
 	// Lerp
-	return Color(Lerp(start.r, end.r, time), Lerp(start.g, end.g, time), Lerp(start.b, end.b, time), Lerp(start.a, end.a, time));
+	return glm::vec3(Lerp(start.r, end.r, time), Lerp(start.g, end.g, time), Lerp(start.b, end.b, time));
+}
+
+glm::vec4 TweenCurve::Calculate(const Type &algorithm, const glm::vec4 &start, const glm::vec4 &end, float time) {
+	// Update time
+	time = CalculateNewTime(algorithm, time);
+
+	// Lerp
+	return glm::vec4(Lerp(start.r, end.r, time), Lerp(start.g, end.g, time), Lerp(start.b, end.b, time), Lerp(start.a, end.a, time));
 }
 
 TweenCurve::TweenCurve(const TweenCurve &other)
@@ -97,7 +85,11 @@ TweenCurve::TweenCurve(const TweenCurve &other)
 	}
 }
 
-float CS529::TweenCurve::Calculate(float time) const {
+bool TweenCurve::Initialize() {
+	return true;
+}
+
+float TweenCurve::Calculate(float time) const {
 	// Check if there are any keyframes
 	if(keyFrames.size() == 0) {
 		// If not, just return the starting value
@@ -132,9 +124,9 @@ float CS529::TweenCurve::Calculate(float time) const {
 	return Calculate(nextKeyFrame->type, startValue, nextKeyFrame->value, time);
 }
 
-void TweenCurve::Read(Stream &stream) {
+bool TweenCurve::Read(Stream &stream) {
 	// Read the starting value
-	Utils::ReadOptionalAttribute(stream, START, startingValue, LOG_TWEEN_CURVE);
+	stream.Read(START, startingValue);
 
 	// Go through the array of keyframes
 	stream.ReadArray(KEYFRAMES, [this, &stream] () {
@@ -142,16 +134,28 @@ void TweenCurve::Read(Stream &stream) {
 
 		// First, read the type of the keyframe
 		int typeOrdinal = static_cast<int>(Type::Linear);
-		Utils::ReadOptionalAttribute(stream, TYPE, typeOrdinal, LOG_TWEEN_CURVE);
-		DRAGON_ASSERT(typeOrdinal < static_cast<int>(Type::Max), "TweenCurve::Read: unknown type read");
+		stream.Read(TYPE, typeOrdinal);
+
+		LOG_ASSERT(typeOrdinal < static_cast<int>(Type::Max), "TweenCurve::Read: unknown type read");
 		key.type = static_cast<Type>(typeOrdinal);
 
 		// Read the rest
-		Utils::ReadOptionalAttribute(stream, TIME, key.time, LOG_TWEEN_CURVE);
-		Utils::ReadOptionalAttribute(stream, VALUE, key.value, LOG_TWEEN_CURVE);
+		stream.Read(TIME, key.time);
+		stream.Read(VALUE, key.value);
 
 		// Add to the list
 		keyFrames.emplace_back(key);
-		});
+	});
+	return true;
 }
+
+const std::string_view &TweenCurve::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Components::HealthComponent);
+	return className;
+}
+
+std::unique_ptr<TweenCurve> TweenCurve::Clone() const {
+	return std::make_unique<TweenCurve>(*this);
+}
+
 }	// namespace
