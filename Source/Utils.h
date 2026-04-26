@@ -29,21 +29,24 @@ concept IsDerived = !std::is_abstract_v<T> && std::derived_from<T, I>;
 /// @brief Converts the name of the identifier into a char[]
 #define NAMEOF(name) #name
 
-/// @brief Removes the namespace from a class name, if it exists.  Otherwise, returns the name as is.
-static std::string RemoveNamespace(const std::string_view &nameClass) {
-	std::string toReturn{nameClass};
+struct Utils {
+	/// @brief Multiplier to convert degrees to radians
+	static constexpr float DEG_TO_RAD = std::numbers::pi_v<float> / 180.f;
 
-	// Check if there's a namespace in the class name
-	const auto index = toReturn.find_last_of(':');
-	if(index == toReturn.npos) {
-		// If not, just return the name as is
-		return toReturn;
+	/// @brief Removes the namespace from a class name, if it exists.  Otherwise, returns the name as is.
+	static std::string RemoveNamespace(const std::string_view &nameClass) {
+		std::string toReturn{nameClass};
+
+		// Check if there's a namespace in the class name
+		const auto index = toReturn.find_last_of(':');
+		if(index == toReturn.npos) {
+			// If not, just return the name as is
+			return toReturn;
+		}
+
+		// Otherwise, return the substring after the last namespace
+		return toReturn.substr(index + 1);
 	}
-
-	// Otherwise, return the substring after the last namespace
-	return toReturn.substr(index + 1);
-}
-
-static const float DEG_TO_RAD = std::numbers::pi_v<float> / 180.f;
+};
 
 }

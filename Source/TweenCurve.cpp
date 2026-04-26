@@ -16,7 +16,7 @@
 namespace RassEngine {
 static const char *START = "Start";
 static const char *KEYFRAMES = "KeyFrames";
-static const std::string TYPE = RemoveNamespace(NAMEOF(TweenCurve::Type));
+static const std::string TYPE = Utils::RemoveNamespace(NAMEOF(TweenCurve::Type));
 static const char *TIME = "Time";
 static const char *VALUE = "Value";
 
