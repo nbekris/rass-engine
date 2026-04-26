@@ -12,75 +12,35 @@
 
 #pragma once
 
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-
-#include "Object.h"
-#include "Vector2D.h"
-#include "Color.h"
-
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace RassEngine::Components::Particles {
-// Forward Declarations:
 
-// Typedefs:
-
-// Class Definition:
-class Particle {
-	// Public Constants and Enums:
-public:
-
-	// Constructors/Destructors:
-public:
-
-	// Public Static Functions:
-public:
-	inline bool IsActive() const {
-		return lifetime > 0.f;
-	}
-
-	// Public Functions:
-public:
-
-	// Public Event Handlers
-public:
-
-	// Private Functions:
-private:
-
-	// Private Constants:
-private:
-
-	// Private Static Variables:
-private:
-
-	// Public Variables:
-public:
+struct Particle {
 	// The remaining "lifetime" of the particle.
 	//   Three "states":
 	//	   > 0.0f: Active (Currently in use)
 	//	   = 0.0f: Free (Can be allocated)
 	//	   < 0.0f: Dead (Cannot be allocated)
 	float lifetime{0};
+	inline bool IsActive() const {
+		return lifetime > std::numeric_limits<float>::epsilon();
+	}
+	inline bool IsDead() const {
+		return lifetime < std::numeric_limits<float>::epsilon();
+	}
+	inline bool IsFree() const {
+		return !IsActive() && !IsDead();
+	}
 
 	// The 3 "transform" values.
-	Vector2D position{};
-	Vector2D scale{};
+	glm::vec3 position{};
+	glm::vec3 scale{};
 	float rotationRad{0};
 
 	// Color values
-	Color color = Color::White;
-
-	// Private Variables:
-private:
+	glm::vec4 color{1.f, 1.f, 1.f, 1.f};
 };
 
 }	// namespace
