@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/vec3.hpp>
+#include <memory>
+#include <tuple>
 #include <utility>
 
 #include "Cloneable.h"
@@ -18,7 +20,7 @@ public:
 	EmitterCone(const EmitterCone& other);
 
 	// All objects need a virtual destructor to have their destructor called 
-	virtual ~EmitterCone(void) override = default;
+	inline virtual ~EmitterCone(void) override = default;
 
 	// Public Functions:
 
