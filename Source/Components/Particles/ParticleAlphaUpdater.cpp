@@ -6,7 +6,7 @@
 // Project:		Project 4
 // Purpose:		This component class is responsible for ...
 //
-// Copyright © 2025 DigiPen (USA) Corporation.
+// Copyright Â© 2025 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
@@ -29,60 +29,55 @@
 // Namespace Declarations:
 //------------------------------------------------------------------------------
 
-namespace CS529
-{
-	//--------------------------------------------------------------------------
-	// Public Constants:
-	//--------------------------------------------------------------------------
+namespace RassEngine::Components::Particles {
+//--------------------------------------------------------------------------
+// Public Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Public Static Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Static Variables:
+//--------------------------------------------------------------------------
 
-	const char* ParticleAlphaUpdater::NAME = "ParticleAlphaUpdater";
-	static const char* CURVE = "Curve";
+const char *ParticleAlphaUpdater::NAME = "ParticleAlphaUpdater";
+static const char *CURVE = "Curve";
 
-	//--------------------------------------------------------------------------
-	// Public Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Static Constants:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Static Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Constants:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Static Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Static Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Constructors/Destructors:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Constructors/Destructors:
+//--------------------------------------------------------------------------
 
 #pragma region Constructors
 
-	ParticleAlphaUpdater::ParticleAlphaUpdater(void)
-		: Component()
-	{
-	}
+ParticleAlphaUpdater::ParticleAlphaUpdater(void)
+	: Component() {}
 
-	ParticleAlphaUpdater::ParticleAlphaUpdater(const ParticleAlphaUpdater* other)
-		: Component(other), curve(other->curve)
-	{
-	}
+ParticleAlphaUpdater::ParticleAlphaUpdater(const ParticleAlphaUpdater *other)
+	: Component(other), curve(other->curve) {}
 
 #pragma endregion Constructors
 
-	//--------------------------------------------------------------------------
-	// Public Static Functions:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Static Functions:
+//--------------------------------------------------------------------------
 
 #pragma region Public Static Functions
 
@@ -94,47 +89,43 @@ namespace CS529
 
 #pragma region Public Functions
 
-	void ParticleAlphaUpdater::Update(float dt)
-	{
-		ParticleManager* manager = Utils::GetComponentSafe<ParticleManager>(Parent(), ParticleManager::NAME, NAME);
-		if (manager == nullptr)
-		{
-			return;
-		}
+void ParticleAlphaUpdater::Update(float dt) {
+	ParticleManager *manager = Utils::GetComponentSafe<ParticleManager>(Parent(), ParticleManager::NAME, NAME);
+	if(manager == nullptr) {
+		return;
+	}
 
-		// Adjust the alpha for each particle
-		manager->ForEachActiveParticle([this, dt](const ParticleManager::StartingStats& startingStats, Particle& particle) {
-			// Compute time
-			float scalar = 1.f - particle.lifetime / startingStats.lifetime;
-			scalar = curve.Calculate(scalar);
+	// Adjust the alpha for each particle
+	manager->ForEachActiveParticle([this, dt] (const ParticleManager::StartingStats &startingStats, Particle &particle) {
+		// Compute time
+		float scalar = 1.f - particle.lifetime / startingStats.lifetime;
+		scalar = curve.Calculate(scalar);
 
-			// Update the particle's alpha
-			particle.color.a = startingStats.color.a * scalar;
+		// Update the particle's alpha
+		particle.color.a = startingStats.color.a * scalar;
 		});
+}
+
+void ParticleAlphaUpdater::Read(Stream &stream) {
+	// Make sure stream is valid
+	if(!Utils::IsStreamVerified(stream, NAME, NAME)) {
+		return;
 	}
 
-	void ParticleAlphaUpdater::Read(Stream& stream)
-	{
-		// Make sure stream is valid
-		if (!Utils::IsStreamVerified(stream, NAME, NAME))
-		{
-			return;
-		}
+	// Read the node values
+	stream.PushNode(NAME);
 
-		// Read the node values
-		stream.PushNode(NAME);
+	// Read the curve attributes
+	curve.Read(stream);
 
-		// Read the curve attributes
-		curve.Read(stream);
-
-		stream.PopNode();
-	}
+	stream.PopNode();
+}
 
 #pragma endregion Public Functions
 
-	//--------------------------------------------------------------------------
-	// Private Functions:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Functions:
+//--------------------------------------------------------------------------
 
 #pragma region Private Functions
 

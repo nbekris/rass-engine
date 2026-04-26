@@ -6,7 +6,7 @@
 // Project:		Project X
 // Purpose:		This component class is responsible for emitting and managing particles.
 //
-// Copyright © 2025 DigiPen (USA) Corporation.
+// Copyright Â© 2025 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
@@ -31,95 +31,100 @@
 // Namespace Declarations:
 //------------------------------------------------------------------------------
 
-namespace CS529
-{
-	// Forward Declarations:
-	class Mesh;
-	class SpriteSource;
-	class Stream;
+// Forward Declarations:
+class Mesh;
+class SpriteSource;
+class Stream;
 
-	// Typedefs:
+namespace RassEngine::Components::Particles {
 
-	// Class Definition:
-	class ParticleEmitter : public Component
-	{
-		// Public Constants and Enums:
-	public:
+// Typedefs:
 
-		// Constructors/Destructors:
-	public:
-		ParticleEmitter(void);
+// Class Definition:
+class ParticleEmitter : public Component {
+	// Public Constants and Enums:
+public:
 
-		// @brief This copy-constructor should perform a shallow copy of the data.
-		ParticleEmitter(const ParticleEmitter* other);
+	// Constructors/Destructors:
+public:
+	ParticleEmitter(void);
 
-		virtual ~ParticleEmitter(void) override {};
+	// @brief This copy-constructor should perform a shallow copy of the data.
+	ParticleEmitter(const ParticleEmitter *other);
 
-		// Public Static Functions:
-	public:
+	virtual ~ParticleEmitter(void) override {};
 
-		// Public Functions:
-	public:
-		inline bool IsEmitting() const { return isEmitting; }
-		inline void IsEmitting(bool setToEmit) { isEmitting = setToEmit; }
+	// Public Static Functions:
+public:
 
-		// Public Event Handlers
-	public:
+	// Public Functions:
+public:
+	inline bool IsEmitting() const {
+		return isEmitting;
+	}
+	inline void IsEmitting(bool setToEmit) {
+		isEmitting = setToEmit;
+	}
 
-		// Private Functions:
-	private:
-		// @brief This function is required to invoke the copy-constructor in derived classes.
-		ParticleEmitter* Clone() const override { return new ParticleEmitter(this); }
+	// Public Event Handlers
+public:
 
-		// @brief Initialize the component.
-		// @brief [NOTE: Called when a new entity is initialized after creation.]
-		// @brief [NOTE: Many components won't require this step; others might.]  
-		//
-		// @return bool = true if initialization successful, otherwise false.
-		bool Initialize() override;
+	// Private Functions:
+private:
+	// @brief This function is required to invoke the copy-constructor in derived classes.
+	ParticleEmitter *Clone() const override {
+		return new ParticleEmitter(this);
+	}
 
-		// @brief Update the component each frame.
-		//
-		// @param dt = Delta time (in seconds) of the last frame.
-		void Update(float dt) override;
+	// @brief Initialize the component.
+	// @brief [NOTE: Called when a new entity is initialized after creation.]
+	// @brief [NOTE: Many components won't require this step; others might.]  
+	//
+	// @return bool = true if initialization successful, otherwise false.
+	bool Initialize() override;
 
-		// @brief Render the component each frame.
-		// @brief [NOTE: Modern engines handle rendering in a more complicated way.]
-		// @brief [NOTE: Some components are rendered only when debug drawing is enabled.]
-		void Render() const override {};
+	// @brief Update the component each frame.
+	//
+	// @param dt = Delta time (in seconds) of the last frame.
+	void Update(float dt) override;
 
-		// @brief Read the properties of a ParticleEmitter component from a stream.
-		// @brief Specific Steps:
-		// @brief   Check for valid stream (optional).
-		// @brief   Traverse down the tree to the "ParticleEmitter" object (PushNode).
-		// @brief   Read component-specific data here.
-		// @brief   Return to the original location in the tree (PopObject).
-		//
-		// @param stream = The data stream used for reading.
-		void Read(Stream& stream);
+	// @brief Render the component each frame.
+	// @brief [NOTE: Modern engines handle rendering in a more complicated way.]
+	// @brief [NOTE: Some components are rendered only when debug drawing is enabled.]
+	void Render() const override {};
 
-		void SetupParticle(ParticleManager::StartingStats* startingStats, Particle* particle);
+	// @brief Read the properties of a ParticleEmitter component from a stream.
+	// @brief Specific Steps:
+	// @brief   Check for valid stream (optional).
+	// @brief   Traverse down the tree to the "ParticleEmitter" object (PushNode).
+	// @brief   Read component-specific data here.
+	// @brief   Return to the original location in the tree (PopObject).
+	//
+	// @param stream = The data stream used for reading.
+	void Read(Stream &stream);
 
-		// Private Constants:
-	private:
+	void SetupParticle(ParticleManager::StartingStats *startingStats, Particle *particle);
 
-		// Private Static Variables:
-	private:
+	// Private Constants:
+private:
 
-		// Private Variables:
-	private:
-		// Tracks the number of particles to emit, including "partial" particles.
-		// This approach works with both large and fractional numbers.
-		float emitAccumulator{ 0.0f };
+	// Private Static Variables:
+private:
 
-		bool isEmitting{ true };
-		float emitRate{ 1.0f };
-		float lifetimeMin{ 1.0f };
-		float lifetimeMax{ 1.0f };
-		Vector2D scaleMin{ 1.0f, 1.0f };
-		Vector2D scaleMax{ 1.0f, 1.0f };
-		DGL_Color tintColor{ 1.0f, 1.0f, 1.0f, 1.0f };
-		Particles::EmitterShape* shape{ nullptr };
-	};
+	// Private Variables:
+private:
+	// Tracks the number of particles to emit, including "partial" particles.
+	// This approach works with both large and fractional numbers.
+	float emitAccumulator{0.0f};
+
+	bool isEmitting{true};
+	float emitRate{1.0f};
+	float lifetimeMin{1.0f};
+	float lifetimeMax{1.0f};
+	Vector2D scaleMin{1.0f, 1.0f};
+	Vector2D scaleMax{1.0f, 1.0f};
+	DGL_Color tintColor{1.0f, 1.0f, 1.0f, 1.0f};
+	Particles::EmitterShape *shape{nullptr};
+};
 
 }	// namespace
