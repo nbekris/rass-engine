@@ -1,33 +1,15 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	ParticleSystem.cpp
-// Author(s):	dschilling
-// Course:		CS529F25
-// Project:		Project 2
-// Purpose:		Template class for a new system.
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-
 #include "Precompiled.h"
-#include <cassert>
 
-#include "BehaviorCursor.h"		// This behavior is registered here for expediency.
-#include "ParticleEmitter.h"
+#include "Components/Particles/ParticleEmitter.h"	
 #include "ParticleSystem.h"
-#include "ObjectFactory.h"
-#include "System.h"
-#include "EmitterBox.h"
-#include "EmitterCone.h"
-#include "ParticleMover.h"
-#include "ParticleSizeUpdater.h"
-#include "ParticleAlphaUpdater.h"
-#include "ParticleManager.h"
+#include "Components/Particles/EmitterBox.h"
+#include "Components/Particles/EmitterCone.h"
+#include "Components/Particles/ParticleMover.h"
+#include "Components/Particles/ParticleSizeUpdater.h"
+#include "Components/Particles/ParticleAlphaUpdater.h"
+#include "Components/Particles/ParticleManager.h"
+#include "Systems/Component/IComponentFactory.h"
+#include "Utils.h"
 
 //------------------------------------------------------------------------------
 // External Declarations:
@@ -37,103 +19,47 @@
 // Namespace Declarations:
 //------------------------------------------------------------------------------
 
-namespace CS529
-{
-	//--------------------------------------------------------------------------
-	// Public Constants:
-	//--------------------------------------------------------------------------
+using namespace RassEngine::Components::Particles;
 
-	//--------------------------------------------------------------------------
-	// Public Static Variables:
-	//--------------------------------------------------------------------------
+namespace RassEngine::Systems {
 
-	//--------------------------------------------------------------------------
-	// Public Variables:
-	//--------------------------------------------------------------------------
+bool ParticleSystem::Initialize() {
+	// Add system-specific initialization code here.
 
-	//--------------------------------------------------------------------------
-	// Private Static Constants:
-	//--------------------------------------------------------------------------
+	// Register the "ParticleEmitter" and "BehaviorCursor" components.
+	IComponentFactory::Get()->Register(NAMEOF(ParticleEmitter), [] () -> Component * {
+		return new ParticleEmitter();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(ParticleMover), [] () -> Component * {
+		return new ParticleMover();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(ParticleSizeUpdater), [] () -> Component * {
+		return new ParticleSizeUpdater();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(ParticleAlphaUpdater), [] () -> Component * {
+		return new ParticleAlphaUpdater();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(ParticleManager), [] () -> Component * {
+		return new ParticleManager();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(EmitterBox), [] () -> Component * {
+		return new EmitterBox();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(EmitterCone), [] () -> Component * {
+		return new EmitterCone();
+	});
 
-	//------------------------------------------------------------------------------
-	// Private Static Variables:
-	//------------------------------------------------------------------------------
+	// Return true if the initialization completed successfully.
+	return true;
+}
 
-	ParticleSystem* ParticleSystem::instance = nullptr;
+const std::string_view &ParticleSystem::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Systems::ParticleSystem);
+	return className;
+}
 
-	//--------------------------------------------------------------------------
-	// Private Constants:
-	//--------------------------------------------------------------------------
-
-	//--------------------------------------------------------------------------
-	// Private Variables:
-	//--------------------------------------------------------------------------
-
-	//--------------------------------------------------------------------------
-	// Constructors/Destructors:
-	//--------------------------------------------------------------------------
-
-#pragma region Constructors
-
-	ParticleSystem::ParticleSystem(void)
-		: System("ParticleSystem")
-	{
-		// Raise an assert if this system has already been created.
-		assert(instance == nullptr);
-
-		// Store this system's instance for use by static functions.
-		instance = this;
-	}
-
-	//--------------------------------------------------------------------------
-
-	ParticleSystem::~ParticleSystem(void)
-	{
-	}
-
-#pragma endregion Constructors
-
-	//--------------------------------------------------------------------------
-	// Public Static Functions:
-	//--------------------------------------------------------------------------
-
-#pragma region Public Static Functions
-
-
-#pragma endregion Public Static Functions
-
-	//--------------------------------------------------------------------------
-	// Public Functions:
-	//--------------------------------------------------------------------------
-
-#pragma region Public Functions
-
-#pragma endregion Public Functions
-
-	//--------------------------------------------------------------------------
-	// Private Functions:
-	//--------------------------------------------------------------------------
-
-#pragma region Private Functions
-
-	bool ParticleSystem::Initialize()
-	{
-		// Add system-specific initialization code here.
-
-		// Register the "ParticleEmitter" and "BehaviorCursor" components.
-		ObjectFactory::GetInstance().Register("ParticleEmitter", []() { return new ParticleEmitter(); });
-		ObjectFactory::GetInstance().Register("BehaviorCursor", []() { return new BehaviorCursor(); });
-		ObjectFactory::GetInstance().Register(ParticleMover::NAME, []() { return new ParticleMover(); });
-		ObjectFactory::GetInstance().Register(ParticleSizeUpdater::NAME, []() { return new ParticleSizeUpdater(); });
-		ObjectFactory::GetInstance().Register(ParticleAlphaUpdater::NAME, []() { return new ParticleAlphaUpdater(); });
-		ObjectFactory::GetInstance().Register(ParticleManager::KEY, []() { return new ParticleManager(); });
-		ObjectFactory::GetInstance().Register(Particles::EmitterBox::KEY, []() { return new Particles::EmitterBox(); });
-		ObjectFactory::GetInstance().Register(Particles::EmitterCone::KEY, []() { return new Particles::EmitterCone(); });
-
-		// Return true if the initialization completed successfully.
-		return true;
-	}
-
-#pragma endregion Private Functions
+void ParticleSystem::Shutdown() {
+	// Do nothing
+}
 
 }	// namespace

@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../GlobalEvents/IGlobalEventsSystem.h"
+#include "Systems/GlobalEvents/IGlobalSystem.h"
 
 namespace RassEngine::Systems {
 
-	class IMemorySystem : public IGlobalSystem<IMemorySystem> {
+class IParticleSystem : public IGlobalSystem<IParticleSystem> {
+public:
+	virtual ~IParticleSystem() = 0;
+};
 
-		public:
-			virtual ~IMemorySystem() = default;
-
-			virtual size_t GetActiveAllocationCount() const = 0;
-			virtual size_t GetTotalBytesAllocated() const = 0;
-	};
 }
