@@ -30,25 +30,25 @@ bool ParticleSystem::Initialize() {
 	// Add system-specific initialization code here.
 
 	// Register the "ParticleEmitter" and "BehaviorCursor" components.
-	IComponentFactory::Get()->Register(NAMEOF(ParticleEmitter), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(ParticleEmitter)), [] () -> Component * {
 		return new ParticleEmitter();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(ParticleMover), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(ParticleMover)), [] () -> Component * {
 		return new ParticleMover();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(ParticleSizeUpdater), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(ParticleSizeUpdater)), [] () -> Component * {
 		return new ParticleSizeUpdater();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(ParticleAlphaUpdater), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(ParticleAlphaUpdater)), [] () -> Component * {
 		return new ParticleAlphaUpdater();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(ParticleManager), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(ParticleManager)), [] () -> Component * {
 		return new ParticleManager();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(EmitterBox), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(EmitterBox)), [] () -> Component * {
 		return new EmitterBox();
 	});
-	IComponentFactory::Get()->Register(NAMEOF(EmitterCone), [] () -> Component * {
+	IComponentFactory::Get()->Register(RemoveNamespace(NAMEOF(EmitterCone)), [] () -> Component * {
 		return new EmitterCone();
 	});
 
