@@ -26,6 +26,9 @@ public:
 	template<typename T>
 	static T range(T rangeMin, T rangeMax);
 
+	template<typename T>
+	static T angleRad();
+
 private:
 	inline static Random *get() {
 		static std::unique_ptr<Random> instance;
@@ -49,6 +52,11 @@ template<typename T>
 inline T Random::range(T rangeMin, T rangeMax) {
 	// Code taken from https://learn.microsoft.com/en-us/cpp/standard-library/random
 	return std::uniform_int_distribution<T>(rangeMin, rangeMax)(get()->generator);
+}
+
+template<typename T>
+inline T Random::angleRad() {
+	return range(static_cast<T>(0), (std::numbers::pi_v<T> * static_cast<T>(2)));
 }
 
 template<>

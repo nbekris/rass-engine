@@ -1,87 +1,46 @@
-//------------------------------------------------------------------------------
-//
-// File Name:	EmitterBox.h
-// Author(s):	taro.omiya
-// Course:		CS529F25
-// Project:		Project 7
-// Purpose:		Behavior pattern for particle emission from a box.
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
 #pragma once
 
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
+#include <glm/vec3.hpp>
+#include <memory>
+#include <tuple>
+#include <utility>
 
+#include "Component.h"
+#include "Components/Transform.h"
 #include "EmitterShape.h"
-
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+#include "Particle.h"
+#include "Stream.h"
 
 namespace RassEngine::Components::Particles {
-// Forward Declarations:
 
-// Typedefs:
-
-// Class Definition:
 class EmitterBox : public EmitterShape {
-	// Public Constants and Enums:
-public:
-	static const char *KEY;
-	static const char *NAME;
 
-	// Constructors/Destructors:
 public:
 	EmitterBox(void);
-	EmitterBox(const EmitterBox *other);
+	EmitterBox(const EmitterBox &other);
 
 	// All objects need a virtual destructor to have their destructor called 
-	virtual ~EmitterBox(void) override;
+	inline virtual ~EmitterBox(void) override = default;
 
-	// Public Static Functions:
-public:
-
-	// Public Functions:
-public:
 	// @brief Shallow-copies this instance to a new pointer
-	EmitterBox *Clone() const override {
-		return new EmitterBox(this);
+	inline virtual std::unique_ptr<Component> Clone() const override {
+		return std::make_unique<EmitterBox>(static_cast<EmitterBox const &>(*this));
 	}
 
 	// @brief Read the properties of a EmitterShape component from a stream.
 	//
 	// @param stream = The data stream used for reading.
-	void Read(CS529::Stream &stream) override;
+	bool Read(Stream &stream) override;
 
 	// @brief Selects a random location of emission
 	//
 	// @param transform = The center of emit-shape
-	std::tuple<Vector2D, float> GetEmitTransform(const Transform *transform) const override;
+	std::tuple<glm::vec3, float> GetEmitTransform(const Transform &transform) const override;
 
 	// @brief Selects a velocity for the particle
 	//
 	// @param transform = The center of emit-shape
-	std::tuple<Vector2D, float> GetInitVelocities(const Particle &particle) const;
-
-	// Public Event Handlers
-public:
-
-	// Private Functions:
-private:
-
-	// Private Constants:
-private:
-
-	// Private Static Variables:
-private:
+	std::tuple<glm::vec3, float> GetInitVelocities(const Particle &particle) const;
 
 	// Private Variables:
 private:

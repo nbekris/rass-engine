@@ -12,15 +12,14 @@
 #include "Stream.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Utils.h"
+#include "Graphics/Utils.h"
 
 namespace RassEngine::Components::Particles {
-static const char *KEY = NAMEOF(EmitterCone);
+
 static const char *KEY_START_ANGLE = "StartAngle";
 static const char *KEY_END_ANGLE = "EndAngle";
 static const char *KEY_MIN_RADIUS = "MinRadius";
 static const char *KEY_MAX_RADIUS = "MaxRadius";
-
-#pragma region Constructors
 
 EmitterCone::EmitterCone(void)
 	: EmitterShape() {}
@@ -30,13 +29,9 @@ EmitterCone::EmitterCone(const EmitterCone& other)
 	, startAngleDeg(other.startAngleDeg), endAngleDeg(other.endAngleDeg)
 	, minRadius(other.minRadius), maxRadius(other.maxRadius) {}
 
-//--------------------------------------------------------------------------
-
-EmitterCone::~EmitterCone(void) {}
-
 bool EmitterCone::Read(Stream &stream) {
 	// Read the node values
-	stream.PushNode(KEY);
+	stream.PushNode(NAMEOF(EmitterCone));
 
 	// Read the cone's range
 	stream.Read(KEY_START_ANGLE, startAngleDeg);
@@ -60,39 +55,26 @@ bool EmitterCone::Read(Stream &stream) {
 std::tuple<glm::vec3, float> EmitterCone::GetEmitTransform(const Transform &transform) const {
 	// Get a random rotation within a certain range
 	float returnRotation = transform.GetRotationRad();
-	returnRotation += Random::range((startAngleDeg * DEG_TO_RAD), (endAngleDeg * DEG_TO_RAD));
+	returnRotation += Random::range((startAngleDeg * Utils::DEG_TO_RAD), (endAngleDeg * Utils::DEG_TO_RAD));
 
 	// Get a random radius
 	float radius = Random::range(minRadius, maxRadius);
 
 	// Determin direction of offsetting the particle from the transform's position
-	glm::vec3 offsetDir;
-	offsetDir.FromAngleRad(returnRotation);
+	glm::vec3 offsetDir = Graphics::Utils::FromAngleRad(returnRotation);
 
 	// Convert above into a position
-	glm::vec3 returnPosition = transform.GetPosition();
-	returnPosition.ScaleAdd(radius, offsetDir);
+	glm::vec3 returnPosition = transform.GetPosition() + (offsetDir * radius);
 	return {returnPosition, returnRotation};
 }
 
 std::tuple<glm::vec3, float> EmitterCone::GetInitVelocities(const Particle &particle) const {
 	// Pick a random direction between 0 and 2*M_PI radians.
-	glm::vec3 returnVelocity;
-	returnVelocity.FromAngleRad(particle.rotationRad);
+	glm::vec3 returnVelocity = Graphics::Utils::FromAngleRad(particle.rotationRad);
 
 	// Calculate the particle's velocity by multiplying the direction by the speed.
 	returnVelocity *= GetRandomSpeed();
 	return {returnVelocity, 0.f};
 }
-
-#pragma endregion Public Functions
-
-//--------------------------------------------------------------------------
-// Private Functions:
-//--------------------------------------------------------------------------
-
-#pragma region Private Functions
-
-#pragma endregion Private Functions
 
 }	// namespace
