@@ -1,10 +1,9 @@
 #pragma once
 
+#include <cmath>
+#include <cstdlib>
 #include <glm/vec3.hpp>
-#include <concepts>
-#include <string>
-#include <string_view>
-#include <numbers>
+#include <limits>
 
 namespace RassEngine::Graphics {
 
