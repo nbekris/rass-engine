@@ -77,7 +77,7 @@ void Entity::AddComponent(std::unique_ptr<Component>&& component) {
 	borrowedPtr->Parent(this);
 
 	// Also add component to the cache
-	std::string className = RemoveNamespace(borrowedPtr->NameClass());
+	std::string className = Utils::RemoveNamespace(borrowedPtr->NameClass());
 	const auto cacheIter = nameToComponentCache.find(className);
 	if(cacheIter != nameToComponentCache.end()) {
 		cacheIter->second.emplace_back(borrowedPtr);
