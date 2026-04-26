@@ -6,7 +6,7 @@
 // Project:		Project 4
 // Purpose:		This component class is responsible for ...
 //
-// Copyright © 2025 DigiPen (USA) Corporation.
+// Copyright Â© 2025 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
@@ -29,59 +29,54 @@
 // Namespace Declarations:
 //------------------------------------------------------------------------------
 
-namespace CS529
-{
-	//--------------------------------------------------------------------------
-	// Public Constants:
-	//--------------------------------------------------------------------------
+namespace RassEngine::Components::Particles {
+//--------------------------------------------------------------------------
+// Public Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Public Static Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Static Variables:
+//--------------------------------------------------------------------------
 
-	const char* ParticleMover::NAME = "ParticleMover";
+const char *ParticleMover::NAME = "ParticleMover";
 
-	//--------------------------------------------------------------------------
-	// Public Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Static Constants:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Static Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Constants:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Constants:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Static Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Static Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Private Variables:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Variables:
+//--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	// Constructors/Destructors:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Constructors/Destructors:
+//--------------------------------------------------------------------------
 
 #pragma region Constructors
 
-	ParticleMover::ParticleMover(void)
-		: Component()
-	{
-	}
+ParticleMover::ParticleMover(void)
+	: Component() {}
 
-	ParticleMover::ParticleMover(const ParticleMover* other)
-		: Component(other)
-	{
-	}
+ParticleMover::ParticleMover(const ParticleMover *other)
+	: Component(other) {}
 
 #pragma endregion Constructors
 
-	//--------------------------------------------------------------------------
-	// Public Static Functions:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Public Static Functions:
+//--------------------------------------------------------------------------
 
 #pragma region Public Static Functions
 
@@ -93,43 +88,39 @@ namespace CS529
 
 #pragma region Public Functions
 
-	void ParticleMover::Update(float dt)
-	{
-		ParticleManager* manager = Utils::GetComponentSafe<ParticleManager>(Parent(), ParticleManager::NAME, NAME);
-		if (manager == nullptr)
-		{
-			return;
-		}
+void ParticleMover::Update(float dt) {
+	ParticleManager *manager = Utils::GetComponentSafe<ParticleManager>(Parent(), ParticleManager::NAME, NAME);
+	if(manager == nullptr) {
+		return;
+	}
 
-		// Adjust the transform for each particle
-		manager->ForEachActiveParticle([this, dt](const ParticleManager::StartingStats& startingStats, Particle& particle) {
-			// Update the position of the active particle.
-			particle.position.ScaleAdd(dt, startingStats.velocity);
+	// Adjust the transform for each particle
+	manager->ForEachActiveParticle([this, dt] (const ParticleManager::StartingStats &startingStats, Particle &particle) {
+		// Update the position of the active particle.
+		particle.position.ScaleAdd(dt, startingStats.velocity);
 
-			// Update the rotation of the active particle.
-			particle.rotationRad += dt * startingStats.angularVelocityRad;
+		// Update the rotation of the active particle.
+		particle.rotationRad += dt * startingStats.angularVelocityRad;
 		});
+}
+
+void ParticleMover::Read(Stream &stream) {
+	// Make sure stream is valid
+	if(!Utils::IsStreamVerified(stream, NAME, NAME)) {
+		return;
 	}
 
-	void ParticleMover::Read(Stream& stream)
-	{
-		// Make sure stream is valid
-		if (!Utils::IsStreamVerified(stream, NAME, NAME))
-		{
-			return;
-		}
+	// Read the node values
+	stream.PushNode(NAME);
 
-		// Read the node values
-		stream.PushNode(NAME);
-
-		stream.PopNode();
-	}
+	stream.PopNode();
+}
 
 #pragma endregion Public Functions
 
-	//--------------------------------------------------------------------------
-	// Private Functions:
-	//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// Private Functions:
+//--------------------------------------------------------------------------
 
 #pragma region Private Functions
 
