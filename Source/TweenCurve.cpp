@@ -1,6 +1,8 @@
 #include "Precompiled.h"
 
+#include <cmath>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
