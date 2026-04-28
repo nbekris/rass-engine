@@ -11,7 +11,7 @@
 #include "Stream.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Utils.h"
-#include "Graphics/Utils.h"
+#include "Graphics/Math.h"
 
 namespace RassEngine::Components::Particles {
 
@@ -68,7 +68,7 @@ std::tuple<glm::vec3, float> EmitterBox::GetEmitTransform(const Transform &trans
 std::tuple<glm::vec3, float> EmitterBox::GetInitVelocities(const Particle &particle) const {
 	// Pick a random direction between 0 and 2*M_PI radians.
 	// Calculate the particle's velocity by multiplying the direction by the speed.
-	glm::vec3 returnVelocity = Graphics::Utils::FromAngleRad(Random::angleRad<float>()) * GetRandomSpeed();
+	glm::vec3 returnVelocity = Graphics::Math::FromAngleRad(Random::angleRad<float>()) * GetRandomSpeed();
 
 	// Calculate a random turn velocity
 	float returnTurnVelocityDeg = Random::range(turnSpeedMinDeg, turnSpeedMaxDeg);

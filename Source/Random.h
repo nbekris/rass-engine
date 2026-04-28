@@ -9,6 +9,7 @@
 #pragma once
 
 #include <random>
+#include <numbers>
 
 namespace RassEngine {
 
@@ -56,7 +57,7 @@ inline T Random::range(T rangeMin, T rangeMax) {
 
 template<typename T>
 inline T Random::angleRad() {
-	return range(static_cast<T>(0), (std::numbers::pi_v<T> * static_cast<T>(2)));
+	return range(static_cast<T>(0), (std::numbers::pi_v<T> *static_cast<T>(2)));
 }
 
 template<>

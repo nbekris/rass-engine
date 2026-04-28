@@ -7,7 +7,7 @@
 
 namespace RassEngine::Graphics {
 
-struct Utils {
+struct Math {
 	static glm::vec3 FromAngleRad(float angleRad) {
 		return glm::vec3(std::cosf(angleRad), std::sinf(angleRad), 0);
 	}
