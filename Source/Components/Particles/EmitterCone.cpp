@@ -12,7 +12,7 @@
 #include "Stream.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Utils.h"
-#include "Graphics/Utils.h"
+#include "Graphics/Math.h"
 
 namespace RassEngine::Components::Particles {
 
@@ -61,7 +61,7 @@ std::tuple<glm::vec3, float> EmitterCone::GetEmitTransform(const Transform &tran
 	float radius = Random::range(minRadius, maxRadius);
 
 	// Determin direction of offsetting the particle from the transform's position
-	glm::vec3 offsetDir = Graphics::Utils::FromAngleRad(returnRotation);
+	glm::vec3 offsetDir = Graphics::Math::FromAngleRad(returnRotation);
 
 	// Convert above into a position
 	glm::vec3 returnPosition = transform.GetPosition() + (offsetDir * radius);
@@ -70,7 +70,7 @@ std::tuple<glm::vec3, float> EmitterCone::GetEmitTransform(const Transform &tran
 
 std::tuple<glm::vec3, float> EmitterCone::GetInitVelocities(const Particle &particle) const {
 	// Pick a random direction between 0 and 2*M_PI radians.
-	glm::vec3 returnVelocity = Graphics::Utils::FromAngleRad(particle.rotationRad);
+	glm::vec3 returnVelocity = Graphics::Math::FromAngleRad(particle.rotationRad);
 
 	// Calculate the particle's velocity by multiplying the direction by the speed.
 	returnVelocity *= GetRandomSpeed();
