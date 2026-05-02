@@ -30,6 +30,11 @@ EmitterCone::EmitterCone(const EmitterCone& other)
 	, minRadius(other.minRadius), maxRadius(other.maxRadius) {}
 
 bool EmitterCone::Read(Stream &stream) {
+	// Make sure stream is valid
+	if(!EmitterShape::Read(stream)) {
+		return false;
+	}
+
 	// Read the node values
 	stream.PushNode(NAMEOF(EmitterCone));
 
@@ -44,9 +49,6 @@ bool EmitterCone::Read(Stream &stream) {
 	stream.Read(KEY_MIN_RADIUS, minRadius);
 	stream.Read(KEY_MAX_RADIUS, maxRadius);
 	LOG_ASSERT((maxRadius - minRadius) > -std::numeric_limits<float>::epsilon(), "EmitterCone::Read: maxRadius is less than minRadius");
-
-	// Read the speed
-	EmitterShape::Read(stream);
 
 	stream.PopNode();
 	return true;

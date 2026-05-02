@@ -165,6 +165,8 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 }
 
 bool ParticleManager::Read(Stream &stream) {
+	Component::Read(stream);
+
 	// Traverse down the tree to the "ParticleEmitter" object (PushNode).
 	stream.PushNode(NAMEOF(ParticleManager));
 
