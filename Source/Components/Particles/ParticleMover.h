@@ -1,105 +1,54 @@
-//------------------------------------------------------------------------------
+// File Name:    ParticleMover.h
+// Author(s):    main Taro Omiya, secondary Steven Yacoub, Niko Bekris, Eric Fleegal
+// Course:       GAM541
+// Project:      RASS
+// Purpose:      File stream utilities for reading and writing data.
 //
-// File Name:	ParticleMover.h
-// Author(s):	japta
-// Course:		CS529F25
-// Project:		Project 4
-// Purpose:		This component class is responsible for ...
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
+// Copyright © 2026 DigiPen (USA) Corporation.
 
 #pragma once
 
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-
 #include "Component.h"
-#include "Particle.h"
+#include "Cloneable.h"
+#include "Events/GlobalEventArgs.h"
+#include "Events/GlobalEventListener.h"
+#include "IEvent.h"
 
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+// Forward Declarations:
+namespace RassEngine {
+class Stream;
+}
 
 namespace RassEngine::Components::Particles {
 // Forward Declarations:
-class Stream;
-
-// Typedefs:
+class ParticleManager;
 
 // Class Definition:
-class ParticleMover : public Component {
-	// Public Constants and Enums:
-public:
-	static const char *NAME;
-
-	// Constructors/Destructors:
+class ParticleMover : public Cloneable<Component, ParticleMover> {
 public:
 	ParticleMover(void);
 
 	// @brief This copy-constructor should perform a shallow copy of the data.
-	ParticleMover(const ParticleMover *other);
-
-	~ParticleMover(void) override {};
-
-	// Public Static Functions:
-public:
-
-	// Public Functions:
-public:
-	ParticleMover *Clone() const override {
-		return new ParticleMover(this);
-	}
+	ParticleMover(const ParticleMover &other);
+	virtual ~ParticleMover(void) override;
 
 	// @brief Initialize the component.
-	// @brief [NOTE: Called when a new entity is initialized after creation.]
-	// @brief [NOTE: Many components won't require this step; others might.]  
-	//
 	// @return bool = true if initialization successful, otherwise false.
-	bool Initialize() override {
-		return true;
-	};
+	bool Initialize() override;
 
-	// @brief Update the component each frame.
-	//
-	// @param dt = Delta time (in seconds) of the last frame.
-	void Update(float dt) override;
-
-	// @brief Render the component each frame.
-	// @brief [NOTE: Modern engines handle rendering in a more complicated way.]
-	// @brief [NOTE: Some components are rendered only when debug drawing is enabled.]
-	void Render() const override {};
+	// Inherited via Cloneable
+	const std::string_view &NameClass() const override;
 
 	// @brief Read the properties of a ParticleMover component from a stream.
-	// @brief Specific Steps:
-	// @brief   Check for valid stream (optional).
-	// @brief   Traverse down the tree to the "ParticleMover" object (PushNode).
-	// @brief   Read component-specific data here.
-	// @brief   Return to the original location in the tree (PopObject).
-	//
 	// @param stream = The data stream used for reading.
-	void Read(Stream &stream) override;
-
-	// Public Event Handlers
-public:
+	bool Read(Stream &stream) override;
 
 	// Private Functions:
 private:
+	bool Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
 
-	// Private Constants:
-private:
-
-	// Private Static Variables:
-private:
-
-	// Private Variables:
-private:
+	Events::GlobalEventListener<ParticleMover> updateListener;
+	ParticleManager *manager = nullptr;
 };
 
 }	// namespace
