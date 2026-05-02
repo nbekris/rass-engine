@@ -30,79 +30,10 @@
     <ClInclude Include="**\*.h" />
     <ClInclude Include="**\*.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Components\Animation.cpp" />
-    <ClCompile Include="Components\AudioSource.cpp" />
-    <ClCompile Include="Components\Behaviors\BulletBehavior.cpp" />
-    <ClCompile Include="Components\Behaviors\EnemyBehavior.cpp" />
-    <ClCompile Include="Components\Behaviors\SinRotate.cpp" />
-    <ClCompile Include="Components\Behaviors\SinScale.cpp" />
-    <ClCompile Include="Components\Behaviors\SinTranslate.cpp" />
-    <ClCompile Include="Components\Camera.cpp" />
-    <ClCompile Include="Components\Collider.cpp" />
-    <ClCompile Include="Components\DebugDrawer.cpp" />
-    <ClCompile Include="Components\HealthComponent.cpp" />
-    <ClCompile Include="Components\Movement.cpp" />
-    <ClCompile Include="Components\MusicFader.cpp" />
-    <ClCompile Include="Components\Particles\EmitterBox.cpp" />
-    <ClCompile Include="Components\Particles\EmitterCone.cpp" />
-    <ClCompile Include="Components\Particles\EmitterShape.cpp" />
-    <ClCompile Include="Components\Particles\ParticleAlphaUpdater.cpp" />
-    <ClCompile Include="Components\Particles\ParticleEmitter.cpp" />
-    <ClCompile Include="Components\Particles\ParticleManager.cpp" />
-    <ClCompile Include="Components\Particles\ParticleMover.cpp" />
-    <ClCompile Include="Components\Particles\ParticleSizeUpdater.cpp" />
-    <ClCompile Include="Components\PhysicsBody.cpp" />
-    <ClCompile Include="Components\ShootingController.cpp" />
-    <ClCompile Include="Components\Sprite.cpp" />
-    <ClCompile Include="Components\TileMap.cpp" />
-    <ClCompile Include="Components\Transform.cpp" />
-    <ClCompile Include="Components\Trigger.cpp" />
-    <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityContainer.cpp" />
-    <ClCompile Include="Events\EntityEventID.cpp" />
-    <ClCompile Include="Events\FixedUpdate.cpp" />
-    <ClCompile Include="Events\Global.cpp" />
-    <ClCompile Include="Events\GlobalEventID.cpp" />
-    <ClCompile Include="Events\Render.cpp" />
-    <ClCompile Include="Events\SceneChange.cpp" />
-    <ClCompile Include="Events\TriggerEventIDs.cpp" />
-    <ClCompile Include="Events\Update.cpp" />
-    <ClCompile Include="Graphics\Mesh.cpp" />
-    <ClCompile Include="Graphics\Shader.cpp" />
-    <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="MemoryPool.cpp" />
-    <ClCompile Include="Random.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Scenes\DebugScene.cpp" />
-    <ClCompile Include="Scenes\DemoScene.cpp" />
-    <ClCompile Include="Scenes\SerializedScene.cpp" />
-    <ClCompile Include="Stream.cpp" />
-    <ClCompile Include="Systems\Audio\AudioSystem.cpp" />
-    <ClCompile Include="Systems\Camera\CameraSystem.cpp" />
-    <ClCompile Include="Systems\Cheat\CheatSystem.cpp" />
-    <ClCompile Include="Systems\Component\ComponentFactory.cpp" />
-    <ClCompile Include="Systems\DebugDraw\DebugDrawSystem.cpp" />
-    <ClCompile Include="Systems\Entity\EntityFactory.cpp" />
-    <ClCompile Include="Systems\GlobalEvents\GlobalEventsSystem.cpp" />
-    <ClCompile Include="Systems\ImGui\ImGuiSystem.cpp" />
-    <ClCompile Include="Systems\Input\InputSystemGlfw.cpp" />
-    <ClCompile Include="Systems\Logging\LoggingSystem.cpp" />
-    <ClCompile Include="Systems\Manager\SystemsManager.cpp" />
-    <ClCompile Include="Systems\Manager\SystemsManagerBuilder.cpp" />
-    <ClCompile Include="Systems\Memory\MemorySystem.cpp" />
-    <ClCompile Include="Systems\Particle\ParticleSystem.cpp" />
-    <ClCompile Include="Systems\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="Systems\Render\RenderSystemOpenGl.cpp" />
-    <ClCompile Include="Systems\Resource\ResourceSystem.cpp" />
-    <ClCompile Include="Systems\Scene\SceneSystem.cpp" />
-    <ClCompile Include="Systems\Time\TimeSystem.cpp" />
-    <ClCompile Include="TileMapData.cpp" />
-    <ClCompile Include="TileSet.cpp" />
-    <ClCompile Include="TweenCurve.cpp" />
-    <ClCompile Include="UUID.cpp" />
-  </ItemGroup>
+  
+  	<ItemGroup>
+		<ClCompile Include="**\*.cpp" Exclude="Precompiled.cpp;Main.cpp"/>
+	</ItemGroup>
+	
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
