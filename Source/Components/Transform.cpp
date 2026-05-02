@@ -12,6 +12,7 @@
 #include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Graphics/Math.h"
 #include "Cloneable.h"
 #include "Component.h"
 #include "Stream.h"
@@ -117,10 +118,7 @@ glm::mat4 Transform::getTransformMatrix() const {
 	static const glm::vec3 ROTATE_AXIS{0.0f, 0.0f, 1.0f};
 	if(isDirty) {
 		// calculate local matrix
-		worldMatrix = glm::mat4(1.0f);
-		worldMatrix = glm::translate(worldMatrix, localPosition);
-		worldMatrix = glm::rotate(worldMatrix, localRotationRad, ROTATE_AXIS);
-		worldMatrix = glm::scale(worldMatrix, localScale);
+		worldMatrix = Graphics::Math::GetTransformMatrix(localPosition, localRotationRad, localScale);
 
 		// Calculate global scale
 		lossyGlobalScale = localScale;

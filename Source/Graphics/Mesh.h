@@ -15,6 +15,7 @@ public:
 	Mesh();
 	~Mesh();
 	using SpriteIDCalculator = std::function<int(int row, int col)>;
+	void BuildCustom(const std::string_view &filename);
 	void BuildQuad();
 	void BuildTextGrid(int maxCharacters, float charWidth = 1.0f, float charHeight = 1.0f);
 	void BuildStaticGrid(

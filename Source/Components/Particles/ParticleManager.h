@@ -6,8 +6,11 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include "Events/GlobalEventArgs.h"
+#include "Events/GlobalEventListener.h"
 #include "Component.h"
 #include "Cloneable.h"
+#include "IEvent.h"
 #include "Particle.h"
 
 // Forward Declarations:
@@ -17,10 +20,7 @@ class Stream;
 
 namespace RassEngine::Graphics {
 class Mesh;
-}
-
-namespace RassEngine::Components {
-class Sprite;
+class Texture;
 }
 
 namespace RassEngine::Components::Particles {
@@ -48,7 +48,7 @@ public:
 
 	// @brief This copy-constructor should perform a shallow copy of the data.
 	ParticleManager(const ParticleManager &other);
-	inline virtual ~ParticleManager(void) override = default;
+	virtual ~ParticleManager(void) override;
 
 	// @brief Initialize the component.
 	// @brief [NOTE: Called when a new entity is initialized after creation.]
@@ -94,6 +94,9 @@ public:
 	// Private Functions:
 private:
 
+	bool Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
+	bool Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
+
 	// Kill an active particle.
 	// [NOTE: When areRecyclable is true, particles become "Free", instead of "Dead".]
 	void KillParticle(unsigned particleIndex);
@@ -118,9 +121,10 @@ private:
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
 
-	const RassEngine::Graphics::Mesh *mesh{nullptr};
-
-	const RassEngine::Components::Sprite *spriteSource{nullptr};
+	Graphics::Mesh *mesh{nullptr};
+	Graphics::Texture *spriteSource{nullptr};
+	Events::GlobalEventListener<ParticleManager> updateListener;
+	Events::GlobalEventListener<ParticleManager> renderListener;
 };
 
 }	// namespace
