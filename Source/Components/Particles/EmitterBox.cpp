@@ -33,6 +33,11 @@ EmitterBox::EmitterBox(const EmitterBox &other)
 	, turnSpeedMaxDeg(other.turnSpeedMaxDeg) {}
 
 bool EmitterBox::Read(Stream &stream) {
+	// Make sure stream is valid
+	if(!EmitterShape::Read(stream)) {
+		return false;
+	}
+
 	// Read the node values
 	stream.PushNode(NAMEOF(EmitterBox));
 
@@ -46,7 +51,6 @@ bool EmitterBox::Read(Stream &stream) {
 	stream.Read(KEY_RANDOMIZE_ROTATION, isRotationRandom);
 
 	// Read the velocities
-	EmitterShape::Read(stream);
 	stream.Read(TURN_SPEED_MIN, turnSpeedMinDeg);
 	stream.Read(TURN_SPEED_MAX, turnSpeedMaxDeg);
 

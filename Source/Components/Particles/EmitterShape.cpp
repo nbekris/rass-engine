@@ -19,6 +19,11 @@ EmitterShape::EmitterShape(const EmitterShape &other)
 	, speedMax(other.speedMax) {}
 
 bool EmitterShape::Read(Stream &stream) {
+	// Make sure stream is valid
+	if(!Component::Read(stream)) {
+		return false;
+	}
+
 	stream.Read(SPEED_MIN, speedMin);
 	stream.Read(SPEED_MAX, speedMax);
 	return true;
