@@ -1,3 +1,11 @@
+// File Name:    ParticleManager.h
+// Author(s):    main Taro Omiya, secondary Steven Yacoub, Niko Bekris, Eric Fleegal
+// Course:       GAM541
+// Project:      RASS
+// Purpose:      File stream utilities for reading and writing data.
+//
+// Copyright © 2026 DigiPen (USA) Corporation.
+
 #pragma once
 
 #include <functional>
@@ -6,10 +14,10 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "Events/GlobalEventArgs.h"
-#include "Events/GlobalEventListener.h"
 #include "Component.h"
 #include "Cloneable.h"
+#include "Events/GlobalEventArgs.h"
+#include "Events/GlobalEventListener.h"
 #include "IEvent.h"
 #include "Particle.h"
 
@@ -51,9 +59,6 @@ public:
 	virtual ~ParticleManager(void) override;
 
 	// @brief Initialize the component.
-	// @brief [NOTE: Called when a new entity is initialized after creation.]
-	// @brief [NOTE: Many components won't require this step; others might.]  
-	//
 	// @return bool = true if initialization successful, otherwise false.
 	bool Initialize() override;
 
@@ -61,14 +66,8 @@ public:
 	const std::string_view &NameClass() const override;
 
 	// @brief Read the properties of a ParticleManager component from a stream.
-	// @brief Specific Steps:
-	// @brief   Check for valid stream (optional).
-	// @brief   Traverse down the tree to the "ParticleManager" object (PushNode).
-	// @brief   Read component-specific data here.
-	// @brief   Return to the original location in the tree (PopObject).
-	//
 	// @param stream = The data stream used for reading.
-	bool Read(Stream &stream) override;
+	bool Read(Stream& stream) override;
 
 	// Return true if particleActive == 0.
 	inline bool IsEmpty() const {
@@ -122,7 +121,7 @@ private:
 	bool areRecyclable{false};
 
 	Graphics::Mesh *mesh{nullptr};
-	Graphics::Texture *spriteSource{nullptr};
+	Graphics::Texture *texture{nullptr};
 	Events::GlobalEventListener<ParticleManager> updateListener;
 	Events::GlobalEventListener<ParticleManager> renderListener;
 };

@@ -1,3 +1,11 @@
+// File Name:    ParticleManager.cpp
+// Author(s):    main Taro Omiya, secondary Steven Yacoub, Niko Bekris, Eric Fleegal
+// Course:       GAM541
+// Project:      RASS
+// Purpose:      File stream utilities for reading and writing data.
+//
+// Copyright © 2026 DigiPen (USA) Corporation.
+
 #include "Precompiled.h"
 #include "ParticleManager.h"
 
@@ -21,15 +29,15 @@ using namespace RassEngine::Graphics;
 
 namespace RassEngine::Components::Particles {
 
-//const char *ParticleManager::KEY = "Particles";
-//const char *ParticleManager::NAME = "ParticleManager";
 static const char *PARTICLE_MAX = "ParticleMax";
 static const char *IS_LOOPING = "IsLooping";
+static const char *MESH = "Mesh";
+static const char *TEXTURE = "Texture";
 
 ParticleManager::ParticleManager(void)
 	: Cloneable<Component, ParticleManager>()
-	, updateListener{this, ParticleManager::Update}
-	, renderListener{this, ParticleManager::Render}
+	, updateListener{this, &ParticleManager::Update}
+	, renderListener{this, &ParticleManager::Render}
 {}
 
 ParticleManager::ParticleManager(const ParticleManager &other)
@@ -37,9 +45,9 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 	, maxParticles{other.maxParticles}
 	, areRecyclable{other.areRecyclable}
 	, mesh{other.mesh}
-	, spriteSource{other.spriteSource}
-	, updateListener{this, ParticleManager::Update}
-	, renderListener{this, ParticleManager::Render}
+	, texture{other.texture}
+	, updateListener{this, &ParticleManager::Update}
+	, renderListener{this, &ParticleManager::Render}
 {}
 
 ParticleManager::~ParticleManager() {
@@ -139,7 +147,7 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 
 		IRenderSystem::Renderable particle;
 		particle.mesh = mesh;
-		particle.texture = spriteSource;
+		particle.texture = texture;
 
 		// Pass the alpha value (1.0f) to the DGL.
 		particle.alpha = data.current.color.a;
@@ -165,19 +173,20 @@ bool ParticleManager::Read(Stream &stream) {
 
 	// Read the name of the mesh.
 	std::string fileName;
-	if(stream.Read("Mesh", fileName)) {
+	if(stream.Read(MESH, fileName)) {
 		// Build the requested mesh.
 		mesh = IResourceSystem::Get()->GetCustomMesh(fileName);
 	}
 
 	// Read the name of the sprite.
-	if(stream.Read("SpriteSource", fileName)) {
+	if(stream.Read(TEXTURE, fileName)) {
 		// Build the requested sprite.
-		spriteSource = IResourceSystem::Get()->GetTexture(fileName);
+		texture = IResourceSystem::Get()->GetTexture(fileName);
 	}
 
 	// Return to the original location in the tree.
 	stream.PopNode();
+	return true;
 }
 
 std::tuple<ParticleManager::StartingStats *, Particle *> ParticleManager::AllocateParticle() {
