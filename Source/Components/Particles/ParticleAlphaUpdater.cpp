@@ -1,124 +1,106 @@
-//------------------------------------------------------------------------------
+// File Name:    ParticleAlphaUpdater.cpp
+// Author(s):    main Taro Omiya, secondary Steven Yacoub, Niko Bekris, Eric Fleegal
+// Course:       GAM541
+// Project:      RASS
+// Purpose:      File stream utilities for reading and writing data.
 //
-// File Name:	ParticleAlphaUpdater.cpp
-// Author(s):	japta
-// Course:		CS529F25
-// Project:		Project 4
-// Purpose:		This component class is responsible for ...
-//
-// Copyright © 2025 DigiPen (USA) Corporation.
-//
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
+// Copyright © 2026 DigiPen (USA) Corporation.
 
 #include "Precompiled.h"
 #include "ParticleAlphaUpdater.h"
+
 #include "Component.h"
-#include "Utils.h"
-#include "Stream.h"
+#include "Entity.h"
+#include "Events/Global.h"
 #include "ParticleManager.h"
+#include "Stream.h"
+#include "Systems/GlobalEvents/IGlobalEventsSystem.h"
+#include "Systems/Logging/ILoggingSystem.h"
+#include "Systems/Time/ITimeSystem.h"
+#include "Utils.h"
 
-//------------------------------------------------------------------------------
-// External Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Namespace Declarations:
-//------------------------------------------------------------------------------
+using namespace RassEngine::Systems;
+using namespace RassEngine::Events;
+using namespace RassEngine::Graphics;
 
 namespace RassEngine::Components::Particles {
-//--------------------------------------------------------------------------
-// Public Constants:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Public Static Variables:
-//--------------------------------------------------------------------------
-
-const char *ParticleAlphaUpdater::NAME = "ParticleAlphaUpdater";
-static const char *CURVE = "Curve";
-
-//--------------------------------------------------------------------------
-// Public Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Static Constants:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Constants:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Static Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Private Variables:
-//--------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------
-// Constructors/Destructors:
-//--------------------------------------------------------------------------
 
 #pragma region Constructors
 
 ParticleAlphaUpdater::ParticleAlphaUpdater(void)
-	: Component() {}
+	: Cloneable<Component, ParticleAlphaUpdater>()
+	, updateListener{this, &ParticleAlphaUpdater::Update}
+{}
 
-ParticleAlphaUpdater::ParticleAlphaUpdater(const ParticleAlphaUpdater *other)
-	: Component(other), curve(other->curve) {}
+ParticleAlphaUpdater::ParticleAlphaUpdater(const ParticleAlphaUpdater &other)
+	: Cloneable<Component, ParticleAlphaUpdater>(other)
+	, updateListener{this, &ParticleAlphaUpdater::Update}
+{}
+
+ParticleAlphaUpdater::~ParticleAlphaUpdater(void) {
+	if(IGlobalEventsSystem::Get() == nullptr) {
+		return;
+	}
+
+	// Unbind from the event
+	IGlobalEventsSystem::Get()->unbind(Global::Update, &updateListener);
+}
 
 #pragma endregion Constructors
 
 //--------------------------------------------------------------------------
-// Public Static Functions:
+// Public Functions:
 //--------------------------------------------------------------------------
-
-#pragma region Public Static Functions
-
-#pragma endregion Public Static Functions
-
-	//--------------------------------------------------------------------------
-	// Public Functions:
-	//--------------------------------------------------------------------------
 
 #pragma region Public Functions
 
-void ParticleAlphaUpdater::Update(float dt) {
-	ParticleManager *manager = Utils::GetComponentSafe<ParticleManager>(Parent(), ParticleManager::NAME, NAME);
-	if(manager == nullptr) {
-		return;
+bool ParticleAlphaUpdater::Initialize() {
+	// Retrieve the particle manager
+	if(Parent() == nullptr) {
+		LOG_ERROR("Cannot adjust particle opacities: {} is not attached to an {}", NameClass(), NAMEOF(Entity));
+		return false;
 	}
 
-	// Adjust the alpha for each particle
-	manager->ForEachActiveParticle([this, dt] (const ParticleManager::StartingStats &startingStats, Particle &particle) {
-		// Compute time
-		float scalar = 1.f - particle.lifetime / startingStats.lifetime;
-		scalar = curve.Calculate(scalar);
+	manager = Parent()->Get<ParticleManager>();
+	if(manager == nullptr) {
+		LOG_ERROR("Cannot adjust particle opacities: {} is not attached to an {}", NAMEOF(ParticleManager), NAMEOF(Entity));
+		return false;
+	}
 
-		// Update the particle's alpha
-		particle.color.a = startingStats.color.a * scalar;
-		});
+	// Make sure all systems are available
+	if(IGlobalEventsSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot adjust particle opacities: {} is not registered", NAMEOF(Systems::IGlobalEventsSystem));
+		return false;
+	}
+	if(ITimeSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot adjust particle opacities: {} is not registered", NAMEOF(Systems::ITimeSystem));
+		return false;
+	}
+
+	// Bind to events
+	IGlobalEventsSystem::Get()->bind(Global::Update, &updateListener);
+	return true;
 }
 
-void ParticleAlphaUpdater::Read(Stream &stream) {
+const std::string_view &ParticleAlphaUpdater::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Components::Particles::ParticleAlphaUpdater);
+	return className;
+}
+
+bool ParticleAlphaUpdater::Read(Stream &stream) {
 	// Make sure stream is valid
-	if(!Utils::IsStreamVerified(stream, NAME, NAME)) {
-		return;
+	if(!Component::Read(stream)) {
+		return false;
 	}
 
 	// Read the node values
-	stream.PushNode(NAME);
+	stream.PushNode(NAMEOF(ParticleAlphaUpdater));
 
 	// Read the curve attributes
 	curve.Read(stream);
 
 	stream.PopNode();
+	return true;
 }
 
 #pragma endregion Public Functions
@@ -128,6 +110,21 @@ void ParticleAlphaUpdater::Read(Stream &stream) {
 //--------------------------------------------------------------------------
 
 #pragma region Private Functions
+
+bool ParticleAlphaUpdater::Update(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
+	float dt = ITimeSystem::Get()->GetDeltaTimeSec();
+
+	// Adjust the alpha for each particle
+	manager->ForEachActiveParticle([this, dt] (const ParticleManager::StartingStats &startingStats, Particle &particle) {
+		// Compute time
+		float scalar = 1.f - particle.lifetime / startingStats.lifetime;
+		scalar = curve.Calculate(scalar);
+
+		// Update the particle's alpha
+		particle.color.a = startingStats.color.a * scalar;
+	});
+	return true;
+}
 
 #pragma endregion Private Functions
 
