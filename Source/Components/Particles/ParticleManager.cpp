@@ -81,10 +81,6 @@ bool ParticleManager::Initialize() {
 		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::ITimeSystem));
 		return false;
 	}
-	if(IResourceSystem::Get() == nullptr) {
-		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
-		return false;
-	}
 	if(IRenderSystem::Get() == nullptr) {
 		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IRenderSystem));
 		return false;
@@ -165,7 +161,9 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 }
 
 bool ParticleManager::Read(Stream &stream) {
-	Component::Read(stream);
+	if(!Component::Read(stream)) {
+		return false;
+	}
 
 	// Traverse down the tree to the "ParticleEmitter" object (PushNode).
 	stream.PushNode(NAMEOF(ParticleManager));
@@ -176,12 +174,22 @@ bool ParticleManager::Read(Stream &stream) {
 	// Read the name of the mesh.
 	std::string fileName;
 	if(stream.Read(MESH, fileName)) {
+		if(IResourceSystem::Get() == nullptr) {
+			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+			return false;
+		}
+
 		// Build the requested mesh.
 		mesh = IResourceSystem::Get()->GetCustomMesh(fileName);
 	}
 
 	// Read the name of the sprite.
 	if(stream.Read(TEXTURE, fileName)) {
+		if(IResourceSystem::Get() == nullptr) {
+			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+			return false;
+		}
+
 		// Build the requested sprite.
 		texture = IResourceSystem::Get()->GetTexture(fileName);
 	}
