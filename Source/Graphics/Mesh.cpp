@@ -22,6 +22,10 @@ Mesh::~Mesh() {
 	Cleanup();
 }
 
+void Mesh::BuildCustom(const std::string_view &filename) {
+	throw "Not Implemented";
+}
+
 void Mesh::BuildQuad() {
 	// Define vertices for a quad (two triangles)
 	float vertices[] = {

@@ -3,13 +3,21 @@
 
 #include "Component.h"
 #include "Entity.h"
+#include "Events/Global.h"
 #include "Stream.h"
 #include "Utils.h"
-//#include "MeshLibrary.h"
-//#include "SpriteSourceLibrary.h"
 #include "Graphics/Mesh.h"
-#include "Components/Sprite.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Math.h"
+#include "Systems/GlobalEvents/IGlobalEventsSystem.h"
+#include "Systems/Resource/IResourceSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
+#include "Systems/Render/IRenderSystem.h"
+#include "Systems/Time/ITimeSystem.h"
+
+using namespace RassEngine::Systems;
+using namespace RassEngine::Events;
+using namespace RassEngine::Graphics;
 
 namespace RassEngine::Components::Particles {
 
@@ -19,14 +27,29 @@ static const char *PARTICLE_MAX = "ParticleMax";
 static const char *IS_LOOPING = "IsLooping";
 
 ParticleManager::ParticleManager(void)
-	: Cloneable<Component, ParticleManager>() {}
+	: Cloneable<Component, ParticleManager>()
+	, updateListener{this, ParticleManager::Update}
+	, renderListener{this, ParticleManager::Render}
+{}
 
 ParticleManager::ParticleManager(const ParticleManager &other)
-	: Cloneable<Component, ParticleManager>(other)
-	, maxParticles(other.maxParticles)
-	, areRecyclable(other.areRecyclable)
-	, mesh(other.mesh)
-	, spriteSource(other.spriteSource) {}
+	: Cloneable<Component, ParticleManager>{other}
+	, maxParticles{other.maxParticles}
+	, areRecyclable{other.areRecyclable}
+	, mesh{other.mesh}
+	, spriteSource{other.spriteSource}
+	, updateListener{this, ParticleManager::Update}
+	, renderListener{this, ParticleManager::Render}
+{}
+
+ParticleManager::~ParticleManager() {
+	if(IGlobalEventsSystem::Get() == nullptr) {
+		return;
+	}
+
+	IGlobalEventsSystem::Get()->unbind(Global::Update, &updateListener);
+	IGlobalEventsSystem::Get()->unbind(Global::Render, &renderListener);
+}
 
 bool ParticleManager::Initialize() {
 	// Reset everything
@@ -40,13 +63,36 @@ bool ParticleManager::Initialize() {
 	while(particles.size() < particleFree) {
 		particles.emplace_back();
 	}
+
+	// Make sure all systems are available
+	if(IGlobalEventsSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IGlobalEventsSystem));
+		return false;
+	}
+	if(ITimeSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::ITimeSystem));
+		return false;
+	}
+	if(IResourceSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+		return false;
+	}
+	if(IRenderSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IRenderSystem));
+		return false;
+	}
+
+	// Bind to events
+	IGlobalEventsSystem::Get()->bind(Global::Update, &updateListener);
+	IGlobalEventsSystem::Get()->bind(Global::Render, &renderListener);
 	return true;
 }
 
-void ParticleManager::Update(float dt) {
+bool ParticleManager::Update(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
 	//----------------------------------------------------------------------------
 	// Update all existing particles.
 	//----------------------------------------------------------------------------
+	float dt = ITimeSystem::Get()->GetDeltaTimeSec();
 
 	// For each active particle
 	unsigned i = 0;
@@ -79,22 +125,10 @@ void ParticleManager::Update(float dt) {
 			parent->Destroy();
 		}
 	}
+	return true;
 }
 
-void ParticleManager::Render() const {
-	// Check if sprite is valid
-	if(spriteSource != nullptr) {
-		// Set shader to texture mode
-		DGL_Graphics_SetShaderMode(DGL_PixelShaderMode::DGL_PSM_TEXTURE, DGL_VertexShaderMode::DGL_VSM_DEFAULT);
-
-		// Load the sprite
-		spriteSource->SetTextureOffset(0);
-		spriteSource->UseTexture();
-	} else {
-		// Set shader to color mode
-		DGL_Graphics_SetShaderMode(DGL_PixelShaderMode::DGL_PSM_COLOR, DGL_VertexShaderMode::DGL_VSM_DEFAULT);
-	}
-
+bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
 	// Render each active particle.
 	for(const ParticleData &data : particles) {
 		// Check for an active particle
@@ -103,18 +137,23 @@ void ParticleManager::Render() const {
 			break;
 		}
 
+		IRenderSystem::Renderable particle;
+		particle.mesh = mesh;
+		particle.texture = spriteSource;
+
 		// Pass the alpha value (1.0f) to the DGL.
-		DGL_Graphics_SetCB_Alpha(data.current.color.a);
+		particle.alpha = data.current.color.a;
 
 		// Pass the tint color to the DGL.
-		DGL_Graphics_SetCB_TintColor(&data.current.color);
+		particle.color = glm::vec3(data.current.color.r, data.current.color.g, data.current.color.b);
 
 		// Send the transform data to the DGL.
-		DGL_Graphics_SetCB_TransformData(&data.current.position, &data.current.scale, data.current.rotationRad);
+		particle.modelMatrix = Graphics::Math::GetTransformMatrix(data.current.position, data.current.rotationRad, data.current.scale);
 
 		// Render the mesh associated with the emitter.
-		mesh->Render();
+		IRenderSystem::Get()->SubmitRenderable(particle);
 	}
+	return true;
 }
 
 bool ParticleManager::Read(Stream &stream) {
@@ -128,13 +167,13 @@ bool ParticleManager::Read(Stream &stream) {
 	std::string fileName;
 	if(stream.Read("Mesh", fileName)) {
 		// Build the requested mesh.
-		mesh = MeshLibrary::Build(fileName);
+		mesh = IResourceSystem::Get()->GetCustomMesh(fileName);
 	}
 
 	// Read the name of the sprite.
 	if(stream.Read("SpriteSource", fileName)) {
 		// Build the requested sprite.
-		spriteSource = SpriteSourceLibrary::Build(fileName);
+		spriteSource = IResourceSystem::Get()->GetTexture(fileName);
 	}
 
 	// Return to the original location in the tree.
