@@ -9,9 +9,15 @@
 #include "Precompiled.h"
 #include "ParticleAlphaUpdater.h"
 
+#include <string_view>
+
+#include "Cloneable.h"
 #include "Component.h"
 #include "Entity.h"
 #include "Events/Global.h"
+#include "Events/GlobalEventArgs.h"
+#include "IEvent.h"
+#include "Particle.h"
 #include "ParticleManager.h"
 #include "Stream.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"

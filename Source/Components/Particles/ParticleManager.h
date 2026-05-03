@@ -9,13 +9,14 @@
 #pragma once
 
 #include <functional>
-#include <vector>
-#include <tuple>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <string_view>
+#include <utility>
+#include <vector>
 
-#include "Component.h"
 #include "Cloneable.h"
+#include "Component.h"
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
 #include "IEvent.h"

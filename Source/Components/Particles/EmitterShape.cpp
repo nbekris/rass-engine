@@ -1,3 +1,11 @@
+// File Name:    EmitterShape.cpp
+// Author(s):    main Taro Omiya, secondary Steven Yacoub, Niko Bekris, Eric Fleegal
+// Course:       GAM541
+// Project:      RASS
+// Purpose:      File stream utilities for reading and writing data.
+//
+// Copyright © 2026 DigiPen (USA) Corporation.
+
 #include "Precompiled.h"
 #include "EmitterShape.h"
 

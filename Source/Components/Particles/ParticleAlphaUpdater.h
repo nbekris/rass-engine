@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include "Component.h"
+#include <string_view>
+
 #include "Cloneable.h"
+#include "Component.h"
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
 #include "IEvent.h"
