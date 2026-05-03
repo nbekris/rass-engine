@@ -11,7 +11,6 @@
 #include <glm/vec3.hpp>
 #include <tuple>
 
-#include "Cloneable.h"
 #include "Component.h"
 #include "Components/Transform.h"
 #include "Particle.h"
@@ -20,7 +19,7 @@
 
 namespace RassEngine::Components::Particles {
 
-class EmitterShape : public Cloneable<Component, EmitterShape> {
+class EmitterShape : public Component {
 	// Constructors/Destructors:
 public:
 	EmitterShape(void);
@@ -31,19 +30,10 @@ public:
 
 	// Public Functions:
 
-	// @brief Initialize the Object.
-	// @brief [NOTE: Some Objects may note require this step; others might.]  
-	//
-	// @return bool = true if initialization successful, otherwise false.
-	bool Initialize() override {
-		return true;
-	};
-
 	// @brief Read the properties associated with an object from the stream.
 	virtual bool Read(Stream &stream) override;
 
 	// @brief Selects a random location of emission
-	//
 	// @param transform = The center of emit-shape
 	virtual std::tuple<glm::vec3, float> GetEmitTransform(const Transform &transform) const = 0;
 

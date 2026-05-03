@@ -1,15 +1,16 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include <memory>
 #include <tuple>
-#include <utility>
 
-#include "Cloneable.h"
 #include "Components/Transform.h"
 #include "EmitterShape.h"
 #include "Particle.h"
 #include "Stream.h"
+
+namespace RassEngine {
+class Component;
+}
 
 namespace RassEngine::Components::Particles {
 
@@ -23,6 +24,13 @@ public:
 	inline virtual ~EmitterCone(void) override = default;
 
 	// Public Functions:
+
+	// Inherited via EmitterShape
+	bool Initialize() override;
+	std::unique_ptr<Component> Clone() const override;
+
+	// Inherited via Cloneable
+	const std::string_view &NameClass() const override;
 
 	// @brief Read the properties of a EmitterShape component from a stream.
 	//
@@ -38,10 +46,6 @@ public:
 	//
 	// @param transform = The center of emit-shape
 	std::tuple<glm::vec3, float> GetInitVelocities(const Particle &particle) const override;
-
-	inline virtual std::unique_ptr<Component> Clone() const override {
-		return std::make_unique<EmitterCone>(static_cast<EmitterCone const &>(*this));
-	}
 
 	// Private Variables:
 private:

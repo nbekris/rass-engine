@@ -9,7 +9,6 @@
 #include "Precompiled.h"
 #include "EmitterShape.h"
 
-#include "Cloneable.h"
 #include "Component.h"
 #include "Stream.h"
 
@@ -19,10 +18,10 @@ const char *SPEED_MIN = "SpeedMin";
 const char *SPEED_MAX = "SpeedMax";
 
 EmitterShape::EmitterShape(void)
-	: Cloneable<Component, EmitterShape>() {}
+	: Component() {}
 
 EmitterShape::EmitterShape(const EmitterShape &other)
-	: Cloneable<Component, EmitterShape>(other)
+	: Component(other)
 	, speedMin(other.speedMin)
 	, speedMax(other.speedMax) {}
 
