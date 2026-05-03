@@ -131,17 +131,11 @@ bool ParticleEmitter::Read(Stream &stream) {
 	stream.Read("EmitRate", emitRate);
 	stream.Read("LifeTimeMin", lifetimeMin);
 	stream.Read("LifeTimeMax", lifetimeMax);
-	stream.Read("ScaleMin", scaleMin);
-	stream.Read("ScaleMax", scaleMax);
+	stream.ReadVec3("ScaleMin", scaleMin);
+	stream.ReadVec3("ScaleMax", scaleMax);
 
 	// Read the tintColor.
-	std::vector colorArgs = {1.f, 1.f, 1.f, 1.f};
-	if(stream.Read("TintColor", colorArgs) && (colorArgs.size() >= 4)) {
-		tintColor.r = colorArgs[0];
-		tintColor.g = colorArgs[1];
-		tintColor.b = colorArgs[2];
-		tintColor.a = colorArgs[3];
-	}
+	stream.ReadVec4("TintColor", tintColor);
 
 	stream.ReadObject("Shape", [this, &stream] (const std::string &key) {
 		// Construct the object from the factory, first
