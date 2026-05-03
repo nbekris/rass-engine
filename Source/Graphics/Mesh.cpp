@@ -23,6 +23,55 @@ Mesh::~Mesh() {
 }
 
 void Mesh::BuildCustom(const std::string_view &filename) {
+	//// Make sure stream is valid
+	//if(!stream.IsValid()) {
+	//	// Log error
+	//	LoggingSystem::Error("{}: JSON stream is not valid", KEY_MESH);
+	//	return;
+	//}
+
+	//// Check if mesh exists
+	//if(!stream.Contains(KEY_MESH)) {
+	//	// Log error
+	//	LoggingSystem::Warning("{}: unable to read key, {}", KEY_MESH, KEY_MESH);
+	//	return;
+	//}
+
+	//// Read the node values
+	//stream.PushNode(KEY_MESH);
+
+	//// Retrieve the name
+	//std::string meshType{""};
+	//ReadAttribute(stream, KEY_MESH_NAME, meshType);
+	//if(stream.Contains(KEY_VERTICES)) {
+	//	DGL_Graphics_StartMesh();
+
+	//	// Read the array of vertices
+	//	stream.ReadArray(KEY_VERTICES, [&stream] () {
+	//		// Read the vertex position and UV offset
+	//		Vector2D pos, uvOffset;
+	//		if(stream.Contains(KEY_VERTICES_POS)) {
+	//			stream.ReadVector2D(KEY_VERTICES_POS, pos);
+	//		}
+	//		if(stream.Contains(KEY_VERTICES_UV)) {
+	//			stream.ReadVector2D(KEY_VERTICES_UV, uvOffset);
+	//		}
+
+	//		// Read the color as a vector of floats
+	//		Color color;
+	//		if(stream.Contains(KEY_VERTICES_COLOR)) {
+	//			std::vector<float> colorCoords;
+	//			stream.Read(KEY_VERTICES_COLOR, colorCoords);
+	//			if(colorCoords.size() >= 4) {
+	//				color = Color(colorCoords[0], colorCoords[1], colorCoords[2], colorCoords[3]);
+	//			}
+	//		}
+	//		DGL_Graphics_AddVertex(&pos, &color, &uvOffset);
+	//		});
+
+	//	meshResource = DGL_Graphics_EndMesh();
+	//}
+	//stream.PopNode();
 	throw "Not Implemented";
 }
 
