@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <tuple>
 
+#include "Component.h"
 #include "Components/Transform.h"
 #include "EmitterShape.h"
 #include "Particle.h"
@@ -31,6 +32,11 @@ EmitterBox::EmitterBox(const EmitterBox &other)
 	, isRotationRandom(other.isRotationRandom)
 	, turnSpeedMinDeg(other.turnSpeedMinDeg)
 	, turnSpeedMaxDeg(other.turnSpeedMaxDeg) {}
+
+const std::string_view &EmitterBox::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Components::Particles::EmitterBox);
+	return className;
+}
 
 bool EmitterBox::Read(Stream &stream) {
 	// Make sure stream is valid
@@ -77,6 +83,14 @@ std::tuple<glm::vec3, float> EmitterBox::GetInitVelocities(const Particle &parti
 	// Calculate a random turn velocity
 	float returnTurnVelocityDeg = Random::range(turnSpeedMinDeg, turnSpeedMaxDeg);
 	return {returnVelocity, returnTurnVelocityDeg * Utils::DEG_TO_RAD};
+}
+
+bool EmitterBox::Initialize() {
+	return true;
+}
+
+std::unique_ptr<Component> EmitterBox::Clone() const {
+	return std::make_unique<EmitterBox>(*this);
 }
 
 }	// namespace

@@ -1,15 +1,16 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include <memory>
 #include <tuple>
-#include <utility>
 
-#include "Component.h"
 #include "Components/Transform.h"
 #include "EmitterShape.h"
 #include "Particle.h"
 #include "Stream.h"
+
+namespace RassEngine {
+class Component;
+}
 
 namespace RassEngine::Components::Particles {
 
@@ -22,10 +23,12 @@ public:
 	// All objects need a virtual destructor to have their destructor called 
 	inline virtual ~EmitterBox(void) override = default;
 
-	// @brief Shallow-copies this instance to a new pointer
-	inline virtual std::unique_ptr<Component> Clone() const override {
-		return std::make_unique<EmitterBox>(static_cast<EmitterBox const &>(*this));
-	}
+	// Inherited via Cloneable
+	const std::string_view &NameClass() const override;
+
+	// Inherited via EmitterShape
+	bool Initialize() override;
+	std::unique_ptr<Component> Clone() const override;
 
 	// @brief Read the properties of a EmitterShape component from a stream.
 	//

@@ -5,6 +5,8 @@
 #include <limits>
 #include <tuple>
 
+#include "Cloneable.h"
+#include "Component.h"
 #include "Components/Transform.h"
 #include "EmitterShape.h"
 #include "Particle.h"
@@ -28,6 +30,11 @@ EmitterCone::EmitterCone(const EmitterCone& other)
 	: EmitterShape(other)
 	, startAngleDeg(other.startAngleDeg), endAngleDeg(other.endAngleDeg)
 	, minRadius(other.minRadius), maxRadius(other.maxRadius) {}
+
+const std::string_view &EmitterCone::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(RassEngine::Components::Particles::EmitterCone);
+	return className;
+}
 
 bool EmitterCone::Read(Stream &stream) {
 	// Make sure stream is valid
@@ -77,6 +84,14 @@ std::tuple<glm::vec3, float> EmitterCone::GetInitVelocities(const Particle &part
 	// Calculate the particle's velocity by multiplying the direction by the speed.
 	returnVelocity *= GetRandomSpeed();
 	return {returnVelocity, 0.f};
+}
+
+bool EmitterCone::Initialize() {
+	return true;
+}
+
+std::unique_ptr<Component> EmitterCone::Clone() const {
+	return std::make_unique<EmitterCone>(*this);
 }
 
 }	// namespace
