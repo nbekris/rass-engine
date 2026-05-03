@@ -9,19 +9,28 @@
 #include "Precompiled.h"
 #include "ParticleManager.h"
 
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+
+#include "Cloneable.h"
 #include "Component.h"
 #include "Entity.h"
 #include "Events/Global.h"
-#include "Stream.h"
-#include "Utils.h"
+#include "Events/GlobalEventArgs.h"
+#include "Graphics/Math.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Texture.h"
-#include "Graphics/Math.h"
+#include "IEvent.h"
+#include "Particle.h"
+#include "Stream.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
-#include "Systems/Resource/IResourceSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Systems/Render/IRenderSystem.h"
+#include "Systems/Resource/IResourceSystem.h"
 #include "Systems/Time/ITimeSystem.h"
+#include "Utils.h"
 
 using namespace RassEngine::Systems;
 using namespace RassEngine::Events;
