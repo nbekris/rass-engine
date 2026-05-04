@@ -16,6 +16,7 @@
 
 #include "Cloneable.h"
 #include "Component.h"
+#include "Components/Transform.h"
 #include "Entity.h"
 #include "Events/Global.h"
 #include "Events/GlobalEventArgs.h"
@@ -162,6 +163,7 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 
 		// Send the transform data to the DGL.
 		particle.modelMatrix = Graphics::Math::GetTransformMatrix(data.current.position, data.current.rotationRad, data.current.scale);
+		particle.modelMatrix = Parent()->GetTransform()->getTransformMatrix() * particle.modelMatrix;
 
 		// Render the mesh associated with the emitter.
 		IRenderSystem::Get()->SubmitRenderable(particle);
