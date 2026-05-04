@@ -1,0 +1,82 @@
+{
+  "Entity": {
+    "Name": "StarParticles",
+    "Components": {
+      "Transform": {
+        "Translation": [ 0.0, 0.0 ],
+        "Rotation": 0.0,
+        "Scale": [ 1.0, 1.0 ]
+      },
+      "Particles": {
+        "ParticleMax": 50.0,
+        "IsLooping": true,
+        "Mesh": "MeshStar"
+      },
+      "ParticleEmitter": {
+        "EmitRate": 5.0,
+        "LifeTimeMin": 2.0,
+        "LifeTimeMax": 10.0,
+        "ScaleMin": [ 10.0, 10.0 ],
+        "ScaleMax": [ 50.0, 50.0 ],
+        "TintColor": [ 1.0, 1.0, 1.0, 0.6 ],
+        "Shape": {
+          "Box": {
+            "Width": 980.0,
+            "Height": 700.0,
+            "RandomizeRotation": true,
+            "SpeedMin": 10.0,
+            "SpeedMax": 50.0,
+            "TurnSpeedMin": -180.0,
+            "TurnSpeedMax": 180.0
+          }
+        }
+      },
+      "ParticleMover": {},
+      "ParticleSizeUpdater": {
+        "Start": 0.0,
+        "KeyFrames": [
+          {
+            "Type": 2,
+            "Time": 0.3,
+            "Value": 1.0
+          },
+          {
+            "Type": 0,
+            "Time": 0.7,
+            "Value": 1.0
+          },
+          {
+            "Type": 1,
+            "Time": 1.0,
+            "Value": 0.0
+          }
+        ]
+      },
+      "ParticleAlphaUpdater": {
+        "Start": 1.0,
+        "KeyFrames": [
+          {
+            "Type": 1,
+            "Time": 0.25,
+            "Value": 0.6
+          },
+          {
+            "Type": 2,
+            "Time": 0.5,
+            "Value": 1.0
+          },
+          {
+            "Type": 1,
+            "Time": 0.75,
+            "Value": 0.6
+          },
+          {
+            "Type": 2,
+            "Time": 1.0,
+            "Value": 1.0
+          }
+        ]
+      }
+    }
+  }
+}
