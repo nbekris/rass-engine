@@ -12,9 +12,21 @@
 #include <glbinding/gl/gl.h>
 #include <iterator>
 
+#include "Utils.h"
+#include "Stream.h"
+#include "Systems/Logging/ILoggingSystem.h"
+#include "Systems/Resource/IResourceSystem.h"
+
 using namespace gl;
+using namespace RassEngine::Systems;
 
 namespace RassEngine::Graphics {
+
+static constexpr std::string_view KEY_MESH = NAMEOF(Mesh);
+static constexpr std::string_view KEY_VERTICES = "Vertices";
+static constexpr std::string_view KEY_VERTICES_POS = "Position";
+static constexpr std::string_view KEY_VERTICES_UV = "UV";
+static constexpr std::string_view KEY_VERTICES_COLOR = "Color";
 
 Mesh::Mesh() : VAO(0), VBO(0), vertexCount(0) {}
 
@@ -23,56 +35,78 @@ Mesh::~Mesh() {
 }
 
 void Mesh::BuildCustom(const std::string_view &filename) {
-	//// Make sure stream is valid
-	//if(!stream.IsValid()) {
-	//	// Log error
-	//	LoggingSystem::Error("{}: JSON stream is not valid", KEY_MESH);
-	//	return;
-	//}
+	// Determine the actual file path of the scene resource
+	std::string filePath = IResourceSystem::Path(MESH_FOLDER, filename, MESH_EXTENSION);
 
-	//// Check if mesh exists
-	//if(!stream.Contains(KEY_MESH)) {
-	//	// Log error
-	//	LoggingSystem::Warning("{}: unable to read key, {}", KEY_MESH, KEY_MESH);
-	//	return;
-	//}
+	// First, construct a new stream from the file path
+	Stream stream = Stream(filePath);
+	if(!stream.IsValid()) {
+		LOG_ERROR("{}: Failed to read scene from file path \"{}\"", NAMEOF(Mesh), filePath);
+		return;
+	}
 
-	//// Read the node values
-	//stream.PushNode(KEY_MESH);
+	// Make sure stream is valid
+	if(!stream.IsValid()) {
+		// Log error
+		LOG_ERROR("{}: JSON stream is not valid", KEY_MESH);
+		return;
+	}
 
-	//// Retrieve the name
-	//std::string meshType{""};
-	//ReadAttribute(stream, KEY_MESH_NAME, meshType);
-	//if(stream.Contains(KEY_VERTICES)) {
-	//	DGL_Graphics_StartMesh();
+	// Check if mesh exists
+	if(!stream.Contains(KEY_MESH)) {
+		// Log error
+		LOG_WARNING("{}: unable to read key, {}", KEY_MESH, KEY_MESH);
+		return;
+	}
 
-	//	// Read the array of vertices
-	//	stream.ReadArray(KEY_VERTICES, [&stream] () {
-	//		// Read the vertex position and UV offset
-	//		Vector2D pos, uvOffset;
-	//		if(stream.Contains(KEY_VERTICES_POS)) {
-	//			stream.ReadVector2D(KEY_VERTICES_POS, pos);
-	//		}
-	//		if(stream.Contains(KEY_VERTICES_UV)) {
-	//			stream.ReadVector2D(KEY_VERTICES_UV, uvOffset);
-	//		}
+	// Setup vertices list
+	std::vector<float> vertices;
+	vertices.reserve(6 * 8);
 
-	//		// Read the color as a vector of floats
-	//		Color color;
-	//		if(stream.Contains(KEY_VERTICES_COLOR)) {
-	//			std::vector<float> colorCoords;
-	//			stream.Read(KEY_VERTICES_COLOR, colorCoords);
-	//			if(colorCoords.size() >= 4) {
-	//				color = Color(colorCoords[0], colorCoords[1], colorCoords[2], colorCoords[3]);
-	//			}
-	//		}
-	//		DGL_Graphics_AddVertex(&pos, &color, &uvOffset);
-	//		});
+	// Read the node values
+	stream.PushNode(KEY_MESH);
 
-	//	meshResource = DGL_Graphics_EndMesh();
-	//}
-	//stream.PopNode();
-	throw "Not Implemented";
+	// Read the array of vertices
+	stream.ReadArray(KEY_VERTICES, [&stream, &vertices] () {
+		// Read the vertex position
+		glm::vec3 pos;
+		if(stream.Contains(KEY_VERTICES_POS)) {
+			stream.ReadVec3(KEY_VERTICES_POS, pos);
+		}
+
+		// Push the positions
+		vertices.emplace_back(pos.x);
+		vertices.emplace_back(pos.y);
+		vertices.emplace_back(pos.z);
+
+		// Read the color as a vector of floats
+		glm::vec4 color;
+		if(stream.Contains(KEY_VERTICES_COLOR)) {
+			stream.ReadVec4(KEY_VERTICES_COLOR, color);
+		}
+
+		// Push the colors
+		vertices.emplace_back(color.r);
+		vertices.emplace_back(color.g);
+		vertices.emplace_back(color.b);
+
+		// Read the UV offset
+		glm::vec2 uvs;
+		if(stream.Contains(KEY_VERTICES_UV)) {
+			stream.ReadVec2(KEY_VERTICES_UV, uvs);
+		}
+
+		// Push the UVs
+		vertices.emplace_back(uvs.x);
+		vertices.emplace_back(uvs.y);
+	});
+
+	// Pop mesh
+	stream.PopNode();
+
+	// Construct the mesh, here
+	vertexCount = vertices.size() / 8;
+	UploadVertices(vertices);
 }
 
 void Mesh::BuildQuad() {

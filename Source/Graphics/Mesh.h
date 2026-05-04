@@ -11,6 +11,8 @@
 namespace RassEngine::Graphics {
 
 class Mesh {
+	static constexpr std::string_view MESH_FOLDER = "Meshes";
+	static constexpr std::string_view MESH_EXTENSION = "json";
 public:
 	Mesh();
 	~Mesh();
