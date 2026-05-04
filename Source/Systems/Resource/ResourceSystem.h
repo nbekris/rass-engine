@@ -33,6 +33,7 @@ public:
 	bool Initialize() override;
 	void Shutdown() override;
 	Graphics::Texture *GetTexture(const std::string_view &path, bool useLinear = false) override;
+	Graphics::Mesh *GetCustomMesh(const std::string_view &path) override;
 	Graphics::Mesh *GetQuadMesh() override;
 	Graphics::Mesh *GetTextGridMesh(unsigned int maxCharacters) override;
 	Graphics::Mesh *GetTileMapMesh(
@@ -57,6 +58,7 @@ private:
 	void CleanUp();
 	std::string GenerateTileMapKey(const std::string &mapName, int width, int height) const;
 	std::unordered_map<std::string, std::unique_ptr<Graphics::Mesh>> tileMapMeshMap;
+	std::unordered_map<std::string, std::unique_ptr<Graphics::Mesh>> customMeshMap;
 
 	std::unordered_map<std::string, std::unique_ptr<Graphics::Texture>> pathToTextureMap;
 	std::unique_ptr<Graphics::Mesh> quadMesh;

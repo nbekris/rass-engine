@@ -17,6 +17,7 @@
 #include <spdlog/spdlog.h>
 
 #include "Systems/GlobalEvents/IGlobalSystem.h"
+#include "Utils.h"
 
 // Forward declarations
 namespace RassEngine::Systems {

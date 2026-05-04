@@ -30,7 +30,7 @@ public:
 	virtual ~Cloneable() override {};
 
 	/// <summary>
-	/// Creates a new instance of <typeparam name="T"/>
+	/// Creates a new instance of <typeparam name="B"/>
 	/// </summary>
 	inline virtual std::unique_ptr<B> Clone() const override {
 		return std::make_unique<D>(static_cast<D const &>(*this));
