@@ -5,8 +5,8 @@
 namespace RassEngine::Systems {
 
 class IParticleSystem : public IGlobalSystem<IParticleSystem> {
-public:
-	virtual ~IParticleSystem() = 0;
+//public:
+//	virtual ~IParticleSystem() = 0;
 };
 
 }
