@@ -3,9 +3,9 @@
     "Name": "StarParticles",
     "Components": {
       "Transform": {
-        "Translation": [ 0.0, 0.0 ],
+				"Translation": [ 0.0, 0.0, 1.0 ],
         "Rotation": 0.0,
-        "Scale": [ 1.0, 1.0 ]
+				"Scale": [ 1.0, 1.0, 1.0 ]
       },
       "Particles": {
         "ParticleMax": 50.0,
@@ -16,8 +16,8 @@
         "EmitRate": 5.0,
         "LifeTimeMin": 2.0,
         "LifeTimeMax": 10.0,
-        "ScaleMin": [ 10.0, 10.0 ],
-        "ScaleMax": [ 50.0, 50.0 ],
+        "ScaleMin": [ 10.0, 10.0, 1.0 ],
+				"ScaleMax": [ 50.0, 50.0, 1.0 ],
         "TintColor": [ 1.0, 1.0, 1.0, 0.6 ],
         "Shape": {
           "Box": {
