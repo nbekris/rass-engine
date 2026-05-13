@@ -44,4 +44,56 @@ bool InputActions::IsGrabBoxHeld() {
 		|| inputSystem->IsKeyDown(GLFW_KEY_DOWN);
 }
 
+static constexpr float GAMEPAD_DEADZONE = 0.2f;
+
+bool InputActions::IsMoveLeftHeld() {
+	const IInputSystem *inputSystem = IInputSystem::Get();
+	if(inputSystem == nullptr) {
+		return false;
+	}
+
+	return inputSystem->IsKeyDown(GLFW_KEY_LEFT)
+		|| inputSystem->IsKeyDown(GLFW_KEY_A)
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
+		|| inputSystem->GetGamepadAxis(GLFW_GAMEPAD_AXIS_LEFT_X) < -GAMEPAD_DEADZONE;
+}
+
+bool InputActions::IsMoveRightHeld() {
+	const IInputSystem *inputSystem = IInputSystem::Get();
+	if(inputSystem == nullptr) {
+		return false;
+	}
+
+	return inputSystem->IsKeyDown(GLFW_KEY_RIGHT)
+		|| inputSystem->IsKeyDown(GLFW_KEY_D)
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)
+		|| inputSystem->GetGamepadAxis(GLFW_GAMEPAD_AXIS_LEFT_X) > GAMEPAD_DEADZONE;
+}
+
+bool InputActions::IsJumpPressed() {
+	const IInputSystem *inputSystem = IInputSystem::Get();
+	if(inputSystem == nullptr) {
+		return false;
+	}
+
+	return inputSystem->IsKeyPressed(GLFW_KEY_X)
+		|| inputSystem->IsKeyPressed(GLFW_KEY_SPACE)
+		|| inputSystem->IsKeyPressed(GLFW_KEY_UP)
+		|| inputSystem->IsKeyPressed(GLFW_KEY_W)
+		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER);
+}
+
+bool InputActions::IsJumpHeld() {
+	const IInputSystem *inputSystem = IInputSystem::Get();
+	if(inputSystem == nullptr) {
+		return false;
+	}
+
+	return inputSystem->IsKeyDown(GLFW_KEY_X)
+		|| inputSystem->IsKeyDown(GLFW_KEY_SPACE)
+		|| inputSystem->IsKeyDown(GLFW_KEY_UP)
+		|| inputSystem->IsKeyDown(GLFW_KEY_W)
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER);
+}
+
 }

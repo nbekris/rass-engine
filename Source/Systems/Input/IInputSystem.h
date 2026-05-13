@@ -79,6 +79,27 @@ public:
 	/// </summary>
 	virtual void SetCursorVisible(bool visible) = 0;
 
+	/// <summary>
+	/// Checks if a gamepad is connected in slot 0.
+	/// </summary>
+	virtual bool IsGamepadConnected() const = 0;
+	/// <summary>
+	/// Checks if a gamepad button is held down. Use GLFW_GAMEPAD_BUTTON_* constants.
+	/// </summary>
+	virtual bool IsGamepadButtonDown(unsigned short button) const = 0;
+	/// <summary>
+	/// Checks if a gamepad button was pressed this frame. Use GLFW_GAMEPAD_BUTTON_* constants.
+	/// </summary>
+	virtual bool IsGamepadButtonPressed(unsigned short button) const = 0;
+	/// <summary>
+	/// Checks if a gamepad button was released this frame. Use GLFW_GAMEPAD_BUTTON_* constants.
+	/// </summary>
+	virtual bool IsGamepadButtonReleased(unsigned short button) const = 0;
+	/// <summary>
+	/// Gets the value of a gamepad axis in the range [-1, 1]. Use GLFW_GAMEPAD_AXIS_* constants.
+	/// </summary>
+	virtual float GetGamepadAxis(unsigned short axis) const = 0;
+
 protected:
 	// Do not allow constructing an interface
 	IInputSystem() = default;
