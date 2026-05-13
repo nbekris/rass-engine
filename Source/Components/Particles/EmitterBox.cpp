@@ -44,9 +44,6 @@ bool EmitterBox::Read(Stream &stream) {
 		return false;
 	}
 
-	// Read the node values
-	stream.PushNode(NAMEOF(EmitterBox));
-
 	// Read the box width
 	stream.Read(KEY_WIDTH, width);
 
@@ -59,8 +56,6 @@ bool EmitterBox::Read(Stream &stream) {
 	// Read the velocities
 	stream.Read(TURN_SPEED_MIN, turnSpeedMinDeg);
 	stream.Read(TURN_SPEED_MAX, turnSpeedMaxDeg);
-
-	stream.PopNode();
 	return true;
 }
 

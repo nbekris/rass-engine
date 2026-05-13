@@ -176,9 +176,6 @@ bool ParticleManager::Read(Stream &stream) {
 		return false;
 	}
 
-	// Traverse down the tree to the "ParticleEmitter" object (PushNode).
-	stream.PushNode(NAMEOF(ParticleManager));
-
 	stream.Read(PARTICLE_MAX, maxParticles);
 	stream.Read(IS_LOOPING, areRecyclable);
 
@@ -205,8 +202,6 @@ bool ParticleManager::Read(Stream &stream) {
 		texture = IResourceSystem::Get()->GetTexture(fileName);
 	}
 
-	// Return to the original location in the tree.
-	stream.PopNode();
 	return true;
 }
 

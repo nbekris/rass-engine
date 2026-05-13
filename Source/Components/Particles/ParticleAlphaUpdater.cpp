@@ -99,13 +99,8 @@ bool ParticleAlphaUpdater::Read(Stream &stream) {
 		return false;
 	}
 
-	// Read the node values
-	stream.PushNode(NAMEOF(ParticleAlphaUpdater));
-
 	// Read the curve attributes
 	curve.Read(stream);
-
-	stream.PopNode();
 	return true;
 }
 

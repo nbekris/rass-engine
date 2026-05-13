@@ -42,9 +42,6 @@ bool EmitterCone::Read(Stream &stream) {
 		return false;
 	}
 
-	// Read the node values
-	stream.PushNode(NAMEOF(EmitterCone));
-
 	// Read the cone's range
 	stream.Read(KEY_START_ANGLE, startAngleDeg);
 	stream.Read(KEY_END_ANGLE, endAngleDeg);
@@ -57,7 +54,6 @@ bool EmitterCone::Read(Stream &stream) {
 	stream.Read(KEY_MAX_RADIUS, maxRadius);
 	LOG_ASSERT((maxRadius - minRadius) > -std::numeric_limits<float>::epsilon(), "EmitterCone::Read: maxRadius is less than minRadius");
 
-	stream.PopNode();
 	return true;
 }
 

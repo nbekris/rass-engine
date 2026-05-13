@@ -12,10 +12,10 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <memory>
+#include <format>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <vector>
 
 #include "Cloneable.h"
 #include "Component.h"
@@ -123,9 +123,6 @@ bool ParticleEmitter::Read(Stream &stream) {
 		return false;
 	}
 
-	// Read the node values
-	stream.PushNode(NAMEOF(ParticleEmitter));
-
 	// Read the emitter properties, from "emitRate" to "scale".
 	stream.Read("EmitOnStart", isEmitting);
 	stream.Read("EmitRate", emitRate);
@@ -139,9 +136,18 @@ bool ParticleEmitter::Read(Stream &stream) {
 
 	stream.ReadObject("Shape", [this, &stream] (const std::string &key) {
 		// Construct the object from the factory, first
-		Component *toConvert = IComponentFactory::Get()->Create(key);
+		std::string newKey = key;
+		Component *toConvert = IComponentFactory::Get()->Create(newKey);
+
+		// If this doesn't work, try a different alternative
 		if(toConvert == nullptr) {
-			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), key);
+			newKey = std::format("Emitter{}", key);
+			toConvert = IComponentFactory::Get()->Create(newKey);
+		}
+
+		// If both failed, indicate error
+		if(toConvert == nullptr) {
+			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), newKey);
 			return;
 		}
 
@@ -152,7 +158,7 @@ bool ParticleEmitter::Read(Stream &stream) {
 			delete toConvert;
 
 			// Log that object wasn't a component
-			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), key);
+			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), newKey);
 			return;
 		}
 
@@ -160,11 +166,8 @@ bool ParticleEmitter::Read(Stream &stream) {
 		shape->Read(stream);
 
 		// Add the shape as a component to the entity
-		Parent()->AddComponent(std::unique_ptr<Particles::EmitterShape>(shape));
+		Parent()->AddComponent(std::unique_ptr<Component>{toConvert});
 	});
-
-	// Return to the original location in the tree.
-	stream.PopNode();
 	return true;
 }
 

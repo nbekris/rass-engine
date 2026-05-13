@@ -94,11 +94,6 @@ bool ParticleMover::Read(Stream &stream) {
 	if(!Component::Read(stream)) {
 		return false;
 	}
-
-	// Read the node values
-	stream.PushNode(NAMEOF(ParticleMover));
-
-	stream.PopNode();
 	return true;
 }
 
