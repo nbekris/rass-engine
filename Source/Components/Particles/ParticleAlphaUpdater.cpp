@@ -40,6 +40,7 @@ ParticleAlphaUpdater::ParticleAlphaUpdater(void)
 
 ParticleAlphaUpdater::ParticleAlphaUpdater(const ParticleAlphaUpdater &other)
 	: Cloneable<Component, ParticleAlphaUpdater>(other)
+	, curve{other.curve}
 	, updateListener{this, &ParticleAlphaUpdater::Update}
 {}
 

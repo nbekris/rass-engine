@@ -41,6 +41,7 @@ ParticleSizeUpdater::ParticleSizeUpdater(void)
 
 ParticleSizeUpdater::ParticleSizeUpdater(const ParticleSizeUpdater &other)
 	: Cloneable<Component, ParticleSizeUpdater>(other)
+	, curve{other.curve}
 	, updateListener{this, &ParticleSizeUpdater::Update}
 {}
 
