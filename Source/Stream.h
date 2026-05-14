@@ -42,8 +42,8 @@ public:
 	void ReadArray(const std::string_view &key, std::function<void()> lambda);
 	void ReadObject(const std::string_view &key, std::function<void(const std::string &key)> lambda);
 
-	void PushNode(const std::string_view &key);
-	void PopNode();
+	bool PushNode(const std::string_view &key);
+	bool PopNode();
 
 	template <typename T>
 	bool Read(const std::string_view& key, T &value) const;
