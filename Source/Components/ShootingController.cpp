@@ -274,10 +274,18 @@ void ShootingController::calculateAimDirection() {
 	const float stickY = -IInputSystem::Get()->GetGamepadAxis(GLFW_GAMEPAD_AXIS_RIGHT_Y);
 	const glm::vec2 stick{stickX, stickY};
 
+	const glm::vec2 aimOrigin = transform->GetPosition2D() + glm::vec2(0.0f, AIM_HEIGHT_OFFSET);
+
 	if(glm::length(stick) > AIM_STICK_DEADZONE) {
 		usingGamepadAim_ = true;
 		aimDirection = glm::normalize(stick);
-		aimWorldPos_ = transform->GetPosition2D() + aimDirection * CROSSHAIR_DISTANCE;
+		aimWorldPos_ = aimOrigin + aimDirection * CROSSHAIR_DISTANCE;
+	} else if(IInputSystem::Get()->IsGamepadConnected()) {
+		// Stick is neutral — rest crosshair directly in front of the player at body height
+		usingGamepadAim_ = true;
+		float facingX = (transform->GetLocalScale().x >= 0.0f) ? 1.0f : -1.0f;
+		aimDirection = glm::vec2(facingX, 0.0f);
+		aimWorldPos_ = aimOrigin + aimDirection * CROSSHAIR_DISTANCE;
 	} else {
 		usingGamepadAim_ = false;
 		glm::vec2 mouseNDC = IInputSystem::Get()->GetMousePositionViewport();

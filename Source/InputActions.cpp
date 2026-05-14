@@ -28,7 +28,8 @@ bool InputActions::IsFlipPressed() {
 	// Check the key presses
 	return inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT)
 		|| inputSystem->IsKeyPressed(GLFW_KEY_RIGHT_SHIFT)
-		|| inputSystem->IsKeyPressed(GLFW_KEY_DOWN);
+		|| inputSystem->IsKeyPressed(GLFW_KEY_DOWN)
+		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER);
 }
 
 bool InputActions::IsGrabBoxHeld() {
@@ -41,7 +42,8 @@ bool InputActions::IsGrabBoxHeld() {
 	// Check the key down
 	return inputSystem->IsKeyDown(GLFW_KEY_LEFT_SHIFT)
 		|| inputSystem->IsKeyDown(GLFW_KEY_RIGHT_SHIFT)
-		|| inputSystem->IsKeyDown(GLFW_KEY_DOWN);
+		|| inputSystem->IsKeyDown(GLFW_KEY_DOWN)
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER);
 }
 
 static constexpr float GAMEPAD_DEADZONE = 0.2f;
