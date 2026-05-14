@@ -123,6 +123,13 @@ bool ParticleEmitter::Read(Stream &stream) {
 		return false;
 	}
 
+	// Retrieve the factory
+	auto *factory = Systems::IComponentFactory::Get();
+	if(factory == nullptr) {
+		LOG_WARNING("{}: {} is not registered", NAMEOF(ParticleEmitter), NAMEOF(Systems::IComponentFactory));
+		return false;
+	}
+
 	// Read the emitter properties, from "emitRate" to "scale".
 	stream.Read("EmitOnStart", isEmitting);
 	stream.Read("EmitRate", emitRate);
@@ -134,39 +141,30 @@ bool ParticleEmitter::Read(Stream &stream) {
 	// Read the tintColor.
 	stream.ReadVec4("TintColor", tintColor);
 
-	stream.ReadObject("Shape", [this, &stream] (const std::string &key) {
+	stream.ReadObject("Shape", [this, &stream, factory] (const std::string &key) {
 		// Construct the object from the factory, first
 		std::string newKey = key;
-		Component *toConvert = IComponentFactory::Get()->Create(newKey);
+		Component *toConvert = Parent()->ReadNewComponent(stream, newKey);
 
 		// If this doesn't work, try a different alternative
 		if(toConvert == nullptr) {
 			newKey = std::format("Emitter{}", key);
-			toConvert = IComponentFactory::Get()->Create(newKey);
+			toConvert = Parent()->ReadNewComponent(stream, newKey, key);
 		}
 
 		// If both failed, indicate error
 		if(toConvert == nullptr) {
-			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), newKey);
+			LOG_ERROR("{}: unable to create {}, {}", NAMEOF(ParticleEmitter), NAMEOF(EmitterShape), newKey);
 			return;
 		}
 
 		// See if this can be converted into a component
 		shape = dynamic_cast<Particles::EmitterShape *>(toConvert);
 		if(shape == nullptr) {
-			// Clean up the object
-			delete toConvert;
-
 			// Log that object wasn't a component
-			LOG_ERROR("{}: unable to create object, {}", NAMEOF(ParticleEmitter), newKey);
+			LOG_ERROR("{}: {} was not an {}", NAMEOF(ParticleEmitter), newKey, NAMEOF(EmitterShape));
 			return;
 		}
-
-		// If so, read from the stream
-		shape->Read(stream);
-
-		// Add the shape as a component to the entity
-		Parent()->AddComponent(std::unique_ptr<Component>{toConvert});
 	});
 	return true;
 }
