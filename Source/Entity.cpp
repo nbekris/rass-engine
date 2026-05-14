@@ -69,12 +69,12 @@ void Entity::AddComponent(std::unique_ptr<Component>&& component) {
 		return;
 	}
 
+	// Update the component's parent pointer
+	component->Parent(this);
+
 	// Add component into the components list
 	Component *borrowedPtr = component.get();
 	components.emplace_back(std::move(component));
-
-	// Update the component's parent pointer
-	borrowedPtr->Parent(this);
 
 	// Also add component to the cache
 	std::string className = Utils::RemoveNamespace(borrowedPtr->NameClass());
