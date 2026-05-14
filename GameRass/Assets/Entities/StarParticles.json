@@ -3,7 +3,7 @@
     "Name": "StarParticles",
 		"Components": {
 			"Transform": {
-				"Translation": [ 0.0, 0.0, 1.0 ],
+				"Translation": [ 0.0, 0.0, 0.0 ],
 				"Rotation": 0.0,
 				"Scale": [ 1.0, 1.0, 1.0 ]
 			},
@@ -16,16 +16,16 @@
 				"EmitRate": 5.0,
 				"LifeTimeMin": 2.0,
 				"LifeTimeMax": 10.0,
-				"ScaleMin": [ 10.0, 10.0, 1.0 ],
-				"ScaleMax": [ 50.0, 50.0, 1.0 ],
+				"ScaleMin": [ 0.01, 0.01, 1.0 ],
+				"ScaleMax": [ 0.25, 0.25, 1.0 ],
 				"TintColor": [ 1.0, 1.0, 1.0, 0.6 ],
 				"Shape": {
 					"Box": {
-						"Width": 980.0,
-						"Height": 700.0,
+						"Width": 2.0,
+						"Height": 1.0,
 						"RandomizeRotation": true,
-						"SpeedMin": 10.0,
-						"SpeedMax": 50.0,
+						"SpeedMin": 0.05,
+						"SpeedMax": 1.0,
 						"TurnSpeedMin": -180.0,
 						"TurnSpeedMax": 180.0
 					}
