@@ -10,6 +10,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "Systems/GlobalEvents/IGlobalSystem.h"
 
@@ -39,6 +40,7 @@ public:
 	}
 
 	virtual Graphics::Texture *GetTexture(const std::string_view &path, bool useLinear = false) = 0;
+	virtual Graphics::Mesh *GetCustomMesh(const std::string_view &path) = 0;
 	virtual Graphics::Mesh *GetQuadMesh() = 0;
 	virtual Graphics::Mesh *GetTextGridMesh(unsigned int maxCharacters) = 0;
 	virtual Graphics::Mesh *GetTileMapMesh(

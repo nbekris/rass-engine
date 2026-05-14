@@ -34,11 +34,11 @@ using namespace RassEngine::Events;
 using namespace RassEngine::Systems;
 
 namespace RassGame::Components {
-static const std::string KEY_TYPE = RemoveNamespace(NAMEOF(Flipper::Type));
+static const std::string KEY_TYPE = Utils::RemoveNamespace(NAMEOF(Flipper::Type));
 static constexpr std::string_view KEY_TRIGGERED_BY = "TriggeredBy";
-static const std::string TYPE_BOTH = RemoveNamespace(NAMEOF(Flipper::Type::Both));
-static const std::string TYPE_UPSIDE_DOWN = RemoveNamespace(NAMEOF(Flipper::Type::UpsideDown));
-static const std::string TYPE_RIGHTSIDE_UP = RemoveNamespace(NAMEOF(Flipper::Type::RightSideUp));
+static const std::string TYPE_BOTH = Utils::RemoveNamespace(NAMEOF(Flipper::Type::Both));
+static const std::string TYPE_UPSIDE_DOWN = Utils::RemoveNamespace(NAMEOF(Flipper::Type::UpsideDown));
+static const std::string TYPE_RIGHTSIDE_UP = Utils::RemoveNamespace(NAMEOF(Flipper::Type::RightSideUp));
 
 Flipper::Flipper() : Cloneable<Component, Flipper>{}
 , onTriggerEnter{this, &Flipper::OnTriggerEnter}

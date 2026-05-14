@@ -33,7 +33,7 @@ static constexpr char FOLDER_DIVIDER = '/';
 static constexpr char EXTENSION_DIVIDER = '.';
 
 ResourceSystem::ResourceSystem()
-	: pathToTextureMap{}, quadMesh{nullptr}, textGridMeshMap{}
+	: pathToTextureMap{}, quadMesh{nullptr}, textGridMeshMap{}, customMeshMap{}
 	, onSceneShutdown{[this](const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
 		CleanUp();
 		return true;
@@ -156,13 +156,33 @@ Texture *ResourceSystem::GetTexture(const std::string_view &path, bool useLinear
 	return inserted_it->second.get();
 }
 
-Mesh *ResourceSystem::GetQuadMesh() {
+Graphics::Mesh *RassEngine::Systems::ResourceSystem::GetCustomMesh(const std::string_view &path) {
+	// Check the cache
+	std::string meshPath{path};
+	auto it = customMeshMap.find(meshPath);
+	if(it != customMeshMap.end()) {
+		return it->second.get();
+	}
+
+	// build a new custom mesh
+	auto mesh = std::make_unique<Graphics::Mesh>();
+	mesh->BuildCustom(meshPath);
+
+	// cache and return
+	auto *meshPtr = mesh.get();
+	customMeshMap[meshPath] = std::move(mesh);
+
+	return meshPtr;
+}
+
+Graphics::Mesh *RassEngine::Systems::ResourceSystem::GetQuadMesh() {
 	if(quadMesh == nullptr) {
 		quadMesh = std::make_unique<Mesh>();
 		quadMesh->BuildQuad();
 	}
 	return quadMesh.get();
 }
+
 Graphics::Mesh *ResourceSystem::GetTileMapMesh(
 	const std::string &mapName,
 	const std::vector<int> &tileIDs,

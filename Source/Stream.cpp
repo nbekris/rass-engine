@@ -58,18 +58,22 @@ void Stream::ReadObject(const std::string_view &key, std::function<void(const st
 	PopNode();
 }
 
-void Stream::PushNode(const std::string_view &key) {
+bool Stream::PushNode(const std::string_view &key) {
 	if(Contains(key)) {
 		dataStack.push_back(dataNode);
 		this->dataNode = (&(*dataNode)[key]);
+		return true;
 	}
+	return false;
 }
 
-void Stream::PopNode() {
+bool Stream::PopNode() {
 	if(!dataStack.empty()) {
 		this->dataNode = dataStack.back();
 		dataStack.pop_back();
+		return true;
 	}
+	return false;
 }
 
 bool Stream::Open(const std::string_view &filePath) {

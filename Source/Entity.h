@@ -132,10 +132,15 @@ public:
 		return events.call(eventID, args);
 	}
 
+	/// <summary>
+	/// Helper function to create a component from a stream directly.
+	/// Useful for components to nest more components.
+	/// </summary>
+	Component *ReadNewComponent(Stream &stream, const std::string &componentName, const std::string_view &jsonKey = "");
+
 private:
 	// Helper methods
-	void ReadNewComponent(Stream &stream, const std::string &key);
-	void ReadOverrideComponent(Stream &stream, const std::string &key);
+	void ReadOverrideComponent(Stream &stream, const std::string &componentName);
 	/// <summary>
 	/// This is a helper method to set the ID of this entity, since the ID is const.
 	/// It should only be used by EntityFactory, and should not be exposed publicly.
