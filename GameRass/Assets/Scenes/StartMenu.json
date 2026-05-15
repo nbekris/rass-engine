@@ -37,6 +37,9 @@
 			},
 			{
 				"Path": "MenuCursor"
+			},
+			{
+				"Path": "StarParticles"
 			}
 		]
 	}

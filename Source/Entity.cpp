@@ -69,15 +69,15 @@ void Entity::AddComponent(std::unique_ptr<Component>&& component) {
 		return;
 	}
 
+	// Update the component's parent pointer
+	component->Parent(this);
+
 	// Add component into the components list
 	Component *borrowedPtr = component.get();
 	components.emplace_back(std::move(component));
 
-	// Update the component's parent pointer
-	borrowedPtr->Parent(this);
-
 	// Also add component to the cache
-	std::string className = RemoveNamespace(borrowedPtr->NameClass());
+	std::string className = Utils::RemoveNamespace(borrowedPtr->NameClass());
 	const auto cacheIter = nameToComponentCache.find(className);
 	if(cacheIter != nameToComponentCache.end()) {
 		cacheIter->second.emplace_back(borrowedPtr);
@@ -114,45 +114,72 @@ Components::Transform *Entity::GetTransform() const {
 	return cacheTransform;
 }
 
-void Entity::ReadNewComponent(Stream &stream, const std::string &key) {
+Component *Entity::ReadNewComponent(Stream &stream, const std::string &componentName, const std::string_view &jsonKey) {
 	// Retrieve the factory
 	auto *factory = Systems::IComponentFactory::Get();
 	if(factory == nullptr) {
 		LOG_WARNING("{}: {} is not registered", NAMEOF(Entity), NAMEOF(Systems::IComponentFactory));
-		return;
+		return nullptr;
 	}
 
 	// Create the component
-	Component* comp = factory->Create(key);
+	Component* comp = factory->Create(componentName);
 	if(comp == nullptr) {
-		LOG_WARNING("{}: No registered component of type: {}", NAMEOF(Entity), key);
-		return;
+		LOG_WARNING("{}: No registered component of type: {}", NAMEOF(Entity), componentName);
+		return nullptr;
 	}
 
-	// Read from the component's stream
-	stream.PushNode(key);
-	comp->Read(stream);
-	stream.PopNode();
+	// Update the component's parent pointer
+	comp->Parent(this);
 
-	// Add the component
-	AddComponent(std::unique_ptr<Component>{comp});
+	// Figure out what the node's key is
+	std::string jsonNodeKey;
+	if(!jsonKey.empty()) {
+		jsonNodeKey = std::string(jsonKey);
+	} else {
+		jsonNodeKey = componentName;
+	}
+
+	// Push the component's object onto stream
+	bool isPushed = stream.PushNode(jsonNodeKey);
+	try {
+		// Read from the component's stream
+		comp->Read(stream);
+
+		// Add the component
+		AddComponent(std::unique_ptr<Component>{comp});
+	} catch (std::exception ex) {
+		// Print errors
+		LOG_ERROR("{}: could not read a new component from key \"{}\":\n{}", NAMEOF(Entity), jsonNodeKey, ex.what());
+
+		// Delete the component
+		delete comp;
+		comp = nullptr;
+	}
+
+	if(isPushed) {
+		// Pop the component's object onto stream
+		stream.PopNode();
+	}
+
+	return comp;
 }
 
-void Entity::ReadOverrideComponent(Stream &stream, const std::string &key) {
+void Entity::ReadOverrideComponent(Stream &stream, const std::string &componentName) {
 	// Search component by key, and override it if it exists
-	auto componentIter = nameToComponentCache.find(key);
+	auto componentIter = nameToComponentCache.find(componentName);
 	if(componentIter == nameToComponentCache.end()) {
-		LOG_WARNING("{}: No existing component of type {} to override", NameClass(), key);
+		LOG_WARNING("{}: No existing component of type {} to override", NameClass(), componentName);
 		return;
 	} else if(componentIter->second.size() < 1) {
-		LOG_WARNING("{}: No existing component of type {} to override", NameClass(), key);
+		LOG_WARNING("{}: No existing component of type {} to override", NameClass(), componentName);
 		return;
 	} else if(componentIter->second.size() > 1) {
-		LOG_WARNING("{}: Multiple existing components of type {} to override; only overriding the first one", NameClass(), key);
+		LOG_WARNING("{}: Multiple existing components of type {} to override; only overriding the first one", NameClass(), componentName);
 	}
 
 	// If found, for now, override the values of the first component
-	stream.PushNode(key);
+	stream.PushNode(componentName);
 	componentIter->second[0]->Read(stream);
 	stream.PopNode();
 }
