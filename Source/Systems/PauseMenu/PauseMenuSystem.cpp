@@ -399,7 +399,8 @@ bool PauseMenuSystem::Update(const IEvent<Events::GlobalEventArgs> *, const Even
 	}
 
 	// Toggle pause with ESC
-	if(IInputSystem::Get()->IsKeyPressed(GLFW_KEY_ESCAPE)) {
+	if(IInputSystem::Get()->IsKeyPressed(GLFW_KEY_ESCAPE)
+		|| IInputSystem::Get()->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_START)) {
 		if(isPaused && (currentSubMenu == PauseSubMenu::Options || currentSubMenu == PauseSubMenu::HowToPlay || currentSubMenu == PauseSubMenu::ConfirmExit)) {
 			BackToPause();
 		} else if(isPaused) {

@@ -190,7 +190,8 @@ bool ShootingController::Update(const IEvent<Events::GlobalEventArgs> *, const E
 	}
 
 	const bool switchInput = (IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT))
-		|| leftTriggerJustPressed;
+		|| leftTriggerJustPressed
+		|| (IInputSystem::Get() && IInputSystem::Get()->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_X));
 
 	if(switchInput && (weapons_.size() > 0)) {
 		activeWeaponIndex_++;

@@ -82,7 +82,8 @@ bool InputActions::IsJumpPressed() {
 		|| inputSystem->IsKeyPressed(GLFW_KEY_SPACE)
 		|| inputSystem->IsKeyPressed(GLFW_KEY_UP)
 		|| inputSystem->IsKeyPressed(GLFW_KEY_W)
-		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER);
+		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A);
 }
 
 bool InputActions::IsJumpHeld() {
@@ -95,7 +96,8 @@ bool InputActions::IsJumpHeld() {
 		|| inputSystem->IsKeyDown(GLFW_KEY_SPACE)
 		|| inputSystem->IsKeyDown(GLFW_KEY_UP)
 		|| inputSystem->IsKeyDown(GLFW_KEY_W)
-		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER);
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+		|| inputSystem->IsGamepadButtonDown(GLFW_GAMEPAD_BUTTON_A);
 }
 
 }
