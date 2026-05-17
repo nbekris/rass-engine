@@ -1,0 +1,72 @@
+name: User Story
+description: File a bug report.
+title: "[Story]: "
+labels: ["Story", "triage"]
+projects: ["DigiPen-GAM5xx/33"]
+assignees:
+  - octocat
+type: feature
+body:
+  - type: input
+    id: report
+    attributes:
+      label: Reporter
+      description: What is your name?
+      placeholder: ex. Jane Doe
+    validations:
+      required: false
+  - type: input
+    id: as-a
+    attributes:
+      label: As A...
+      description: Who is this story for?
+      placeholder: ex. Player
+    validations:
+      required: false
+  - type: input
+    id: i-need
+    attributes:
+      label: I Need...
+      description: What is the feature's name?
+      placeholder: ex. Legs
+    validations:
+      required: false
+  - type: textarea
+    id: so-i-can
+    attributes:
+      label: So I Can...
+      description: Why does the user want this feature?
+      placeholder: Describe want or need, here
+      value: "so I can move from point A to point B"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: How would you categories this story?
+      multiple: true
+      options:
+        - AI
+        - Architecture
+        - Audio
+        - Content
+        - Data
+        - Debugging
+        - Graphics
+        - Physics
+        - Tools
+    validations:
+      required: true
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      description: What epic does this story fall under (optional)?
+      multiple: true
+      options:
+        - Rendering Pipeline
+        - Physics Simulation
+        - Core Engine Architecture
+        - Game Concepts & Content
+        - Debugging & Development Tools
