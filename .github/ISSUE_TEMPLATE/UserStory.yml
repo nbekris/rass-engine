@@ -56,17 +56,6 @@ body:
         - Graphics
         - Physics
         - Tools
+        - Misc.
     validations:
       required: true
-  - type: dropdown
-    id: epic
-    attributes:
-      label: Epic
-      description: What epic does this story fall under (optional)?
-      multiple: true
-      options:
-        - Rendering Pipeline
-        - Physics Simulation
-        - Core Engine Architecture
-        - Game Concepts & Content
-        - Debugging & Development Tools
