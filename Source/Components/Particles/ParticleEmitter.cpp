@@ -60,7 +60,8 @@ ParticleEmitter::ParticleEmitter(const ParticleEmitter &other)
 	, lifetimeMax(other.lifetimeMax)
 	, scaleMin(other.scaleMin)
 	, scaleMax(other.scaleMax)
-	, tintColor(other.tintColor)
+	, tintColorMin(other.tintColorMin)
+	, tintColorMax(other.tintColorMax)
 	, isEmitting(other.isEmitting)
 	, updateListener{this, &ParticleEmitter::Update}
 {}
@@ -133,13 +134,36 @@ bool ParticleEmitter::Read(Stream &stream) {
 	// Read the emitter properties, from "emitRate" to "scale".
 	stream.Read("EmitOnStart", isEmitting);
 	stream.Read("EmitRate", emitRate);
-	stream.Read("LifeTimeMin", lifetimeMin);
-	stream.Read("LifeTimeMax", lifetimeMax);
-	stream.ReadVec3("ScaleMin", scaleMin);
-	stream.ReadVec3("ScaleMax", scaleMax);
 
-	// Read the tintColor.
-	stream.ReadVec4("TintColor", tintColor);
+	// Read lifetime property
+	if(stream.Read("LifeTime", lifetimeMin)) {
+		// If available, set max to the same value
+		lifetimeMax = lifetimeMin;
+	} else {
+		// Otherwise, retrieve lifetime range
+		stream.Read("LifeTimeMin", lifetimeMin);
+		stream.Read("LifeTimeMax", lifetimeMax);
+	}
+
+	// Read scale property
+	if(stream.ReadVec3("Scale", scaleMin)) {
+		// If available, set max to the same value
+		scaleMax = scaleMin;
+	} else {
+		// Otherwise, retrieve scale range
+		stream.ReadVec3("ScaleMin", scaleMin);
+		stream.ReadVec3("ScaleMax", scaleMax);
+	}
+
+	// Read tint color property
+	if(stream.ReadVec4("TintColor", tintColorMin)) {
+		// If available, set max to the same value
+		tintColorMax = tintColorMin;
+	} else {
+		// Otherwise, retrieve scale range
+		stream.ReadVec4("TintColorMin", tintColorMin);
+		stream.ReadVec4("TintColorMax", tintColorMax);
+	}
 
 	stream.ReadObject("Shape", [this, &stream, factory] (const std::string &key) {
 		// Construct the object from the factory, first
@@ -225,7 +249,7 @@ void ParticleEmitter::SetupParticle(ParticleManager::StartingStats *startingStat
 	particle->lifetime = startingStats->lifetime;
 
 	// Setup random color
-	startingStats->color = glm::vec4(Random::range(0.f, tintColor.r), Random::range(0.f, tintColor.g), Random::range(0.f, tintColor.b), tintColor.a);
+	startingStats->color = glm::vec4(Random::range(tintColorMin.r, tintColorMax.r), Random::range(tintColorMin.g, tintColorMax.g), Random::range(tintColorMin.b, tintColorMax.b), Random::range(tintColorMin.a, tintColorMax.a));
 	particle->color = startingStats->color;
 
 	// Set the particle's scale
