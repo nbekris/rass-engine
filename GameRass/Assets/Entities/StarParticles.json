@@ -18,7 +18,8 @@
 				"LifeTimeMax": 10.0,
 				"ScaleMin": [ 0.01, 0.01, 1.0 ],
 				"ScaleMax": [ 0.25, 0.25, 1.0 ],
-				"TintColor": [ 1.0, 1.0, 1.0, 0.6 ],
+				"TintColorMax": [ 1.0, 1.0, 1.0, 0.6 ],
+				"TintColorMin": [ 0.0, 0.0, 0.0, 0.2 ],
 				"Shape": {
 					"Box": {
 						"Width": 2.0,
