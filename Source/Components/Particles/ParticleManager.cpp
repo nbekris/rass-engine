@@ -179,25 +179,22 @@ bool ParticleManager::Read(Stream &stream) {
 	stream.Read(PARTICLE_MAX, maxParticles);
 	stream.Read(IS_LOOPING, areRecyclable);
 
+	if(IResourceSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+		return false;
+	}
+
 	// Read the name of the mesh.
 	std::string fileName;
 	if(stream.Read(MESH, fileName)) {
-		if(IResourceSystem::Get() == nullptr) {
-			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
-			return false;
-		}
-
 		// Build the requested mesh.
 		mesh = IResourceSystem::Get()->GetCustomMesh(fileName);
+	} else {
+		mesh = IResourceSystem::Get()->GetQuadMesh();
 	}
 
 	// Read the name of the sprite.
 	if(stream.Read(TEXTURE, fileName)) {
-		if(IResourceSystem::Get() == nullptr) {
-			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
-			return false;
-		}
-
 		// Build the requested sprite.
 		texture = IResourceSystem::Get()->GetTexture(fileName);
 	}
