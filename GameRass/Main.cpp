@@ -76,6 +76,7 @@
 #include "Components/Flipper.h"
 #include "Components/IsKinematicMidFlip.h"
 #include "Components/ParallaxController.h"
+#include "Components/ParentTo.h"
 #include "Components/QuitOnClick.h"
 #include "Components/ResumeOnClick.h"
 #include "Components/SceneTransition.h"
@@ -226,6 +227,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	});
 	IComponentFactory::Get()->Register(NAMEOF(WeaponUnlocker), [] () -> Component * {
 		return new WeaponUnlocker();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(ParentTo), [] () -> Component * {
+		return new ParentTo();
 	});
 
 	//#ifdef _DEBUG
