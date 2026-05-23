@@ -3,9 +3,13 @@
     "Name": "GlowParticles",
 		"Components": {
 			"Transform": {
-				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Translation": [ 0.0, 0.0, -3.0 ],
 				"Rotation": 0.0,
 				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"ParentTo": {
+				"EntityName": "Player",
+				"LocalPosition": [ 0.0, 0.0, -3.0 ]
 			},
 			"ParticleManager": {
 				"ParticleMax": 50.0,
