@@ -59,14 +59,22 @@ bool EmitterBox::Read(Stream &stream) {
 	return true;
 }
 
-std::tuple<glm::vec3, float> EmitterBox::GetEmitTransform(const Transform &transform) const {
+std::tuple<glm::vec3, float> RassEngine::Components::Particles::EmitterBox::GetEmitTransform(const Transform *transform) const {
 	// Initialize the particle's position to the emitter's position (from parent's transform).
-	glm::vec3 returnPosition = transform.GetPosition();
+	glm::vec3 returnPosition{0.0f, 0.0f, 0.0f};
+	if(transform != nullptr) {
+		returnPosition = transform->GetPosition();
+	}
 	returnPosition.x += Random::range(-width, width) / 2.f;
 	returnPosition.y += Random::range(-height, height) / 2.f;
 
 	// Initialize the particle's rotation to zero.
-	float returnRotation = isRotationRandom ? Random::angleRad<float>() : transform.GetRotationRad();
+	float returnRotation = 0;
+	if(isRotationRandom) {
+		returnRotation = Random::angleRad<float>();
+	} else if(transform != nullptr) {
+		returnRotation = transform->GetRotationRad();
+	}
 	return {returnPosition, returnRotation};
 }
 

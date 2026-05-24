@@ -189,7 +189,7 @@ bool ParticleEmitter::Read(Stream &stream) {
 			LOG_ERROR("{}: {} was not an {}", NAMEOF(ParticleEmitter), newKey, NAMEOF(EmitterShape));
 			return;
 		}
-	});
+		});
 	return true;
 }
 
@@ -268,7 +268,8 @@ void ParticleEmitter::SetupParticle(ParticleManager::StartingStats *startingStat
 	}
 
 	// Initialize the particle's position and rotationRad
-	std::tie(particle->position, particle->rotationRad) = shape->GetEmitTransform(*transform);
+	std::tie(particle->position, particle->rotationRad) = shape->GetEmitTransform(
+		manager->GetSimSpace() == ParticleManager::SimSpace::Global ? transform : nullptr);
 
 	// Compute the particle's velocities
 	std::tie(startingStats->velocity, startingStats->angularVelocityRad) = shape->GetInitVelocities(*particle);

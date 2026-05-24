@@ -34,8 +34,8 @@ public:
 	virtual bool Read(Stream &stream) override;
 
 	// @brief Selects a random location of emission
-	// @param transform = The center of emit-shape
-	virtual std::tuple<glm::vec3, float> GetEmitTransform(const Transform &transform) const = 0;
+	// @param transform = If set, determines the center of emit-shape in global space
+	virtual std::tuple<glm::vec3, float> GetEmitTransform(const Transform *transform = nullptr) const = 0;
 
 	// @brief Selects a velocity for the particle
 	//
