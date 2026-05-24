@@ -23,7 +23,8 @@
 				"Path": "MenuCursor"
 			},
 			{
-				"Path": "MenuParticles"
+				"Path": "MenuParticles",
+				"Position": [ 0.0, 0.0, -1.0 ]
 			}
 		]
 	}
