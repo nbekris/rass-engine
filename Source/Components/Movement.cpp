@@ -12,6 +12,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "InputActions.h"
 #include "Component.h"
 #include "Components/PhysicsBody.h"
 #include "Components/Transform.h"
@@ -265,10 +266,7 @@ bool Movement::FixedUpdate(const IEvent<Events::GlobalEventArgs> *, const Events
 }
 
 bool Movement::Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
-	if(inputSystem->IsKeyPressed(GLFW_KEY_X) ||
-		inputSystem->IsKeyPressed(GLFW_KEY_UP) ||
-		inputSystem->IsKeyPressed(GLFW_KEY_W) ||
-		inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) {
+	if(InputActions::IsJumpPressed()) {
 		jumpBufferTimer = jumpBufferDuration;
 	}
 
@@ -281,7 +279,7 @@ void Movement::UpdateIdle(float dt) {
 	velocity.x = physics->impulseVelocity.x;
 	velocity.y += gravityFactor * dt;
 
-	if(inputSystem->IsKeyDown(GLFW_KEY_LEFT) || inputSystem->IsKeyDown(GLFW_KEY_A) || inputSystem->IsKeyDown(GLFW_KEY_RIGHT) || inputSystem->IsKeyDown(GLFW_KEY_D)) {
+	if(InputActions::IsMoveLeftHeld() || InputActions::IsMoveRightHeld()) {
 		ChangeState(MovementState::Walking);
 	}
 
@@ -311,7 +309,7 @@ void Movement::UpdateWalking(float dt) {
 
 	velocity.y += gravityFactor * dt;
 
-	if(inputSystem->IsKeyDown(GLFW_KEY_RIGHT) || inputSystem->IsKeyDown(GLFW_KEY_D)) {
+	if(InputActions::IsMoveRightHeld()) {
 		velocity.x = moveSpeed * speedMultiplierOverride + physics->impulseVelocity.x;
 		if(direction != 1) {
 			direction = 1;
@@ -319,9 +317,7 @@ void Movement::UpdateWalking(float dt) {
 			scale.x = std::abs(scale.x);
 			transform->SetLocalScale(scale);
 		}
-	} else if(inputSystem->IsKeyDown(GLFW_KEY_LEFT)
-		|| inputSystem->IsKeyDown(GLFW_KEY_A)
-		|| inputSystem->IsKeyDown(GLFW_KEY_D)) {
+	} else if(InputActions::IsMoveLeftHeld()) {
 		velocity.x = -moveSpeed * speedMultiplierOverride + physics->impulseVelocity.x;
 		if(direction != -1) {
 			direction = -1;
@@ -359,22 +355,18 @@ void Movement::UpdateJumping(float dt) {
 
 	velocity.y += gravityFactor * dt;
 
-	if(inputSystem->IsKeyDown(GLFW_KEY_RIGHT) || inputSystem->IsKeyDown(GLFW_KEY_D)) {
+	if(InputActions::IsMoveRightHeld()) {
 		velocity.x = moveSpeed + physics->impulseVelocity.x;
 		direction = 1;
-	} else if(inputSystem->IsKeyDown(GLFW_KEY_LEFT) || inputSystem->IsKeyDown(GLFW_KEY_A)) {
+	} else if(InputActions::IsMoveLeftHeld()) {
 		velocity.x = -moveSpeed + physics->impulseVelocity.x;
 		direction = -1;
 	} else {
 		velocity.x = physics->impulseVelocity.x;
 	}
 
-	if(!rocketJumping &&
-		!(inputSystem->IsKeyDown(GLFW_KEY_X)
-		|| inputSystem->IsKeyDown(GLFW_KEY_UP)
-		|| inputSystem->IsKeyDown(GLFW_KEY_W)
-		|| inputSystem->IsKeyDown(GLFW_KEY_SPACE)) && velocity.y > 0) {
-			velocity.y *= 0.5f;
+	if(!rocketJumping && !InputActions::IsJumpHeld() && velocity.y > 0) {
+		velocity.y *= 0.5f;
 	}
 
 	if(velocity.y <= 0) {
@@ -394,9 +386,9 @@ void Movement::UpdateFalling(float dt) {
 		coyoteTimer -= dt;
 	}
 
-	if(inputSystem->IsKeyDown(GLFW_KEY_RIGHT) || inputSystem->IsKeyDown(GLFW_KEY_D)) {
+	if(InputActions::IsMoveRightHeld()) {
 		velocity.x = moveSpeed + physics->impulseVelocity.x;
-	} else if(inputSystem->IsKeyDown(GLFW_KEY_LEFT) || inputSystem->IsKeyDown(GLFW_KEY_A)) {
+	} else if(InputActions::IsMoveLeftHeld()) {
 		velocity.x = -moveSpeed + physics->impulseVelocity.x;
 	} else {
 		velocity.x = physics->impulseVelocity.x;
@@ -459,10 +451,10 @@ void Movement::MoveSprite(float dt) {
 		}
 
 		// Impulse is additive with input: shooting while moving gives momentum interaction
-		if(inputSystem->IsKeyDown(GLFW_KEY_RIGHT) || inputSystem->IsKeyDown(GLFW_KEY_D)) {
+		if(InputActions::IsMoveRightHeld()) {
 			velocity.x = moveSpeed * dt + physics->impulseVelocity.x;
 
-		} else if(inputSystem->IsKeyDown(GLFW_KEY_LEFT) || inputSystem->IsKeyDown(GLFW_KEY_A)) {
+		} else if(InputActions::IsMoveLeftHeld()) {
 			velocity.x = -moveSpeed * dt + physics->impulseVelocity.x;
 
 		} else {
@@ -477,9 +469,7 @@ void Movement::Jump() {
 	glm::vec3 velocity = physics->GetVelocity();
 
 	if(transform && physics) {
-		if(inputSystem->IsKeyDown(GLFW_KEY_UP)
-			|| inputSystem->IsKeyDown(GLFW_KEY_W)
-			|| inputSystem->IsKeyDown(GLFW_KEY_SPACE)){
+		if(InputActions::IsJumpHeld()) {
 			velocity.y = jumpVelocity;
 
 			//Need to split this for RocketSound and JumpSound

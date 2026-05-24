@@ -103,7 +103,8 @@ bool TimedSceneTransition::OnUpdate(const IEvent<GlobalEventArgs>*, const Global
 
 	if(inputSystem->IsKeyPressed(GLFW_KEY_ENTER) || inputSystem->IsKeyPressed(GLFW_KEY_SPACE)
 		|| inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE) || inputSystem->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_LEFT)
-		|| inputSystem->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT)) {
+		|| inputSystem->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT)
+		|| inputSystem->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_START)) {
 		bypassCheck = true;
 	}
 

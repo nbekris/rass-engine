@@ -116,6 +116,15 @@ private:
 	std::vector<WeaponProfile> weapons_;
 	int activeWeaponIndex_{0};
 	bool rapidFire_{false};
+
+	static constexpr float AIM_STICK_DEADZONE = 0.2f;
+	static constexpr float TRIGGER_THRESHOLD  = 0.2f;
+	static constexpr float CROSSHAIR_DISTANCE = 5.0f;
+	static constexpr float AIM_HEIGHT_OFFSET  = 0.5f;  // raises aim origin from feet to body center
+
+	float prevRightTrigger_{-1.0f};
+	float prevLeftTrigger_{-1.0f};
+	bool  usingGamepadAim_{false};
 };
 }
 

@@ -151,12 +151,17 @@ bool MenuNavigator::Update(const IEvent<Events::GlobalEventArgs> *, const Events
 		lastMousePos = currentMousePos;
 	}
 
-	// Navigate with Up/Down arrows
-	if(input->IsKeyPressed(GLFW_KEY_DOWN) || input->IsKeyPressed(GLFW_KEY_UP)) {
+	// Navigate with Up/Down arrows or D-pad
+	const bool navDown = input->IsKeyPressed(GLFW_KEY_DOWN)
+		|| input->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN);
+	const bool navUp = input->IsKeyPressed(GLFW_KEY_UP)
+		|| input->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP);
+
+	if(navDown || navUp) {
 		// If no button is highlighted (mouse was used), re-highlight the first button
 		if(highlightedIndex < 0) {
 			HighlightButton(0);
-		} else if(input->IsKeyPressed(GLFW_KEY_DOWN)) {
+		} else if(navDown) {
 			int next = (highlightedIndex + 1) % static_cast<int>(buttons.size());
 			HighlightButton(next);
 		} else {
@@ -165,8 +170,9 @@ bool MenuNavigator::Update(const IEvent<Events::GlobalEventArgs> *, const Events
 		}
 	}
 
-	// Activate with Enter or Space
-	if(input->IsKeyPressed(GLFW_KEY_ENTER) || input->IsKeyPressed(GLFW_KEY_SPACE)) {
+	// Activate with Enter, Space, or gamepad A button
+	if(input->IsKeyPressed(GLFW_KEY_ENTER) || input->IsKeyPressed(GLFW_KEY_SPACE)
+		|| input->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)) {
 		if(highlightedIndex >= 0 && highlightedIndex < static_cast<int>(buttons.size())) {
 			Button *btn = buttons[highlightedIndex];
 			if(btn->IsInteractable()) {

@@ -30,6 +30,7 @@ namespace RassEngine::Systems {
 
 InputSystemGlfw::InputSystemGlfw(GLFWwindow *window)
 	: window{window}, currentKeys{0}, previousKeys{0}, mousePosRaw{}, mousePosViewport{}, currentMouseButtons{0}, previousMouseButtons{0}
+	, currentGamepad{}, previousGamepad{}
 	, updateListener{this, &InputSystemGlfw::Update} {
 	if(window == nullptr) {
 		throw std::invalid_argument("window cannot be null");
@@ -56,6 +57,10 @@ bool InputSystemGlfw::Initialize() {
 	// Setup mouse buttons
 	currentMouseButtons = static_cast<std::byte>(0);
 	previousMouseButtons = static_cast<std::byte>(0);
+
+	// Setup gamepad state
+	std::memset(&currentGamepad, 0, sizeof(currentGamepad));
+	std::memset(&previousGamepad, 0, sizeof(previousGamepad));
 
 	// Bind to mouse button changes
 	// First, by storing this system as user pointer
@@ -165,6 +170,9 @@ bool InputSystemGlfw::Update(const IEvent<Events::GlobalEventArgs> *, const Even
 	// Copy the current button states over the previous one
 	previousMouseButtons = currentMouseButtons;
 
+	// Copy gamepad state from last frame
+	previousGamepad = currentGamepad;
+
 	// Poll GLFW events
 	glfwPollEvents();
 
@@ -173,6 +181,11 @@ bool InputSystemGlfw::Update(const IEvent<Events::GlobalEventArgs> *, const Even
 
 	// Poll the mouse cursor position
 	UpdateMousePositions();
+
+	// Poll gamepad state (joystick slot 0)
+	if(!glfwGetGamepadState(GLFW_JOYSTICK_1, &currentGamepad)) {
+		std::memset(&currentGamepad, 0, sizeof(currentGamepad));
+	}
 
 	return true;
 }
@@ -280,6 +293,40 @@ bool InputSystemGlfw::IsMouseButtonReleased(unsigned short button) const {
 	bool thisFrame, lastFrame;
 	WhenMouseButtonDown(button, thisFrame, lastFrame);
 	return lastFrame && !thisFrame;
+}
+
+bool InputSystemGlfw::IsGamepadConnected() const {
+	return glfwJoystickIsGamepad(GLFW_JOYSTICK_1);
+}
+
+bool InputSystemGlfw::IsGamepadButtonDown(unsigned short button) const {
+	if(button >= GLFW_GAMEPAD_BUTTON_LAST + 1) {
+		return false;
+	}
+	return currentGamepad.buttons[button] == GLFW_PRESS;
+}
+
+bool InputSystemGlfw::IsGamepadButtonPressed(unsigned short button) const {
+	if(button >= GLFW_GAMEPAD_BUTTON_LAST + 1) {
+		return false;
+	}
+	return currentGamepad.buttons[button] == GLFW_PRESS
+		&& previousGamepad.buttons[button] != GLFW_PRESS;
+}
+
+bool InputSystemGlfw::IsGamepadButtonReleased(unsigned short button) const {
+	if(button >= GLFW_GAMEPAD_BUTTON_LAST + 1) {
+		return false;
+	}
+	return currentGamepad.buttons[button] != GLFW_PRESS
+		&& previousGamepad.buttons[button] == GLFW_PRESS;
+}
+
+float InputSystemGlfw::GetGamepadAxis(unsigned short axis) const {
+	if(axis >= GLFW_GAMEPAD_AXIS_LAST + 1) {
+		return 0.f;
+	}
+	return currentGamepad.axes[axis];
 }
 
 const std::string_view &InputSystemGlfw::NameClass() const {

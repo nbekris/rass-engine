@@ -13,6 +13,11 @@ namespace RassEngine {
 struct InputActions {
 	static bool IsFlipPressed();
 	static bool IsGrabBoxHeld();
+
+	static bool IsMoveLeftHeld();
+	static bool IsMoveRightHeld();
+	static bool IsJumpPressed();
+	static bool IsJumpHeld();
 };
 
 }

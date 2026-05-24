@@ -168,23 +168,34 @@ bool ShootingController::Update(const IEvent<Events::GlobalEventArgs> *, const E
 	UpdateArmRotation();
 	UpdateCameraOffset();
 	timmer += Systems::ITimeSystem::Get()->GetDeltaTimeSec();
+
+	// Sample triggers once per frame for threshold-crossing detection
+	const float rightTrigger = IInputSystem::Get() ? IInputSystem::Get()->GetGamepadAxis(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) : -1.0f;
+	const float leftTrigger  = IInputSystem::Get() ? IInputSystem::Get()->GetGamepadAxis(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER)  : -1.0f;
+	const bool rightTriggerJustPressed = (prevRightTrigger_ <= TRIGGER_THRESHOLD) && (rightTrigger > TRIGGER_THRESHOLD);
+	const bool leftTriggerJustPressed  = (prevLeftTrigger_  <= TRIGGER_THRESHOLD) && (leftTrigger  > TRIGGER_THRESHOLD);
+
 	// God mode: bypass per-weapon cooldown when rapidFire_ is active
 	if(activeWeaponIndex_ >= 0 && activeWeaponIndex_ < static_cast<int>(weapons_.size())) {
-		// God mode: bypass per-weapon cooldown when rapidFire_ is active
 		const float effectiveCooldown = rapidFire_ ? 0.0f : weapons_[activeWeaponIndex_].fireCooldownTime;
 		if(timmer > effectiveCooldown) {
-			if(IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_LEFT)) {
+			const bool fireInput = (IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_LEFT))
+				|| rightTriggerJustPressed;
+			if(fireInput) {
 				ApplyRecoil();
 				SpawnBullet();
 				timmer = 0.0f;
 			}
 		}
 	}
-	if(IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT) && (weapons_.size() > 0)) {
-		// Handle right mouse button click
-		activeWeaponIndex_++;
-		if(activeWeaponIndex_ >= weapons_.size()) {
 
+	const bool switchInput = (IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT))
+		|| leftTriggerJustPressed
+		|| (IInputSystem::Get() && IInputSystem::Get()->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_X));
+
+	if(switchInput && (weapons_.size() > 0)) {
+		activeWeaponIndex_++;
+		if(activeWeaponIndex_ >= static_cast<int>(weapons_.size())) {
 			activeWeaponIndex_ = 0;
 		}
 		int tempcounter = 0;
@@ -202,11 +213,12 @@ bool ShootingController::Update(const IEvent<Events::GlobalEventArgs> *, const E
 		SwitchWeapon(activeWeaponIndex_);
 	}
 
-	if(IInputSystem::Get() && IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT) && (weapons_.size() == 0)) {
-		if(IInputSystem::Get()->IsMouseButtonClicked(GLFW_MOUSE_BUTTON_RIGHT)) {
-			StartGrapple();
-		}
+	if(switchInput && (weapons_.size() == 0)) {
+		StartGrapple();
 	}
+
+	prevRightTrigger_ = rightTrigger;
+	prevLeftTrigger_  = leftTrigger;
 	return true;
 }
 void ShootingController::SwitchWeapon(int index) {
@@ -258,17 +270,36 @@ void ShootingController::ApplyRecoil() {
 void ShootingController::calculateAimDirection() {
 	if(!IInputSystem::Get() || !ICameraSystem::Get() || !transform) return;
 
-	glm::vec2 mouseNDC = IInputSystem::Get()->GetMousePositionViewport();
-	aimWorldPos_ = ICameraSystem::Get()->ViewportToWorld(mouseNDC);  // Stored for use in UpdateCameraOffset
-	glm::vec2 toMouse = aimWorldPos_ - transform->GetPosition2D();
+	// Right stick aim: read axes, apply deadzone, flip Y (GLFW Y+ = down, world Y+ = up)
+	const float stickX = IInputSystem::Get()->GetGamepadAxis(GLFW_GAMEPAD_AXIS_RIGHT_X);
+	const float stickY = -IInputSystem::Get()->GetGamepadAxis(GLFW_GAMEPAD_AXIS_RIGHT_Y);
+	const glm::vec2 stick{stickX, stickY};
 
-	if(glm::length(toMouse) > std::numeric_limits<float>::epsilon()) {
-		aimDirection = glm::normalize(toMouse);
+	const glm::vec2 aimOrigin = transform->GetPosition2D() + glm::vec2(0.0f, AIM_HEIGHT_OFFSET);
+
+	if(glm::length(stick) > AIM_STICK_DEADZONE) {
+		usingGamepadAim_ = true;
+		aimDirection = glm::normalize(stick);
+		aimWorldPos_ = aimOrigin + aimDirection * CROSSHAIR_DISTANCE;
+	} else if(IInputSystem::Get()->IsGamepadConnected()) {
+		// Stick is neutral — rest crosshair directly in front of the player at body height
+		usingGamepadAim_ = true;
+		float facingX = (transform->GetLocalScale().x >= 0.0f) ? 1.0f : -1.0f;
+		aimDirection = glm::vec2(facingX, 0.0f);
+		aimWorldPos_ = aimOrigin + aimDirection * CROSSHAIR_DISTANCE;
 	} else {
-		aimDirection = glm::vec2(0.0f);
+		usingGamepadAim_ = false;
+		glm::vec2 mouseNDC = IInputSystem::Get()->GetMousePositionViewport();
+		aimWorldPos_ = ICameraSystem::Get()->ViewportToWorld(mouseNDC);
+		glm::vec2 toMouse = aimWorldPos_ - transform->GetPosition2D();
+		if(glm::length(toMouse) > std::numeric_limits<float>::epsilon()) {
+			aimDirection = glm::normalize(toMouse);
+		} else {
+			aimDirection = glm::vec2(0.0f);
+		}
 	}
 
-	// Flip character to face the cursor
+	// Flip character to face the aim direction
 	if(transform && std::abs(aimDirection.x) > std::numeric_limits<float>::epsilon()) {
 		glm::vec3 scale = transform->GetLocalScale();
 		float absX = std::abs(scale.x);
@@ -358,19 +389,26 @@ void ShootingController::SpawnBullet() const {
 void ShootingController::UpdateCrosshairPosition() {
 	if(!crosshair || !IInputSystem::Get() || !IRenderSystem::Get()) return;
 
-	glm::vec2 mouseNDC = IInputSystem::Get()->GetMousePositionViewport();
 	float aspectRatio = static_cast<float>(IRenderSystem::Get()->getScreenWidth())
 		/ static_cast<float>(IRenderSystem::Get()->getScreenHeight());
 
+	glm::vec2 ndc;
+	if(usingGamepadAim_ && ICameraSystem::Get()) {
+		// Place crosshair at the aim world position computed in calculateAimDirection
+		ndc = ICameraSystem::Get()->WorldToScreenViewport(glm::vec3(aimWorldPos_, 0.0f));
+		ndc.x = glm::clamp(ndc.x, -1.0f, 1.0f);
+		ndc.y = glm::clamp(ndc.y, -1.0f, 1.0f);
+	} else {
+		ndc = IInputSystem::Get()->GetMousePositionViewport();
 #ifndef _DEBUG
-	// Clamp cursor to visible screen bounds to prevent crosshair from going off-screen
-	mouseNDC.x = glm::clamp(mouseNDC.x, -1.0f, 1.0f);
-	mouseNDC.y = glm::clamp(mouseNDC.y, -1.0f, 1.0f);
-#endif // bound the mouse cursor but only for release builds
+		ndc.x = glm::clamp(ndc.x, -1.0f, 1.0f);
+		ndc.y = glm::clamp(ndc.y, -1.0f, 1.0f);
+#endif
+	}
 
 	crosshair->GetTransform()->SetPosition(glm::vec3(
-		mouseNDC.x * aspectRatio,
-		mouseNDC.y,
+		ndc.x * aspectRatio,
+		ndc.y,
 		crosshair->GetTransform()->GetPosition().z
 	));
 }

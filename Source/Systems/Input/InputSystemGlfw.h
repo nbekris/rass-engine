@@ -47,6 +47,11 @@ public:
 	bool IsMouseButtonDown(unsigned short button) const override;
 	bool IsMouseButtonClicked(unsigned short button) const override;
 	bool IsMouseButtonReleased(unsigned short button) const override;
+	bool IsGamepadConnected() const override;
+	bool IsGamepadButtonDown(unsigned short button) const override;
+	bool IsGamepadButtonPressed(unsigned short button) const override;
+	bool IsGamepadButtonReleased(unsigned short button) const override;
+	float GetGamepadAxis(unsigned short axis) const override;
 
 	inline const glm::dvec2 &GetMousePositionRaw() const override {
 		return mousePosRaw;
@@ -79,6 +84,8 @@ private:
 	glm::vec2 mousePosViewport;
 	std::byte currentMouseButtons{0};
 	std::byte previousMouseButtons{0};
+	GLFWgamepadstate currentGamepad{};
+	GLFWgamepadstate previousGamepad{};
 	Events::GlobalEventListener<InputSystemGlfw> updateListener;
 #ifndef _DEBUG
 	bool isMouseCaptured{false};
