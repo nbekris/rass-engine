@@ -41,6 +41,7 @@ namespace RassEngine::Components::Particles {
 
 static const char *PARTICLE_MAX = "ParticleMax";
 static const char *IS_LOOPING = "IsLooping";
+static const char *SIM_SPACE = "SimSpace";
 static const char *MESH = "Mesh";
 static const char *TEXTURE = "Texture";
 
@@ -54,6 +55,7 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 	: Cloneable<Component, ParticleManager>{other}
 	, maxParticles{other.maxParticles}
 	, areRecyclable{other.areRecyclable}
+	, simSpace{other.simSpace}
 	, mesh{other.mesh}
 	, texture{other.texture}
 	, updateListener{this, &ParticleManager::Update}
@@ -163,7 +165,9 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 
 		// Send the transform data to the DGL.
 		particle.modelMatrix = Graphics::Math::GetTransformMatrix(data.current.position, data.current.rotationRad, data.current.scale);
-		particle.modelMatrix = Parent()->GetTransform()->getTransformMatrix() * particle.modelMatrix;
+		if(GetSimSpace() == SimSpace::Local) {
+			particle.modelMatrix = Parent()->GetTransform()->getTransformMatrix() * particle.modelMatrix;
+		}
 
 		// Render the mesh associated with the emitter.
 		IRenderSystem::Get()->SubmitRenderable(particle);
@@ -178,6 +182,18 @@ bool ParticleManager::Read(Stream &stream) {
 
 	stream.Read(PARTICLE_MAX, maxParticles);
 	stream.Read(IS_LOOPING, areRecyclable);
+
+	// Read the type
+	std::string_view simStr;
+	if(stream.Read(SIM_SPACE, simStr)) {
+		if(simStr == "Global") {
+			simSpace = SimSpace::Global;
+		} else if(simStr == "Local") {
+			simSpace = SimSpace::Local;
+		} else {
+			LOG_WARNING("{}: Unrecognized {} type '{}'", NameClass(), NAMEOF(SimSpace), simStr);
+		}
+	}
 
 	if(IResourceSystem::Get() == nullptr) {
 		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));

@@ -12,7 +12,6 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include "Cloneable.h"
@@ -37,6 +36,11 @@ namespace RassEngine::Components::Particles {
 // Class Definition:
 class ParticleManager : public Cloneable<Component, ParticleManager> {
 public:
+	enum class SimSpace {
+		Global,
+		Local
+	};
+
 	// Starting stats
 	struct StartingStats {
 		// The duration this particle is intended to remain alive
@@ -80,6 +84,11 @@ public:
 		return particleFree == 0;
 	}
 
+	// Return true if simSpace == SimSpace::Local.
+	inline SimSpace GetSimSpace() const {
+		return simSpace;
+	}
+
 	// Allocate an unused particle, if possible.
 	std::tuple<StartingStats *, Particle *> AllocateParticle();
 
@@ -120,6 +129,8 @@ private:
 
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
+
+	SimSpace simSpace{SimSpace::Global};
 
 	Graphics::Mesh *mesh{nullptr};
 	Graphics::Texture *texture{nullptr};
