@@ -11,6 +11,7 @@
 #include <functional>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -105,6 +106,7 @@ private:
 
 	bool Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
 	bool Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
+	void Reset();
 
 	// Kill an active particle.
 	// [NOTE: When areRecyclable is true, particles become "Free", instead of "Dead".]
@@ -132,8 +134,10 @@ private:
 
 	SimSpace simSpace{SimSpace::Global};
 
-	Graphics::Mesh *mesh{nullptr};
-	Graphics::Texture *texture{nullptr};
+	std::string meshName{""};
+	std::string texturePath{""};
+	bool filterLinear{false};  // false=GL_NEAREST,true=GL_LINEAR
+
 	Events::GlobalEventListener<ParticleManager> updateListener;
 	Events::GlobalEventListener<ParticleManager> renderListener;
 };
