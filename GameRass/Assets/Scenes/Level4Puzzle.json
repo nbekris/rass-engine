@@ -42,12 +42,12 @@
 
 			},
 			{
-				"Path":"DeathArea",
-				"Position":[50.0,0.0,0,0]
+				"Path": "DeathArea",
+				"Position": [ 50.0, 0.0, 0, 0 ]
 			},
 			{
-				"Path":"DeathArea",
-				"Position":[50.0,33.0,0,0]
+				"Path": "DeathArea",
+				"Position": [ 50.0, 33.0, 0, 0 ]
 			},
 			{
 				"Path": "TipsTextEntity"
@@ -222,6 +222,9 @@
 			},
 			{
 				"Path": "MusicRockThinker"
+			},
+			{
+				"Path": "GlowParticles"
 			}
 		]
 	}

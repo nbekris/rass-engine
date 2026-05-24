@@ -21,6 +21,9 @@
 			},
 			{
 				"Path": "MenuCursor"
+			},
+			{
+				"Path": "MenuParticles"
 			}
 		]
 	}

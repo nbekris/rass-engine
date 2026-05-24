@@ -1,6 +1,6 @@
 {
   "Entity": {
-    "Name": "StarParticles",
+    "Name": "MenuParticles",
 		"Components": {
 			"Transform": {
 				"Translation": [ 0.0, 0.0, 0.0 ],
@@ -10,7 +10,8 @@
 			"ParticleManager": {
 				"ParticleMax": 50.0,
 				"IsLooping": true,
-				"Mesh": "MeshStar"
+				"SimSpace": "Global",
+				"Texture": "Assets/Textures/GlowParticle.png"
 			},
 			"ParticleEmitter": {
 				"EmitRate": 5.0,
