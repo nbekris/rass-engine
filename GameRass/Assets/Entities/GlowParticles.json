@@ -1,0 +1,63 @@
+{
+  "Entity": {
+    "Name": "GlowParticles",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, -2.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"ParentTo": {
+				"EntityName": "Player",
+				"LocalPosition": [ 0.0, 0.0, -2.0 ]
+			},
+			"ParticleManager": {
+				"ParticleMax": 100.0,
+				"IsLooping": true,
+				"SimSpace": "Global",
+				"Texture": "Assets/Textures/GlowParticle.png"
+			},
+			"ParticleEmitter": {
+				"EmitRate": 40.0,
+				"LifeTimeMin": 1.0,
+				"LifeTimeMax": 5.0,
+				"ScaleMin": [ 0.05, 0.05, 1.0 ],
+				"ScaleMax": [ 0.25, 0.25, 1.0 ],
+				"TintColorMax": [ 1.0, 1.0, 1.0, 0.6 ],
+				"TintColorMin": [ 0.6, 0.6, 0.6, 0.2 ],
+				"Shape": {
+					"Box": {
+						"Width": 20.0,
+						"Height": 10.0,
+						"RandomizeRotation": false,
+						"SpeedMin": 0.1,
+						"SpeedMax": 0.5,
+						"TurnSpeedMin": -1.0,
+						"TurnSpeedMax": 1.0
+					}
+				}
+			},
+			"ParticleMover": {},
+			"ParticleSizeUpdater": {
+				"Start": 0.0,
+				"KeyFrames": [
+					{
+						"Type": 2,
+						"Time": 0.3,
+						"Value": 1.0
+					},
+					{
+						"Type": 0,
+						"Time": 0.7,
+						"Value": 1.0
+					},
+					{
+						"Type": 1,
+						"Time": 1.0,
+						"Value": 0.0
+					}
+				]
+			}
+		}
+  }
+}

@@ -11,8 +11,8 @@
 #include <functional>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include "Cloneable.h"
@@ -37,6 +37,11 @@ namespace RassEngine::Components::Particles {
 // Class Definition:
 class ParticleManager : public Cloneable<Component, ParticleManager> {
 public:
+	enum class SimSpace {
+		Global,
+		Local
+	};
+
 	// Starting stats
 	struct StartingStats {
 		// The duration this particle is intended to remain alive
@@ -80,6 +85,11 @@ public:
 		return particleFree == 0;
 	}
 
+	// Return true if simSpace == SimSpace::Local.
+	inline SimSpace GetSimSpace() const {
+		return simSpace;
+	}
+
 	// Allocate an unused particle, if possible.
 	std::tuple<StartingStats *, Particle *> AllocateParticle();
 
@@ -96,6 +106,7 @@ private:
 
 	bool Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
 	bool Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
+	void Reset();
 
 	// Kill an active particle.
 	// [NOTE: When areRecyclable is true, particles become "Free", instead of "Dead".]
@@ -121,8 +132,12 @@ private:
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
 
-	Graphics::Mesh *mesh{nullptr};
-	Graphics::Texture *texture{nullptr};
+	SimSpace simSpace{SimSpace::Global};
+
+	std::string meshName{""};
+	std::string texturePath{""};
+	bool filterLinear{false};  // false=GL_NEAREST,true=GL_LINEAR
+
 	Events::GlobalEventListener<ParticleManager> updateListener;
 	Events::GlobalEventListener<ParticleManager> renderListener;
 };

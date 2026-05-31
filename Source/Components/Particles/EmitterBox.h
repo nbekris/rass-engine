@@ -38,7 +38,7 @@ public:
 	// @brief Selects a random location of emission
 	//
 	// @param transform = The center of emit-shape
-	std::tuple<glm::vec3, float> GetEmitTransform(const Transform &transform) const override;
+	std::tuple<glm::vec3, float> GetEmitTransform(const Transform * transform) const override;
 
 	// @brief Selects a velocity for the particle
 	//
