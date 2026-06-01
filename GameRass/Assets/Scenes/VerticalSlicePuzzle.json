@@ -175,6 +175,9 @@
 			},
 			{
 				"Path": "GlowParticles"
+			},
+			{
+				"Path": "ScreenFlash"
 			}
 		]
 	}

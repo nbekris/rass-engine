@@ -1,0 +1,26 @@
+{
+  "Entity": {
+    "Name": "ScreenFlash",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.1 ],
+				"Rotation": 0.0,
+				"Scale": [ 25.0, 12.5, 1.0 ]
+			},
+			"Sprite": {
+				"Alpha": 0.0,
+				"Color": [
+					1.0,
+					1.0,
+					1.0
+				],
+				"TexturePath": "Assets/Textures/ScreenFlash.png",
+				"FilterLinear": false
+			},
+			"ParentTo": {
+				"EntityName": "Player",
+				"LocalPosition": [ 0.0, 0.0, 0.1 ]
+			}
+		}
+  }
+}
