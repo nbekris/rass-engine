@@ -17,7 +17,7 @@ namespace RassEngine::Components {
 	MusicFader::MusicFader() : Cloneable<Component, MusicFader>{} {}
 
 	MusicFader::MusicFader(const MusicFader &other)
-		: Cloneable<Component, MusicFader>{}
+		: Cloneable<Component, MusicFader>{other}
 		, fileName{other.fileName}
 		, volume{other.volume}
 		, pitch{other.pitch}

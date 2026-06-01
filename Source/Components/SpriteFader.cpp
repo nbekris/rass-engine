@@ -35,7 +35,7 @@ SpriteFader::SpriteFader() : Cloneable<Component, SpriteFader>{},
 onUpdateListener{this, &SpriteFader::OnUpdate}  {}
 
 	SpriteFader::SpriteFader(const SpriteFader &other)
-		: Cloneable<Component, SpriteFader>{}, fadeDuration{other.fadeDuration},
+	: Cloneable<Component, SpriteFader>{other}, fadeDuration{other.fadeDuration},
 		onUpdateListener{this, &SpriteFader::OnUpdate}
 	{
 	}
