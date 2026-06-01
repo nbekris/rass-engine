@@ -20,6 +20,10 @@
 			"ParentTo": {
 				"EntityName": "Player",
 				"LocalPosition": [ 0.0, 0.0, 0.1 ]
+			},
+			"SpriteFader": {
+				"Enabled": false,
+				"FadeDuration": 0.5
 			}
 		}
   }
