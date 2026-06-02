@@ -10,6 +10,7 @@ uniform float uAlpha;
 uniform vec2 uTiling;
 uniform vec2 uOffset;
 uniform int uIsTextMode;
+uniform int uIsMultiply;
 uniform sampler2D diffuseTex;
 
 // Destructible tilemap
@@ -44,6 +45,11 @@ void main() {
     if (texColor.a < 0.01) {
         discard;
     }
-
+		if (uIsMultiply == 1) {
+		vec3  tinted = texColor.rgb * uColorTint;
+		float a      = texColor.a   * uAlpha;
+		FragColor = vec4(mix(vec3(1.0), tinted, a), 1.0);
+		} else {
     FragColor = texColor * vec4(uColorTint, uAlpha);
+		}
 }

@@ -39,7 +39,13 @@ public:
 		Transparent,
 		UI
 	};
-
+	enum class BlendMode : unsigned char {
+		AlphaBlend = 0,    // Standard transparency:    out = src.rgb*src.a + dst*(1-src.a)
+		Premultiplied,     // For premultiplied alpha:  out = src.rgb + dst*(1-src.a)
+		Additive,          // Glow / fire / lasers:     out = src.rgb*src.a + dst
+		Multiply,          // Darken / tint (PS-style): out = src*dst*src.a + dst*(1-src.a)
+		//Screen             // Brighten:   
+	};
 	/// <summary>
 	/// Packet of data to render
 	/// </summary>
@@ -53,6 +59,7 @@ public:
 		int priorityOffset = 0;
 		float alpha = 1.0f;
 		RenderLayer renderLayer = RenderLayer::Transparent;
+		BlendMode blendMode = BlendMode::AlphaBlend;
 		//Text rendering specific
 		bool isTextMode = false;
 		std::vector<glm::vec2> charUVOffsets{MAX_TEXT_LENGTH};

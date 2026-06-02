@@ -40,6 +40,7 @@ Sprite::Sprite(const Sprite &other)
 	, color{other.color}
 	, texturePath{other.texturePath}
 	, renderLayer{other.renderLayer}
+	, blendMode{other.blendMode}
 	, numCols{other.numCols}
 	, numRows{other.numRows}
 	, frameindex{other.frameindex}
@@ -92,7 +93,15 @@ bool Sprite::Read(Stream &stream) {
 	if(stream.Read<unsigned char>("RenderLayer", readEnumLayer)) {
 		renderLayer = static_cast<IRenderSystem::RenderLayer>(readEnumLayer);
 	}
-
+	std::string_view blendStr;
+	if(stream.Read("BlendMode", blendStr)) {
+		if(blendStr == "AlphaBlend")         blendMode = IRenderSystem::BlendMode::AlphaBlend;
+		else if(blendStr == "Premultiplied") blendMode = IRenderSystem::BlendMode::Premultiplied;
+		else if(blendStr == "Additive")      blendMode = IRenderSystem::BlendMode::Additive;
+		else if(blendStr == "Multiply")      blendMode = IRenderSystem::BlendMode::Multiply;
+		//else if(blendStr == "Screen")        blendMode = IRenderSystem::BlendMode::Screen;
+		else LOG_WARNING("{}: Unrecognized BlendMode '{}'", NameClass(), blendStr);
+	}
 	return true;
 }
 void Sprite::SetColor(float r, float g, float b) {
@@ -177,6 +186,7 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 		Mesh *mesh = IResourceSystem::Get()->GetQuadMesh();
 		renderable.texture = texture;
 		renderable.mesh = mesh;
+		renderable.blendMode = blendMode;
 		//
 		//renderable.priorityOffset = trans->GetPosition().b;
 		renderable.texTiling = glm::vec2(1.0f / numCols, 1.0f / numRows);

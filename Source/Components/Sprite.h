@@ -107,6 +107,7 @@ private:
 	// Member variables
 	float alpha{1.0f};
 	IRenderSystem::RenderLayer renderLayer{IRenderSystem::RenderLayer::Transparent};
+	IRenderSystem::BlendMode blendMode{IRenderSystem::BlendMode::AlphaBlend};
 	glm::vec3 color{1.0f, 1.0f, 1.0f};
 
 	std::string texturePath{};
