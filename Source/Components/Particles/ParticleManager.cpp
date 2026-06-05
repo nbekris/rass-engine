@@ -56,10 +56,10 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 	: Cloneable<Component, ParticleManager>{other}
 	, maxParticles{other.maxParticles}
 	, areRecyclable{other.areRecyclable}
+	, blendMode{other.blendMode}
 	, simSpace{other.simSpace}
 	, meshName{other.meshName}
 	, texturePath{other.texturePath}
-	, blendMode{other.blendMode}
 	, updateListener{this, &ParticleManager::Update}
 	, renderListener{this, &ParticleManager::Render}
 {}

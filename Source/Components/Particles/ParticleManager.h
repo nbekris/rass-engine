@@ -34,7 +34,7 @@ class Texture;
 }
 
 namespace RassEngine::Components::Particles {
-using namespace RassEngine::Systems;
+//using namespace RassEngine::Systems;
 // Class Definition:
 class ParticleManager : public Cloneable<Component, ParticleManager> {
 public:
@@ -133,7 +133,7 @@ private:
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
 
-	IRenderSystem::BlendMode blendMode{IRenderSystem::BlendMode::AlphaBlend};
+	RassEngine::Systems::IRenderSystem::BlendMode blendMode{RassEngine::Systems::IRenderSystem::BlendMode::AlphaBlend};
 
 	SimSpace simSpace{SimSpace::Global};
 
