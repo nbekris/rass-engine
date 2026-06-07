@@ -26,7 +26,7 @@ static const char *KEY_MAX_RADIUS = "MaxRadius";
 EmitterCone::EmitterCone(void)
 	: EmitterShape() {}
 
-EmitterCone::EmitterCone(const EmitterCone& other)
+EmitterCone::EmitterCone(const EmitterCone &other)
 	: EmitterShape(other)
 	, startAngleDeg(other.startAngleDeg), endAngleDeg(other.endAngleDeg)
 	, minRadius(other.minRadius), maxRadius(other.maxRadius) {}
@@ -57,9 +57,12 @@ bool EmitterCone::Read(Stream &stream) {
 	return true;
 }
 
-std::tuple<glm::vec3, float> EmitterCone::GetEmitTransform(const Transform &transform) const {
+std::tuple<glm::vec3, float> RassEngine::Components::Particles::EmitterCone::GetEmitTransform(const Transform *transform) const {
 	// Get a random rotation within a certain range
-	float returnRotation = transform.GetRotationRad();
+	float returnRotation = 0;
+	if(transform != nullptr) {
+		returnRotation = transform->GetRotationRad();
+	}
 	returnRotation += Random::range((startAngleDeg * Utils::DEG_TO_RAD), (endAngleDeg * Utils::DEG_TO_RAD));
 
 	// Get a random radius
@@ -69,7 +72,11 @@ std::tuple<glm::vec3, float> EmitterCone::GetEmitTransform(const Transform &tran
 	glm::vec3 offsetDir = Graphics::Math::FromAngleRad(returnRotation);
 
 	// Convert above into a position
-	glm::vec3 returnPosition = transform.GetPosition() + (offsetDir * radius);
+	glm::vec3 returnPosition{0.0f, 0.0f, 0.0f};
+	if(transform != nullptr) {
+		returnPosition = transform->GetPosition();
+	}
+	returnPosition += (offsetDir * radius);
 	return {returnPosition, returnRotation};
 }
 

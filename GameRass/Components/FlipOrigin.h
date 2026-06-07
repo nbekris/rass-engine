@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <string_view>
+
 #include <Cloneable.h>
 #include <Component.h>
 #include <Components/Transform.h>
@@ -16,10 +20,7 @@
 #include <Events/GlobalEventListener.h>
 #include <IEvent.h>
 #include <IEventListener.h>
-#include <memory>
 #include <Stream.h>
-#include <string>
-#include <string_view>
 
 namespace RassGame::Components {
 class FlipOrigin : public RassEngine::Cloneable<RassEngine::Component, FlipOrigin> {

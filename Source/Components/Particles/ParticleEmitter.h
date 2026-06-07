@@ -82,7 +82,8 @@ private:
 	float lifetimeMax{1.0f};
 	glm::vec3 scaleMin{1.0f, 1.0f, 1.0f};
 	glm::vec3 scaleMax{1.0f, 1.0f, 1.0f};
-	glm::vec4 tintColor{1.0f, 1.0f, 1.0f, 1.0f};
+	glm::vec4 tintColorMin{1.0f, 1.0f, 1.0f, 1.0f};
+	glm::vec4 tintColorMax{1.0f, 1.0f, 1.0f, 1.0f};
 	EmitterShape *shape{nullptr};
 	ParticleManager *manager{nullptr};
 	Events::GlobalEventListener<ParticleEmitter> updateListener;

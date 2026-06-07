@@ -41,8 +41,10 @@ namespace RassEngine::Components::Particles {
 
 static const char *PARTICLE_MAX = "ParticleMax";
 static const char *IS_LOOPING = "IsLooping";
+static const char *SIM_SPACE = "SimSpace";
 static const char *MESH = "Mesh";
 static const char *TEXTURE = "Texture";
+static const char *FILTER_LINEAR = "FilterLinear";
 
 ParticleManager::ParticleManager(void)
 	: Cloneable<Component, ParticleManager>()
@@ -54,8 +56,9 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 	: Cloneable<Component, ParticleManager>{other}
 	, maxParticles{other.maxParticles}
 	, areRecyclable{other.areRecyclable}
-	, mesh{other.mesh}
-	, texture{other.texture}
+	, simSpace{other.simSpace}
+	, meshName{other.meshName}
+	, texturePath{other.texturePath}
 	, updateListener{this, &ParticleManager::Update}
 	, renderListener{this, &ParticleManager::Render}
 {}
@@ -67,14 +70,14 @@ ParticleManager::~ParticleManager() {
 
 	IGlobalEventsSystem::Get()->unbind(Global::Update, &updateListener);
 	IGlobalEventsSystem::Get()->unbind(Global::Render, &renderListener);
+
+	// Reset everything
+	Reset();
 }
 
 bool ParticleManager::Initialize() {
 	// Reset everything
-	particles.clear();
-	particleActive = 0;
-	particleFree = maxParticles;
-	particleAlive = maxParticles;
+	Reset();
 
 	// Allocate the maximum number of particles to avoid resizing.
 	particles.reserve(particleFree);
@@ -143,6 +146,23 @@ bool ParticleManager::Update(const IEvent<GlobalEventArgs> *, const GlobalEventA
 }
 
 bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
+	if(IResourceSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+		return false;
+	}
+
+	// Build the requested mesh.
+	Mesh *mesh = IResourceSystem::Get()->GetQuadMesh();
+	if(!meshName.empty()) {
+		mesh = IResourceSystem::Get()->GetCustomMesh(meshName);
+	}
+
+	// Build the requested texture, if any
+	Texture *texture = nullptr;
+	if(!texturePath.empty()) {
+		texture = IResourceSystem::Get()->GetTexture(texturePath);
+	}
+
 	// Render each active particle.
 	for(const ParticleData &data : particles) {
 		// Check for an active particle
@@ -163,7 +183,9 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 
 		// Send the transform data to the DGL.
 		particle.modelMatrix = Graphics::Math::GetTransformMatrix(data.current.position, data.current.rotationRad, data.current.scale);
-		particle.modelMatrix = Parent()->GetTransform()->getTransformMatrix() * particle.modelMatrix;
+		if(GetSimSpace() == SimSpace::Local) {
+			particle.modelMatrix = Parent()->GetTransform()->getTransformMatrix() * particle.modelMatrix;
+		}
 
 		// Render the mesh associated with the emitter.
 		IRenderSystem::Get()->SubmitRenderable(particle);
@@ -179,30 +201,38 @@ bool ParticleManager::Read(Stream &stream) {
 	stream.Read(PARTICLE_MAX, maxParticles);
 	stream.Read(IS_LOOPING, areRecyclable);
 
-	// Read the name of the mesh.
-	std::string fileName;
-	if(stream.Read(MESH, fileName)) {
-		if(IResourceSystem::Get() == nullptr) {
-			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
-			return false;
+	// Read the type
+	std::string_view simStr;
+	if(stream.Read(SIM_SPACE, simStr)) {
+		if(simStr == "Global") {
+			simSpace = SimSpace::Global;
+		} else if(simStr == "Local") {
+			simSpace = SimSpace::Local;
+		} else {
+			LOG_WARNING("{}: Unrecognized {} type '{}'", NameClass(), NAMEOF(SimSpace), simStr);
 		}
-
-		// Build the requested mesh.
-		mesh = IResourceSystem::Get()->GetCustomMesh(fileName);
 	}
+
+	if(IResourceSystem::Get() == nullptr) {
+		LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
+		return false;
+	}
+
+	// Read the name of the mesh.
+	stream.Read(MESH, meshName);
 
 	// Read the name of the sprite.
-	if(stream.Read(TEXTURE, fileName)) {
-		if(IResourceSystem::Get() == nullptr) {
-			LOG_ERROR("Cannot run particles: {} is not registered", NAMEOF(Systems::IResourceSystem));
-			return false;
-		}
-
-		// Build the requested sprite.
-		texture = IResourceSystem::Get()->GetTexture(fileName);
-	}
+	stream.Read(TEXTURE, texturePath);
+	stream.Read(FILTER_LINEAR, filterLinear);
 
 	return true;
+}
+
+void ParticleManager::Reset() {
+	particles.clear();
+	particleActive = 0;
+	particleFree = maxParticles;
+	particleAlive = maxParticles;
 }
 
 std::tuple<ParticleManager::StartingStats *, Particle *> ParticleManager::AllocateParticle() {
