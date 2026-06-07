@@ -21,6 +21,7 @@
 #include "Events/GlobalEventListener.h"
 #include "IEvent.h"
 #include "Particle.h"
+#include "Systems/Render/IRenderSystem.h"
 
 // Forward Declarations:
 namespace RassEngine {
@@ -33,7 +34,7 @@ class Texture;
 }
 
 namespace RassEngine::Components::Particles {
-
+//using namespace RassEngine::Systems;
 // Class Definition:
 class ParticleManager : public Cloneable<Component, ParticleManager> {
 public:
@@ -131,6 +132,8 @@ private:
 
 	// Indicates that the particles can be recycled/reused after their lifetimer has expired.
 	bool areRecyclable{false};
+
+	RassEngine::Systems::IRenderSystem::BlendMode blendMode{RassEngine::Systems::IRenderSystem::BlendMode::AlphaBlend};
 
 	SimSpace simSpace{SimSpace::Global};
 

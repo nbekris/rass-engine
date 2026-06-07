@@ -51,7 +51,7 @@ RenderSystemOpenGl::RenderSystemOpenGl(GLFWwindow *window)
 	, shader{nullptr}
 	, projection(1.0f)
 	, view{-1}
-	, projectionLoc {-1}
+	, projectionLoc{-1}
 	, viewLoc{-1}
 	, renderQueue{} {
 	if(window == nullptr) {
@@ -85,7 +85,7 @@ bool RenderSystemOpenGl::Initialize() {
 	}
 
 	viewLoc = gl::glGetUniformLocation(shader->GetProgramId(), VIEW_LOCATION);
-	if (viewLoc == -1) {
+	if(viewLoc == -1) {
 		std::cerr << "Warning: 'view' uniform not found!" << std::endl;
 		return false;
 	}
@@ -94,7 +94,10 @@ bool RenderSystemOpenGl::Initialize() {
 
 	// Initialize projection matrix with default orthographic projection
 	projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-
+	gl::glEnable(static_cast<gl::GLenum>(GL_BLEND));
+	gl::glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
+	gl::glDepthFunc(static_cast<gl::GLenum>(GL_LEQUAL));
+	gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
 	return true;
 }
 
@@ -135,11 +138,6 @@ void RenderSystemOpenGl::UpdateProjection() {
 	// Calculate aspect ratio and update projection matrix
 	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 	projection = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
-	gl::glEnable(static_cast<gl::GLenum>(GL_BLEND));
-	gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
-	// gl::glBlendFuncSeparate(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE), static_cast<gl::GLenum>(GL_ZERO));
-	gl::glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
-	gl::glDepthFunc(static_cast<gl::GLenum>(GL_LEQUAL));
 }
 
 void RenderSystemOpenGl::BeginFrame() {
@@ -175,8 +173,29 @@ bool RenderSystemOpenGl::BeginRender() {
 	}
 	return true;
 }
-
-bool RenderSystemOpenGl::DrawRenderables(){
+static void ApplyBlendMode(IRenderSystem::BlendMode mode) {
+	switch(mode) {
+	case RassEngine::Systems::IRenderSystem::BlendMode::AlphaBlend:
+		gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
+		break;
+	case RassEngine::Systems::IRenderSystem::BlendMode::Premultiplied:
+		gl::glBlendFunc(static_cast<gl::GLenum>(GL_ONE), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
+		break;
+	case RassEngine::Systems::IRenderSystem::BlendMode::Additive:
+		gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE));
+		break;
+	case RassEngine::Systems::IRenderSystem::BlendMode::Multiply:
+		//gl::glBlendFunc(static_cast<gl::GLenum>(GL_DST_COLOR), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
+		gl::glBlendFunc(static_cast<gl::GLenum>(GL_DST_COLOR), static_cast<gl::GLenum>(GL_ZERO));
+		break;
+	//case RassEngine::Systems::IRenderSystem::BlendMode::Screen:
+	//	gl::glBlendFunc(static_cast<gl::GLenum>(GL_ONE), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_COLOR));
+	//	break;
+	default:
+		break;
+	}
+}
+bool RenderSystemOpenGl::DrawRenderables() {
 	std::sort(renderQueue.begin(), renderQueue.end(), [] (const Renderable &a, const Renderable &b) {
 		if(a.renderLayer != b.renderLayer) {
 			return a.renderLayer < b.renderLayer;
@@ -200,16 +219,18 @@ bool RenderSystemOpenGl::DrawRenderables(){
 		});
 	static const glm::mat4 identityView = glm::mat4(1.0f);
 	RenderLayer currentLayer = static_cast<RenderLayer>(-1);
+	BlendMode currentBlendMode = BlendMode::AlphaBlend;
+	gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
 	for(const auto &renderable : renderQueue) {
 		if(renderable.renderLayer != currentLayer) {
 			currentLayer = renderable.renderLayer;
 
 			// no view matrix for background and UI layers
 			if(currentLayer == RenderLayer::Background || currentLayer == RenderLayer::UI) {
-				
+
 				gl::glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(identityView));
 			} else {
-				
+
 				gl::glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 			}
 		}
@@ -256,6 +277,11 @@ bool RenderSystemOpenGl::DrawRenderables(){
 			gl::glUniform1i(loc, renderable.isTextMode ? 1 : 0);
 		}
 
+		//loc = gl::glGetUniformLocation(shader->GetProgramId(), "uIsMultiply");
+		//if(loc != -1) {
+		//	gl::glUniform1i(loc, renderable.blendMode == RassEngine::Systems::IRenderSystem::BlendMode::Multiply ? 1 : 0);
+		//}
+
 		if(renderable.isTextMode && renderable.charCount > 0) {
 			// upload character count
 			loc = gl::glGetUniformLocation(shader->GetProgramId(), "uCharCount");
@@ -295,12 +321,22 @@ bool RenderSystemOpenGl::DrawRenderables(){
 			// Restore texture unit 0 for subsequent draws
 			gl::glActiveTexture(gl::GL_TEXTURE0);
 		}
+		if(currentBlendMode != renderable.blendMode) {
+			currentBlendMode = renderable.blendMode;
+			ApplyBlendMode(currentBlendMode);
+			int isMulLoc = gl::glGetUniformLocation(shader->GetProgramId(), "uIsMultiply");
+			if(isMulLoc != -1) {
+				gl::glUniform1i(isMulLoc, currentBlendMode == BlendMode::Multiply ? 1 : 0);
+			}
+		}
 		// Draw the mesh with its texture
 		if(renderable.mesh != nullptr) {
 			drawMesh(renderable.mesh);
 		}
 	}
 	gl::glDepthMask(GL_TRUE);
+	gl::glBlendFunc(static_cast<gl::GLenum>(GL_SRC_ALPHA),
+		static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
 	return true;
 }
 
@@ -324,7 +360,7 @@ bool RenderSystemOpenGl::EndRender() {
 	return true;
 }
 
-void RenderSystemOpenGl::SubmitRenderable(const Renderable& renderable) {
+void RenderSystemOpenGl::SubmitRenderable(const Renderable &renderable) {
 	renderQueue.push_back(renderable);
 }
 

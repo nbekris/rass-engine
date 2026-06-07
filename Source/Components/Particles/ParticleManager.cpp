@@ -56,6 +56,7 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 	: Cloneable<Component, ParticleManager>{other}
 	, maxParticles{other.maxParticles}
 	, areRecyclable{other.areRecyclable}
+	, blendMode{other.blendMode}
 	, simSpace{other.simSpace}
 	, meshName{other.meshName}
 	, texturePath{other.texturePath}
@@ -174,7 +175,7 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 		IRenderSystem::Renderable particle;
 		particle.mesh = mesh;
 		particle.texture = texture;
-
+		particle.blendMode = blendMode;
 		// Pass the alpha value (1.0f) to the DGL.
 		particle.alpha = data.current.color.a;
 
@@ -224,7 +225,15 @@ bool ParticleManager::Read(Stream &stream) {
 	// Read the name of the sprite.
 	stream.Read(TEXTURE, texturePath);
 	stream.Read(FILTER_LINEAR, filterLinear);
-
+	std::string_view blendStr;
+	if(stream.Read("BlendMode", blendStr)) {
+		if(blendStr == "AlphaBlend")         blendMode = IRenderSystem::BlendMode::AlphaBlend;
+		else if(blendStr == "Premultiplied") blendMode = IRenderSystem::BlendMode::Premultiplied;
+		else if(blendStr == "Additive")      blendMode = IRenderSystem::BlendMode::Additive;
+		else if(blendStr == "Multiply")      blendMode = IRenderSystem::BlendMode::Multiply;
+		//else if(blendStr == "Screen")        blendMode = IRenderSystem::BlendMode::Screen;
+		else LOG_WARNING("{}: Unrecognized BlendMode '{}'", NameClass(), blendStr);
+	}
 	return true;
 }
 
