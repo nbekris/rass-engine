@@ -9,16 +9,16 @@
 #include "Precompiled.h"
 #include "SpriteFader.h"
 
-#include "Stream.h"
-#include "Utils.h"
 #include "Cloneable.h"
 #include "Component.h"
 #include "Components/Sprite.h"
 #include "Entity.h"
 #include "Events/Global.h"
+#include "Stream.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
 #include "Systems/Time/ITimeSystem.h"
 #include "TweenCurve.h"
+#include "Utils.h"
 
 using namespace RassEngine;
 using namespace RassEngine::Events;
