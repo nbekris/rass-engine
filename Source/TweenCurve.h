@@ -1,15 +1,16 @@
 #pragma once
 #include <vector>
 
-#include <memory>
-#include <string_view>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <initializer_list>
+#include <memory>
+#include <string_view>
 
-#include "Object.h"
 #include "ICloneable.h"
 #include "ISerializable.h"
+#include "Object.h"
 
 namespace RassEngine {
 // Forward Declarations:
@@ -25,14 +26,12 @@ public:
 		Max
 	};
 
-private:
 	struct KeyFrame {
 		Type type{Type::Linear};
 		float time{0.f};
 		float value{0.f};
 	};
 
-public:
 	static float Calculate(const Type &algorithm, float startValue, float endValue, float time);
 	static glm::vec2 Calculate(const Type &algorithm, const glm::vec2 &startValue, const glm::vec2 &endValue, float time);
 	static glm::vec3 Calculate(const Type &algorithm, const glm::vec3 &startValue, const glm::vec3 &endValue, float time);
@@ -42,7 +41,13 @@ public:
 	TweenCurve(const TweenCurve &other);
 	virtual ~TweenCurve() = default;
 
+	void Set(float startValue, std::initializer_list<KeyFrame> keyFrames);
 	float Calculate(float time) const;
+	float GetTotalDuration() const;
+	float GetEndingValue() const;
+	inline float GetStartingValue() const {
+		return startingValue;
+	}
 
 	// Inherited via Object
 	bool Initialize() override;

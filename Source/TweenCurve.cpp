@@ -91,6 +91,20 @@ bool TweenCurve::Initialize() {
 	return true;
 }
 
+void TweenCurve::Set(float startValue, std::initializer_list<KeyFrame> keyFrames) {
+	// Update starting value
+	startingValue = startValue;
+
+	// Empty key frames
+	this->keyFrames.clear();
+	this->keyFrames.reserve(keyFrames.size());
+
+	// Populate it with the setter
+	for(const KeyFrame &key : keyFrames) {
+		this->keyFrames.emplace_back(key);
+	}
+}
+
 float TweenCurve::Calculate(float time) const {
 	// Check if there are any keyframes
 	if(keyFrames.size() == 0) {
@@ -124,6 +138,32 @@ float TweenCurve::Calculate(float time) const {
 
 	// Choose a tweening algorithm
 	return Calculate(nextKeyFrame->type, startValue, nextKeyFrame->value, time);
+}
+
+float TweenCurve::GetTotalDuration() const {
+	// Check if there are any keyframes
+	float toReturn = 0.0f;
+	if(keyFrames.size() == 0) {
+		// If not, return 0
+		return toReturn;
+	}
+
+	// Sum the times of all keyframes
+	for(const KeyFrame &key : keyFrames) {
+		toReturn += key.time;
+	}
+	return toReturn;
+}
+
+float TweenCurve::GetEndingValue() const {
+	// Check if there are any keyframes
+	if(keyFrames.size() == 0) {
+		// If not, just return the starting value
+		return startingValue;
+	}
+
+	// Otherwise, grab the last keyframe, and return its value
+	return keyFrames[keyFrames.size() - 1].value;
 }
 
 bool TweenCurve::Read(Stream &stream) {
