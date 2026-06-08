@@ -118,7 +118,7 @@ float TweenCurve::Calculate(float time) const {
 	auto nextKeyFrame = keyFrames.begin();
 
 	// Find a keyframe time is on
-	while((nextKeyFrame->time < time) && (nextKeyFrame != keyFrames.end())) {
+	while((nextKeyFrame != keyFrames.end()) && (nextKeyFrame->time < time)) {
 		// Grab this keyframe's stats
 		startTime = nextKeyFrame->time;
 		startValue = nextKeyFrame->value;
@@ -129,8 +129,8 @@ float TweenCurve::Calculate(float time) const {
 
 	// Check if we're on the last keyframe
 	if(nextKeyFrame == keyFrames.end()) {
-		// If so, just return the keyframe's value
-		return nextKeyFrame->value;
+		// If so, just return the last keyframe's value
+		return GetEndingValue();
 	}
 
 	// Normalize the time between startTime and nextKeyFrame->time
