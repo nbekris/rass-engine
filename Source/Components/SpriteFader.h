@@ -13,6 +13,7 @@
 #include "Component.h"
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
+#include "TweenCurve.h"
 
 namespace RassEngine::Components {
 // Forward declaration
@@ -32,10 +33,15 @@ public:
 private:
 	bool OnUpdate(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &args);
 	Sprite *GetSprite() const;
+	inline void UpdateLinearCurve() {
+		curve.Set(0.0f, {TweenCurve::KeyFrame{TweenCurve::Type::Linear, fadeDuration, 1.0f}});
+	}
 
 private:
 	float fadeDuration{2.0f};
 	float currentTime{0.0f};
+	TweenCurve curve{};
+	bool autoDisable{true};
 	mutable Sprite *spriteCache{nullptr};
 
 	RassEngine::Events::GlobalEventListener<SpriteFader> onUpdateListener;
