@@ -9,12 +9,13 @@
 			},
 			"Sprite": {
 				"Alpha": 1.0,
-				"Color": [ 1.0, 1.0, 1.0 ],
+				"Color": [ 1.0, 1.0, 4.0 ],
 				"TexturePath": "Assets/Textures/Bullet1.png",
 				"NumCols": 1,
 				"NumRows": 1,
 				"DisplayText": "",
-				"FilterLinear": true
+				"FilterLinear": true,
+				"BlendMode": "AlphaBlend"
 			},
 			"Collider": {
 				"ColliderType": "Box",

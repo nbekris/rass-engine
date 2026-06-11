@@ -33,6 +33,13 @@ class IRenderSystem : public IGlobalSystem<IRenderSystem> {
 	friend class Engine;
 public:
 	static constexpr unsigned MAX_TEXT_LENGTH = 128;
+	struct BloomSettings {
+		bool  enabled = true;
+		bool  hdr = true;
+		float threshold = 1.0f;
+		float intensity = 1.0f;
+		int   blurPasses = 3;
+	};
 	enum class RenderLayer : unsigned char {
 		Background = 0,
 		Opaque,
@@ -95,6 +102,10 @@ public:
 	/// </summary>
 	virtual bool IsFullscreen() const = 0;
 
+	virtual void SetBloomSettings(const BloomSettings &settings) = 0;
+	virtual const BloomSettings &GetBloomSettings() const = 0;
+	virtual void SetBloomEnabled(bool enabled) = 0;
+
 protected:
 	// Do not allow constructing an interface
 	IRenderSystem() = default;
@@ -103,6 +114,7 @@ protected:
 	virtual bool BeginRender() = 0;
 	virtual bool DrawRenderables() = 0;
 	virtual bool EndRender() = 0;
+	//virtual bool CompositeToScreen() = 0;
 
 private:
 	// Remove the rest of the default functions
