@@ -21,8 +21,6 @@
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Utils.h"
 
-using json = nlohmann::json;
-
 namespace RassEngine {
 
 class Stream {
@@ -63,10 +61,10 @@ private:
 private:
 	bool isValid = false;
 
-	json jsonData{};
+	nlohmann::json jsonData{};
 
-	const json *dataNode{nullptr};
-	std::vector<const json *> dataStack;
+	const nlohmann::json *dataNode{nullptr};
+	std::vector<const nlohmann::json *> dataStack;
 };
 
 template <typename T>
@@ -80,7 +78,7 @@ inline bool Stream::Read(const std::string_view& key, T &value) const {
 
 	try {
 		value = dataNode->at(key).get<T>();
-	} catch(const json::exception &exception) {
+	} catch(const nlohmann::json::exception &exception) {
 		LOG_ERROR("Stream: JSON parsing error reading key {} as {}: {}", key, typeid(T).name(), exception.what());
 		return false;
 	}
@@ -100,7 +98,7 @@ inline bool Stream::ReadVector(const std::string_view &key, const std::string_vi
 		// Retrieve the data as vector
 		const std::vector<T> &vector = dataNode->at(key).get<std::vector<T>>();
 		return process(vector);
-	} catch(const json::exception &exception) {
+	} catch(const nlohmann::json::exception &exception) {
 		LOG_ERROR("Stream: JSON parsing error reading key {} as {}: {}", key, readType, exception.what());
 		return false;
 	}
@@ -117,7 +115,7 @@ inline bool Stream::ReadAs(T &value) const {
 	try {
 		// Retrieve the data directly
 		value = dataNode->get<T>();
-	} catch(const json::exception &exception) {
+	} catch(const nlohmann::json::exception &exception) {
 		return false;
 	}
 
