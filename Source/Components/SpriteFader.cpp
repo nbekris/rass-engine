@@ -86,6 +86,25 @@ bool SpriteFader::Read(Stream &stream) {
 	return true;
 }
 
+bool SpriteFader::Show(const glm::vec3 &color, const TweenCurve &curve) {
+	// Halt if the sprite is not available
+	if(!GetSprite()) {
+		return false;
+	}
+
+	// Update the curve
+	this->curve.Set(curve);
+
+	// Set the color of the sprite
+	GetSprite()->Alpha(this->curve.GetStartingValue());
+	GetSprite()->Color(color);
+
+	// Indicate that the fade should start from the beginning
+	currentTime = 0.0f;
+	SetEnabled(true);
+	return true;
+}
+
 bool SpriteFader::OnUpdate(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
 	if(!IsEnabled()) {
 		// If not enabled, don't update this sprite

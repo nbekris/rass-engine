@@ -7,6 +7,8 @@
 // Copyright © 2026 DigiPen (USA) Corporation.
 
 #pragma once
+
+#include <glm/vec3.hpp>
 #include <string_view>
 
 #include "Cloneable.h"
@@ -29,6 +31,8 @@ public:
 	virtual bool Initialize() override;
 	virtual const std::string_view &NameClass() const override;
 	virtual bool Read(Stream &stream) override;
+
+	bool Show(const glm::vec3 &color, const TweenCurve &curve);
 
 private:
 	bool OnUpdate(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &args);
