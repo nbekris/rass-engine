@@ -1,12 +1,13 @@
 #pragma once
-#include <vector>
 
+#include <algorithm>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <initializer_list>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include "ICloneable.h"
 #include "ISerializable.h"
@@ -41,7 +42,14 @@ public:
 	TweenCurve(const TweenCurve &other);
 	virtual ~TweenCurve() = default;
 
-	void Set(float startValue, std::initializer_list<KeyFrame> keyFrames);
+	template<class T>
+	void Set(float startValue, T begin, T end);
+	inline void Set(float startValue, std::initializer_list<KeyFrame> keyFrames) {
+		Set(startValue, keyFrames.begin(), keyFrames.end());
+	}
+	inline void Set(const TweenCurve &other) {
+		Set(other.startingValue, other.keyFrames.begin(), other.keyFrames.end());
+	}
 	float Calculate(float time) const;
 	float GetTotalDuration() const;
 	float GetEndingValue() const;
@@ -63,5 +71,20 @@ private:
 	float startingValue{1.f};
 	std::vector<KeyFrame> keyFrames;
 };
+
+template<class T>
+inline void TweenCurve::Set(float startValue, T begin, T end) {
+	// Update starting value
+	startingValue = startValue;
+
+	// Empty key frames
+	this->keyFrames.clear();
+	this->keyFrames.reserve(keyFrames.size());
+
+	// Populate it with the setter
+	std::for_each(begin, end, [this] (const KeyFrame &key) {
+		this->keyFrames.emplace_back(key);
+	});
+}
 
 }	// namespace

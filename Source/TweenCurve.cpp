@@ -91,20 +91,6 @@ bool TweenCurve::Initialize() {
 	return true;
 }
 
-void TweenCurve::Set(float startValue, std::initializer_list<KeyFrame> keyFrames) {
-	// Update starting value
-	startingValue = startValue;
-
-	// Empty key frames
-	this->keyFrames.clear();
-	this->keyFrames.reserve(keyFrames.size());
-
-	// Populate it with the setter
-	for(const KeyFrame &key : keyFrames) {
-		this->keyFrames.emplace_back(key);
-	}
-}
-
 float TweenCurve::Calculate(float time) const {
 	// Check if there are any keyframes
 	if(keyFrames.size() == 0) {
