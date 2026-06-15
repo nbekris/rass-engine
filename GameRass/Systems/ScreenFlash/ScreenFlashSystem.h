@@ -18,7 +18,6 @@
 #include <IEvent.h>
 
 namespace RassGame::Systems {
-
 	class ScreenFlashSystem : public IScreenFlashSystem {
 	public:
 		ScreenFlashSystem();
@@ -34,6 +33,7 @@ namespace RassGame::Systems {
 		bool OnSceneLoaded(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &);
 		bool OnSceneUnloaded(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &);
 
+		static constexpr std::string_view ENTITY_NAME = "ScreenFlash";
 		RassEngine::Components::SpriteFader* flashComponent{nullptr};
 		RassEngine::Events::GlobalEventListener<ScreenFlashSystem> onSceneLoaded, onSceneUnloaded;
 	};
