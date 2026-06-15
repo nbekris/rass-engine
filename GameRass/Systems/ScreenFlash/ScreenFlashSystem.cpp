@@ -11,8 +11,14 @@
 
 #include <string_view>
 
+#include <Events/SceneChange.h>
+#include <Systems/GlobalEvents/IGlobalEventsSystem.h>
 #include <Systems/Logging/ILoggingSystem.h>
+#include <Systems/Scene/ISceneSystem.h>
 #include <Utils.h>
+
+using namespace RassEngine::Systems;
+using namespace RassEngine::Events;
 
 namespace RassGame::Systems {
 ScreenFlashSystem::ScreenFlashSystem() :
@@ -22,12 +28,33 @@ ScreenFlashSystem::ScreenFlashSystem() :
 ScreenFlashSystem::~ScreenFlashSystem() {}
 
 bool ScreenFlashSystem::Initialize() {
-	// FIXME: bind to scene load/unload events
+	// Make sure the scene system is available
+	if(!ISceneSystem::Get()) {
+		LOG_ERROR("{} failed to initialize: no scene system", NameClass());
+		return false;
+	}
+
+	// Make sure the events system is available
+	if(!IGlobalEventsSystem::Get()) {
+		LOG_ERROR("{} failed to initialize: no global events system", NameClass());
+		return false;
+	}
+
+	// Bind to scene load/unload events
+	IGlobalEventsSystem::Get()->bind(SceneChange::AfterInitialize, &onSceneLoaded);
+	IGlobalEventsSystem::Get()->bind(SceneChange::BeforeShutdown, &onSceneUnloaded);
 	return true;
 }
 
 void ScreenFlashSystem::Shutdown() {
-	// FIXME: unbind to scene load/unload events
+	if(!IGlobalEventsSystem::Get()) {
+		LOG_ERROR("{} failed to initialize: no global events system", NameClass());
+		return;
+	}
+
+	// Unbind to scene load/unload events
+	IGlobalEventsSystem::Get()->unbind(SceneChange::AfterInitialize, &onSceneLoaded);
+	IGlobalEventsSystem::Get()->unbind(SceneChange::BeforeShutdown, &onSceneUnloaded);
 }
 
 bool ScreenFlashSystem::Show(const glm::vec3 &color, const RassEngine::TweenCurve &curve) {
@@ -35,11 +62,15 @@ bool ScreenFlashSystem::Show(const glm::vec3 &color, const RassEngine::TweenCurv
 }
 
 bool ScreenFlashSystem::OnSceneLoaded(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &) {
-	return false;
+	// FIXME: load the screen flasher
+	// FIXME: set the screenflash pointer
+	return true;
 }
 
 bool ScreenFlashSystem::OnSceneUnloaded(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *, const RassEngine::Events::GlobalEventArgs &) {
-	return false;
+	// Revert the screenflasher to null
+	flashComponent = nullptr;
+	return true;
 }
 
 const std::string_view &ScreenFlashSystem::NameClass() const {
