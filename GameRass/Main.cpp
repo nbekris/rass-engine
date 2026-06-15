@@ -91,11 +91,14 @@
 #include "Components/TimedSceneTransition.h"
 #include "Components/WeaponUnlocker.h"
 #include "Components/ZoomOutArea.h"
+#include <Systems/ScreenFlash/ScreenFlashSystem.h>
+#include <Systems/ScreenFlash/IScreenFlashSystem.h>
 
 using namespace gl;
 using namespace RassEngine;
 using namespace RassEngine::Systems;
 using namespace RassGame::Components;
+using namespace RassGame::Systems;
 
 static constexpr std::string_view DEFAULT_SCENE_NAME = "DigiSplash";
 
@@ -153,7 +156,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		.Register<ICameraSystem, CameraSystem>()
 		.Register<IUiSystem, UiSystem>()
 		.Register<IParticleSystem, ParticleSystem>()
-		.Register<IDebugDrawSystem, DebugDrawSystem>();
+		.Register<IDebugDrawSystem, DebugDrawSystem>()
+		.Register<IScreenFlashSystem, ScreenFlashSystem>();
 
 	// Register new components here
 	IComponentFactory::Get()->Register(NAMEOF(FlipOrigin), [] () -> Component* {
