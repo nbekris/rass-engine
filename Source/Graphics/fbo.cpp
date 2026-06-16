@@ -7,6 +7,10 @@ using namespace gl;
 #include "Systems/Logging/ILoggingSystem.h"
 namespace RassEngine::Graphics {
 void FBO::CreateFBO(int w, int h) {
+	if(w <= 0 || h <= 0) {
+		LOG_DEBUG("Invalid FBO size: {}x{}", w, h);
+		return;
+	}
 	width = w;
 	height = h;
 
@@ -47,6 +51,10 @@ void FBO::CreateFBO(int w, int h) {
 void FBO::Resize(int w, int h) {
 	if(w == width && h == height) {
 		return;  // no change
+	}
+	if(w <= 0 || h <= 0) {
+		LOG_DEBUG("Invalid FBO size: {}x{}", w, h);
+		return;
 	}
 	Destroy();
 	CreateFBO(w, h);

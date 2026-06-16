@@ -469,8 +469,14 @@ bool RenderSystemOpenGl::IsFullscreen() const {
 }
 
 void RenderSystemOpenGl::RenderBloom() {
-	const int bloomW = width / 2;
-	const int bloomH = height / 2;
+	if(!bloom_.enabled) {
+		finalBloomFBO = nullptr;
+		return;
+	}
+	const int safeW = std::max(width, 1);
+	const int safeH = std::max(height, 1);
+	const int bloomW = std::max(safeW / 2, 1);
+	const int bloomH = std::max(safeH / 2, 1);
 
 	brightFBO->SetHdr(bloom_.hdr);
 	blurFBO[0]->SetHdr(bloom_.hdr);
