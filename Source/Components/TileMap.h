@@ -72,6 +72,14 @@ private:
 
 	// Upload initial tile alive/dead states as a GL_R8UI 1D texture
 	void InitTileStateTexture();
+
+	struct DissolvingTile {
+		unsigned short idx;
+		float elapsed;
+	};
+	std::vector<DissolvingTile> dissolvingTiles_;
+	float dissolveDuration_ = 0.35f;
+
 	// Member variables
 	std::string tileMapDataName;  // Name of TileMapData file (e.g., "Level1")
 	TileMapData *tileMapData = nullptr;

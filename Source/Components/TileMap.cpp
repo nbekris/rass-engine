@@ -25,6 +25,7 @@
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Systems/Render/IRenderSystem.h"
+#include "Systems/Time/ITimeSystem.h"
 #include "Systems/Resource/IResourceSystem.h"
 #include "Systems/Physics/IPhysicsSystem.h"
 #include "TileMapData.h"
@@ -165,10 +166,10 @@ void TileMap::InitTileStateTexture() {
 	const unsigned total = tileMapData->GetRows() * tileMapData->GetCols();
 	const auto &tiles = tileMapData->GetTileData();
 
-	// 1 byte per tile: 255 = alive, 0 = destroyed/empty
+	// 1 byte per tile: 0 = alive, 255 = destroyed/empty
 	std::vector<uint8_t> states(total);
 	for(unsigned i = 0; i < total; ++i) {
-		states[i] = (tiles[i] != 0) ? 255u : 0u;
+		states[i] = (tiles[i] != 0) ? 0u : 255u;
 	}
 
 	if(tileStateTexture != 0) {
@@ -198,22 +199,12 @@ void TileMap::InitTileStateTexture() {
 void TileMap::NotifyTileDestroyed(unsigned short row, unsigned short col) {
 	if(!tileMapData || tileStateTexture == 0) return;
 
-	// Update logic/physics data
+	// Physics stops checking this tile immediately (visual dissolve is decoupled).
 	tileMapData->SetTileAt(row, col, 0);
 
-	// Partial GPU texture update — only 1 texel, very cheap
+	// Start the time-based dissolve; Render() ramps the texel 0 -> 255 over dissolveDuration_.
 	const unsigned short idx = row * tileMapData->GetCols() + col;
-	const uint8_t dead = 0u;
-
-	gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
-	gl::glTexSubImage1D(
-		gl::GL_TEXTURE_1D, 0,
-		static_cast<gl::GLint>(idx), 1,
-		gl::GL_RED_INTEGER,
-		gl::GL_UNSIGNED_BYTE,
-		&dead
-	);
-	gl::glBindTexture(gl::GL_TEXTURE_1D, 0);
+	dissolvingTiles_.push_back({idx, 0.0f});
 }
 
 void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open) {
@@ -224,7 +215,8 @@ void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open)
 
 	// open=invisible(0), closed=visible(255)
 	const unsigned short idx = row * tileMapData->GetCols() + col;
-	const uint8_t state = open ? 0u : (tileMapData->GetTileAt(row, col) != 0 ? 255u : 0u);
+	// New semantics: 0 = whole/visible, 255 = dissolved/invisible
+	const uint8_t state = open ? 255u : (tileMapData->GetTileAt(row, col) != 0 ? 0u : 255u);
 
 	gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
 	gl::glTexSubImage1D(
@@ -240,6 +232,21 @@ bool TileMap::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Glob
 	// Early exit if resources not loaded
 	if(!mesh || !texture || !tileMapData) {
 		return false;
+	}
+	if(!dissolvingTiles_.empty()) {
+		float dt = ITimeSystem::Get()->GetDeltaTimeSec();
+		gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
+		for(auto it = dissolvingTiles_.begin(); it != dissolvingTiles_.end();) {
+			it->elapsed += dt;
+			float t = glm::clamp(it->elapsed / dissolveDuration_, 0.0f, 1.0f);
+			uint8_t amount = static_cast<uint8_t>(t * 255.0f);
+			gl::glTexSubImage1D(gl::GL_TEXTURE_1D, 0,
+				static_cast<gl::GLint>(it->idx), 1,
+				gl::GL_RED_INTEGER, gl::GL_UNSIGNED_BYTE, &amount);
+			if(t >= 1.0f) it = dissolvingTiles_.erase(it);
+			else          ++it;
+		}
+		gl::glBindTexture(gl::GL_TEXTURE_1D, 0);
 	}
 	/*InitTileStateTexture();*/
 	// Get transform (same as Sprite)
