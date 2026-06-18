@@ -60,6 +60,8 @@
 #include <Systems/Resource/ResourceSystem.h>
 #include <Systems/Scene/ISceneSystem.h>
 #include <Systems/Scene/SceneSystem.h>
+#include <Systems/ScreenFlash/IScreenFlashSystem.h>
+#include <Systems/ScreenFlash/ScreenFlashSystem.h>
 #include <Systems/Time/ITimeSystem.h>
 #include <Systems/Time/TimeSystem.h>
 #include <Systems/UI/IUiSystem.h>
@@ -74,6 +76,7 @@
 #include "Components/FlipOrigin.h"
 #include "Components/Flippable.h"
 #include "Components/Flipper.h"
+#include "Components/GameFeelEvents.h"
 #include "Components/IsKinematicMidFlip.h"
 #include "Components/ParallaxController.h"
 #include "Components/ParentTo.h"
@@ -91,8 +94,6 @@
 #include "Components/TimedSceneTransition.h"
 #include "Components/WeaponUnlocker.h"
 #include "Components/ZoomOutArea.h"
-#include <Systems/ScreenFlash/ScreenFlashSystem.h>
-#include <Systems/ScreenFlash/IScreenFlashSystem.h>
 
 using namespace gl;
 using namespace RassEngine;
@@ -234,6 +235,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	});
 	IComponentFactory::Get()->Register(NAMEOF(ParentTo), [] () -> Component * {
 		return new ParentTo();
+	});
+	IComponentFactory::Get()->Register(NAMEOF(GameFeelEvents), [] () -> Component * {
+		return new GameFeelEvents();
 	});
 
 	//#ifdef _DEBUG
