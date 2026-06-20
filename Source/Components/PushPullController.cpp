@@ -87,7 +87,7 @@ void PushPullController::LinkTextEntity() {
 	}
 	usingGamepad = Systems::IInputSystem::Get()->IsGamepadConnected();
 	if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
-		sprite->SetText(usingGamepad ? "Hold #92# to pull" : "Hold Shift to pull");
+		sprite->SetText(usingGamepad ? "Hold #94# to pull" : "Hold Shift to pull");
 	}
 	entityLinked = true;
 }
@@ -161,7 +161,7 @@ bool PushPullController::OnFixedUpdate(const IEvent<Events::GlobalEventArgs> *, 
 				if(IInputSystem::Get()->IsGamepadConnected() != usingGamepad) {
 					usingGamepad = !usingGamepad;
 					if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
-						sprite->SetText(usingGamepad ? "Hold #92# to pull" : "Hold Shift to pull");
+						sprite->SetText(usingGamepad ? "Hold #94# to pull" : "Hold Shift to pull");
 					}
 				}
 				text->GetTransform()->SetLocalPosition(Parent()->GetTransform()->GetLocalPosition() + glm::vec3(-1.0f, 0.5f, 0.5f));

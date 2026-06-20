@@ -157,7 +157,7 @@ bool Flipper::OnTriggerEnter(const IEvent<EventArgs> *, const EventArgs &args) {
 			if(IInputSystem::Get()->IsGamepadConnected() != usingGamepad) {
 								usingGamepad = !usingGamepad;
 								if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
-									sprite->SetText(usingGamepad ? "Press #92#" : "Press Shift");
+									sprite->SetText(usingGamepad ? "Press #94#" : "Press Shift");
 								}
 			}
 			text->GetTransform()->SetLocalPosition(Parent()->GetTransform()->GetLocalPosition() + glm::vec3(-0.5f, 0.2f, 0.5f));
@@ -224,7 +224,7 @@ void Flipper::LinkTextEntity() {
 	}
 	usingGamepad = IInputSystem::Get()->IsGamepadConnected();
 	if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
-		sprite->SetText(usingGamepad ? "Press #92#" : "Press Shift");
+		sprite->SetText(usingGamepad ? "Press #94#" : "Press Shift");
 	}
 	entitiesLinked_ = true;
 }
