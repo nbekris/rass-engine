@@ -59,24 +59,24 @@ bool GameFeelEvents::Read(Stream &stream) {
 
 	eventSettings.clear();
 	stream.ReadObject("Events", [this, &stream] (const std::string &eventName) {
-		Settings settings;
-		if(!settings.Read(stream)) {
-			LOG_WARNING("{}: Failed to read settings for event '{}'", NameClass(), eventName);
-			return;
-		}
-		eventSettings.emplace(std::move(eventName), std::move(settings));
+		//Settings settings;
+		//if(!settings.Read(stream)) {
+		//	LOG_WARNING("{}: Failed to read settings for event '{}'", NameClass(), eventName);
+		//	return;
+		//}
+		//eventSettings.emplace(std::move(eventName), std::move(settings));
 	});
 	return true;
 }
 
-bool 	GameFeelEvents::Settings::Play() const {
-	// FIXME: to implement
-	return true;
-}
-
-bool GameFeelEvents::Settings::Read(RassEngine::Stream &stream) {
-	// FIXME: to implement
-	return true;
-}
+//bool 	GameFeelEvents::Settings::Play() const {
+//	// FIXME: to implement
+//	return true;
+//}
+//
+//bool GameFeelEvents::Settings::Read(RassEngine::Stream &stream) {
+//	// FIXME: to implement
+//	return true;
+//}
 
 }

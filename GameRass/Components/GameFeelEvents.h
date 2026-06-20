@@ -14,15 +14,17 @@
 
 #include <Cloneable.h>
 #include <Component.h>
-#include <ISerializable.h>
 #include <Stream.h>
+#include <Events/EventArgs.h>
+#include <Events/EventSynchronous.h>
 
 namespace RassGame::Components {
 
 class GameFeelEvents : public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents> {
-	// Forward declaration of the settings
-	class Settings;
 public:
+	// Forward declaration
+	struct Args;
+
 	GameFeelEvents();
 	GameFeelEvents(const GameFeelEvents &other);
 	virtual ~GameFeelEvents() override;
@@ -31,22 +33,20 @@ public:
 	virtual const std::string_view &NameClass() const override;
 	virtual bool Read(RassEngine::Stream &stream) override;
 
-	inline bool Play(const std::string_view &eventName) const {
+	inline bool Play(const std::string_view &eventName, const Args &args) {
 		auto it = eventSettings.find(std::string(eventName));
 		if (it == eventSettings.end()) {
 			return false;
 		}
-		return it->second.Play();
+		return it->second.call(args);
 	}
 
-private:
-	std::unordered_map<std::string, Settings> eventSettings{};
-
-	class Settings : public RassEngine::ISerializable<RassEngine::Stream> {
+	struct Args : public RassEngine::Events::EventArgs {
 	public:
-		bool Play() const;
-		bool Read(RassEngine::Stream &stream);
 	};
+
+private:
+	std::unordered_map<std::string, RassEngine::Events::EventSynchronous<Args>> eventSettings{};
 };
 
 }
