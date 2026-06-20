@@ -62,6 +62,7 @@ private:
 	float grabOffsetX{0.0f};
 	float maxGrabDistance{4.0f};
 	bool entityLinked{false};
+	bool usingGamepad{false};
 	std::string textEntityName{"TipsTextEntity2"};
 };
 

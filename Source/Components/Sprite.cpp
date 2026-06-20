@@ -49,6 +49,8 @@ Sprite::Sprite(const Sprite &other)
 	, fontGridRows{other.fontGridRows}
 	, filterLinear{other.filterLinear}
 	, parallaxTiling{other.parallaxTiling}
+	, cachedCharUVs{other.cachedCharUVs}
+	, textDirty{other.textDirty}
 	, onRenderListener{this, &Sprite::Render} {}
 
 Sprite::~Sprite() {
@@ -108,7 +110,9 @@ void Sprite::SetColor(float r, float g, float b) {
 	color = glm::vec3(r, g, b);
 }
 void Sprite::SetText(const std::string &text) {
+	if(displayText == text) return;     // 文本没变直接跳过
 	displayText = text;
+	textDirty = true;
 
 	// Make sure text length is within limits
 	if(displayText.length() > IRenderSystem::MAX_TEXT_LENGTH) {
@@ -121,6 +125,38 @@ void Sprite::SetTexture(const std::string &texturePath, bool filterLinear) {
 }
 void Sprite::SetOffset(float x, float y) {
 	parallaxOffset = glm::vec2(x, y);
+}
+//(c - ' ')，#NNN# to  NNN cell
+static std::vector<int> ParseRichText(std::string_view text) {
+	std::vector<int> cells;
+	cells.reserve(text.size());
+	for(size_t i = 0; i < text.size();) {
+		if(text[i] == '#') {
+			// "##" to '#'
+			if(i + 1 < text.size() && text[i + 1] == '#') {
+				cells.push_back('#' - ' ');
+				i += 2;
+				continue;
+			}
+			// find the second '#'
+			size_t close = text.find('#', i + 1);
+			if(close != std::string_view::npos) {
+				int cell = 0;
+				auto begin = text.data() + i + 1;
+				auto end = text.data() + close;
+				auto [ptr, ec] = std::from_chars(begin, end, cell);
+				if(ec == std::errc{} && ptr == end) {  // all characters are digits
+					cells.push_back(cell);
+					i = close + 1;
+					continue;
+				}
+			}
+			// Invalid: treat as a normal '#' to avoid swallowing characters
+		}
+		cells.push_back(static_cast<int>(text[i] - ' '));
+		++i;
+	}
+	return cells;
 }
 bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
 	// get transform component from parent entity
@@ -142,7 +178,7 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 
 
 	if(!displayText.empty()) {
-		Texture *fontTexture = IResourceSystem::Get()->GetTexture(texturePath,filterLinear);
+		Texture *fontTexture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
 
 		// Make sure text length is within limits
 		if(displayText.length() > IRenderSystem::MAX_TEXT_LENGTH) {
@@ -155,7 +191,7 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 
 		// If the mesh size is shorter than the display text,
 		// kepp doubling it
-		while(meshSize < displayText.length()) {			
+		while(meshSize < displayText.length()) {
 			meshSize *= 2;
 		}
 
@@ -175,13 +211,20 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 		//calculate UV offsets for each character
 		renderable.charUVOffsets.clear();
 		renderable.charUVOffsets.reserve(displayText.length());
-		for(char c : displayText) {
-			glm::vec2 uvOffset = CalculateCharUV(c);
-			renderable.charUVOffsets.push_back(uvOffset);
+		//for(char c : displayText) {
+		//	glm::vec2 uvOffset = CalculateCharUV(c);
+		//	renderable.charUVOffsets.push_back(uvOffset);
+		//}
+		if(textDirty) {
+			cachedCharUVs.clear();
+			for(int cell : ParseRichText(displayText)) {   //parse rich text to get cell index, then calculate UV, only when text is dirty
+				cachedCharUVs.push_back(CalculateCellUV(cell));
+			}
+			textDirty = false;
 		}
-		renderable.charCount = static_cast<int>(displayText.length());
-	}
-	else {
+		renderable.charUVOffsets = cachedCharUVs;
+		renderable.charCount = static_cast<int>(cachedCharUVs.size());
+	} else {
 		Texture *texture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
 		Mesh *mesh = IResourceSystem::Get()->GetQuadMesh();
 		renderable.texture = texture;
@@ -224,4 +267,14 @@ glm::vec2 Sprite::CalculateCharUV(char c) {
 	return glm::vec2(u, v);
 }
 
+glm::vec2 Sprite::CalculateCellUV(unsigned index) {
+	if(index < 0 || index >= fontGridCols * fontGridRows) {
+		index = 0;  // Fallback to first character (usually space)
+	}
+	float u = (index % fontGridCols) / static_cast<float>(fontGridCols);
+	float v = (index / fontGridCols) / static_cast<float>(fontGridRows);
+	// Flip v coordinate
+	v = 1.0f - v - (1.0f / fontGridRows);
+	return glm::vec2(u, v);
+}
 }

@@ -69,7 +69,7 @@ public:
 		BlendMode blendMode = BlendMode::AlphaBlend;
 		//Text rendering specific
 		bool isTextMode = false;
-		std::vector<glm::vec2> charUVOffsets{MAX_TEXT_LENGTH};
+		std::vector<glm::vec2> charUVOffsets;
 		int charCount = 0;
 		uint32_t tileStateTexture = 0;  // GL handle for 1D R8UI tile-state texture
 		float tileSize = 1.0f;          // World-space size of one tile (used in fragment shader)

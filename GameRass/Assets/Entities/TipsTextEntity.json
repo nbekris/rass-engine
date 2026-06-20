@@ -10,10 +10,10 @@
 			"Sprite": {
 				"Alpha": 1.0,
 				"Color": [ 0.0, 0.0, 0.0 ],
-				"TexturePath": "Assets/Textures/Roboto_Mono_white.png",
+				"TexturePath": "Assets/Textures/Roboto_Mono_white_icon.png",
 				"NumCols": 1,
 				"NumRows": 1,
-				"DisplayText": "Press Shift",
+				"DisplayText": "Press #92#",
 				"RenderLayer": 2
 			}
 		}

@@ -104,6 +104,7 @@ private:
 	bool Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &);
 	glm::vec2 CalculateTexCoords(int frameIndex);
 	glm::vec2 CalculateCharUV(char c);
+	glm::vec2 CalculateCellUV(unsigned index);
 	// Member variables
 	float alpha{1.0f};
 	IRenderSystem::RenderLayer renderLayer{IRenderSystem::RenderLayer::Transparent};
@@ -117,6 +118,8 @@ private:
 	bool filterLinear{false};  // false=GL_NEAREST,true=GL_LINEAR
 	//Text rendering specific
 	std::string displayText{};
+	std::vector<glm::vec2> cachedCharUVs;   // parsed UV offsets for each character in displayText, not change if not dirty, 
+	bool textDirty{true};
 	int fontGridCols = 16;
 	int fontGridRows = 8;
 	glm::vec2 parallaxOffset{0.0f};
