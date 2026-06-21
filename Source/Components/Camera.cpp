@@ -13,6 +13,7 @@
 #include "Entity.h"
 
 namespace RassEngine::Components {
+
 Camera::Camera() : Cloneable<Component, Camera>{}
 {
 }
@@ -35,6 +36,11 @@ Camera::Camera(const Camera &other)
 , followMode{other.followMode}
 , cameraWindowOffsetLerpSpeed{other.cameraWindowOffsetLerpSpeed}
 , windowOffsetRange{other.windowOffsetRange}
+, shakeOffset{other.shakeOffset}
+, shakeZRotation{other.shakeZRotation}
+, isShaking{other.isShaking}
+, shakeTimer{other.shakeTimer}
+, shakeParams{other.shakeParams}
 {}
 
 Camera::~Camera() {

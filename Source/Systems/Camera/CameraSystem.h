@@ -16,6 +16,10 @@
 namespace RassEngine::Components {
 class Transform;
 class Camera;
+
+enum class CameraShakeEase;
+struct CameraShakeParams;
+
 }
 
 namespace RassEngine::Systems {
@@ -51,6 +55,9 @@ public:
 	glm::vec2 ViewportToWorld(const glm::vec2 &ndcPos) const override;
 	glm::vec2 WorldToScreenPixels(const glm::vec3 &worldPos) const override;
 	glm::vec2 WorldToScreenViewport(const glm::vec3 &worldPos) const override;
+	void ShakeCamera(const Components::CameraShakeParams &params);
+	float EvaluateShakeEase(Components::CameraShakeEase ease, float t) const;
+	void UpdateCameraShake(float dt);
 private:
 	Events::GlobalEventListener<CameraSystem> updateListener;
 	Events::GlobalEventListenerLambda onSceneShutdown;

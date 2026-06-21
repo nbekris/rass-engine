@@ -12,6 +12,8 @@
 #include "Component.h"
 #include "Components/Sprite.h"
 #include "Components/Movement.h"
+#include "Components/Camera.h"
+#include "Systems/Camera/CameraSystem.h"
 #include "Entity.h"
 #include "Events/Global.h"
 #include "Events/GlobalEventArgs.h"
@@ -91,6 +93,19 @@ bool HealthComponent::TakeDamage(int damage) {
 		UpdateHeartSprites();
 		isInvincible = true;
 		invincibilityTimer = invincibilityDuration;
+
+		auto *cameraSys = RassEngine::Systems::ICameraSystem::Get();
+		if(cameraSys) {
+			RassEngine::Components::CameraShakeParams hitShake;
+			hitShake.shakeDuration = 0.35f;
+			hitShake.vibrationSpeed = 35.0f;
+			hitShake.maxTranslation = glm::vec3(0.4f, 0.4f, 0.0f);
+			hitShake.maxZRotation = 4.0f;
+			hitShake.easeType = RassEngine::Components::CameraShakeEase::EaseOut;
+
+			static_cast<RassEngine::Systems::CameraSystem *>(cameraSys)->ShakeCamera(hitShake);
+		}
+
 	}
 	if(health == 0) {
 		OnDeath();
