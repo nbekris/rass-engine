@@ -17,14 +17,18 @@
 #include <Component.h>
 #include <Entity.h>
 #include <Events/EventArgs.h>
+#include <IEventListener.h>
 #include <Stream.h>
 #include <Systems/Logging/ILoggingSystem.h>
 #include <Utils.h>
+
+#include "../Systems/GameFeel/IGameFeelAction.h"
 
 using namespace RassEngine;
 using namespace RassEngine::Components;
 using namespace RassEngine::Events;
 using namespace RassEngine::Systems;
+using namespace RassGame::Systems;
 
 namespace RassGame::Components {
 

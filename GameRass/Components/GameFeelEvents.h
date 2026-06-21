@@ -13,22 +13,19 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <nlohmann/json.hpp>
 
 #include <Cloneable.h>
 #include <Component.h>
-#include <Stream.h>
-#include <Events/EventArgs.h>
 #include <Events/EntityEventID.h>
-#include <IEventListener.h>
+#include <Events/EventArgs.h>
+#include <Stream.h>
+
+namespace RassGame::Systems {
+// Forward declarations
+class IGameFeelAction;
+}
 
 namespace RassGame::Components {
-
-// FIXME: declare this class in a different file
-class IGameFeelAction {
-public:
-	virtual RassEngine::IEventListener<RassEngine::Events::EventArgs> *GetListener() const = 0;
-};
 
 class GameFeelEvents : public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents> {
 	// Forward declare helper container
@@ -42,7 +39,7 @@ public:
 	virtual const std::string_view &NameClass() const override;
 	virtual bool Read(RassEngine::Stream &stream) override;
 
-	void AddAction(const std::string_view &eventName, const std::shared_ptr<IGameFeelAction> &eventSetting);
+	void AddAction(const std::string_view &eventName, const std::shared_ptr<Systems::IGameFeelAction> &eventSetting);
 	bool Play(const std::string_view &eventName, RassEngine::Events::EventArgs &args) const;
 
 private:
@@ -62,7 +59,7 @@ private:
 		}
 
 		RassEngine::Events::EntityEventID id;
-		std::vector<std::shared_ptr<IGameFeelAction>> actions{};
+		std::vector<std::shared_ptr<Systems::IGameFeelAction>> actions{};
 	};
 };
 
