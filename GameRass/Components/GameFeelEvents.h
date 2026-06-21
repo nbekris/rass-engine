@@ -1,5 +1,5 @@
 // File Name:    GameFeelEvents.h
-// Author(s):    main Niko Bekris, secondary Taro Omiya
+// Author(s):    main Taro Omiya
 // Course:       GAM541
 // Project:      RASS
 // Purpose:      Component controlling GameFeelEvents open and close behavior.
@@ -8,23 +8,32 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
+#include <nlohmann/json.hpp>
 
 #include <Cloneable.h>
 #include <Component.h>
 #include <Stream.h>
 #include <Events/EventArgs.h>
-#include <Events/EventSynchronous.h>
+#include <Events/EntityEventID.h>
+#include <IEventListener.h>
 
 namespace RassGame::Components {
 
-class GameFeelEvents : public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents> {
+// FIXME: declare this class in a different file
+class IGameFeelAction {
 public:
-	// Forward declaration
-	struct Args;
+	virtual RassEngine::IEventListener<RassEngine::Events::EventArgs> *GetListener() const = 0;
+};
 
+class GameFeelEvents : public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents> {
+	// Forward declare helper container
+	struct ActionList;
+public:
 	GameFeelEvents();
 	GameFeelEvents(const GameFeelEvents &other);
 	virtual ~GameFeelEvents() override;
@@ -33,20 +42,28 @@ public:
 	virtual const std::string_view &NameClass() const override;
 	virtual bool Read(RassEngine::Stream &stream) override;
 
-	inline bool Play(const std::string_view &eventName, const Args &args) {
-		auto it = eventSettings.find(std::string(eventName));
-		if (it == eventSettings.end()) {
-			return false;
-		}
-		return it->second.call(args);
-	}
-
-	struct Args : public RassEngine::Events::EventArgs {
-	public:
-	};
+	void AddAction(const std::string_view &eventName, const std::shared_ptr<IGameFeelAction> &eventSetting);
+	bool Play(const std::string_view &eventName, RassEngine::Events::EventArgs &args) const;
 
 private:
-	std::unordered_map<std::string, RassEngine::Events::EventSynchronous<Args>> eventSettings{};
+	bool isInitialized{false};
+	std::unordered_map<std::string, ActionList> allActionLists{};
+
+	struct ActionList {
+		inline ActionList(const std::string_view &name)
+			: id{std::string{name}}
+		{}
+		inline ActionList(const ActionList &other)
+			: id{std::string{other.id.GetName()}}
+			, actions{other.actions}
+		{}
+		inline ~ActionList() {
+			actions.clear();
+		}
+
+		RassEngine::Events::EntityEventID id;
+		std::vector<std::shared_ptr<IGameFeelAction>> actions{};
+	};
 };
 
 }
