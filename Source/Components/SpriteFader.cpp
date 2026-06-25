@@ -9,81 +9,128 @@
 #include "Precompiled.h"
 #include "SpriteFader.h"
 
+#include "Cloneable.h"
+#include "Component.h"
+#include "Components/Sprite.h"
+#include "Entity.h"
+#include "Events/Global.h"
 #include "Stream.h"
+#include "Systems/GlobalEvents/IGlobalEventsSystem.h"
+#include "Systems/Time/ITimeSystem.h"
+#include "TweenCurve.h"
 #include "Utils.h"
-#include <Entity.h>
-#include <Cloneable.h>
-#include <Component.h>
-#include <Components/Sprite.h>
-#include <Events/Global.h>
-#include <Scenes/SerializedScene.h>
-#include <Systems/Time/ITimeSystem.h>
-#include <Systems/Scene/ISceneSystem.h>
-#include <Systems/GlobalEvents/IGlobalEventsSystem.h>
 
 using namespace RassEngine;
 using namespace RassEngine::Events;
 using namespace RassEngine::Components;
-using namespace RassEngine::Scenes;
 using namespace RassEngine::Systems;
 
 namespace RassEngine::Components {
 
 static constexpr std::string_view KEY_FADE_DURATION = "FadeDuration";
+static constexpr std::string_view KEY_AUTO_DISABLE = "AutoDisable";
 
 SpriteFader::SpriteFader() : Cloneable<Component, SpriteFader>{},
-onUpdateListener{this, &SpriteFader::OnUpdate}  {}
+onUpdateListener{this, &SpriteFader::OnUpdate}  {
+	UpdateLinearCurve();
+}
 
-	SpriteFader::SpriteFader(const SpriteFader &other)
-		: Cloneable<Component, SpriteFader>{}, fadeDuration{other.fadeDuration},
-		onUpdateListener{this, &SpriteFader::OnUpdate}
-	{
+SpriteFader::SpriteFader(const SpriteFader &other)
+	: Cloneable<Component, SpriteFader>{other}, fadeDuration{other.fadeDuration}
+	, curve{other.curve}, autoDisable{other.autoDisable}
+	, onUpdateListener{this, &SpriteFader::OnUpdate}
+{
+}
+
+SpriteFader::~SpriteFader() {
+	if(IGlobalEventsSystem::Get() != nullptr) {
+		IGlobalEventsSystem::Get()->unbind(Events::Global::Update, &onUpdateListener);
+	}
+}
+
+bool SpriteFader::Initialize() {
+	if(IGlobalEventsSystem::Get() != nullptr) {
+		IGlobalEventsSystem::Get()->bind(Events::Global::Update, &onUpdateListener);
 	}
 
-	SpriteFader::~SpriteFader() {
-		if(IGlobalEventsSystem::Get() != nullptr) {
-			IGlobalEventsSystem::Get()->unbind(Events::Global::Update, &onUpdateListener);
-		}
+	if(GetSprite()) {
+		GetSprite()->Alpha(0.0f);
 	}
 
-	bool SpriteFader::Initialize() {
-		if(IGlobalEventsSystem::Get() != nullptr) {
-			IGlobalEventsSystem::Get()->bind(Events::Global::Update, &onUpdateListener);
-		}
+	return true;
+}
 
-		Sprite *spr = Parent()->Get<Sprite>();
-		if(spr) {
-			spr->Alpha(0.0f);
-		}
+const std::string_view &SpriteFader::NameClass() const {
+	static constexpr std::string_view className = NAMEOF(SpriteFader);
+	return className;
+}
 
+bool SpriteFader::Read(Stream &stream) {
+	if(!Component::Read(stream)) {
+		return false;
+	}
+
+	// Read whether to auto-disable
+	stream.Read(KEY_AUTO_DISABLE, autoDisable);
+
+	// Read the fade duration first
+	if(stream.Read(KEY_FADE_DURATION, fadeDuration)) {
+		// If available, setup a linear curve
+		UpdateLinearCurve();
 		return true;
 	}
 
-	const std::string_view &SpriteFader::NameClass() const {
-		static constexpr std::string_view className = NAMEOF(SpriteFader);
-		return className;
+	// Otherwise, read the curve values
+	curve.Read(stream);
+	fadeDuration = curve.GetTotalDuration();
+	return true;
+}
+
+bool SpriteFader::Show(const glm::vec3 &color, const TweenCurve &curve) {
+	// Halt if the sprite is not available
+	if(!GetSprite()) {
+		return false;
 	}
 
-	bool SpriteFader::Read(Stream &stream) {
-		if(!Component::Read(stream)) {
-			return false;
-		}
+	// Update the curve
+	this->curve.Set(curve);
 
-		stream.Read(KEY_FADE_DURATION, fadeDuration);
+	// Set the color of the sprite
+	GetSprite()->Alpha(this->curve.GetStartingValue());
+	GetSprite()->Color(color);
 
+	// Indicate that the fade should start from the beginning
+	currentTime = 0.0f;
+	SetEnabled(true);
+	return true;
+}
+
+bool SpriteFader::OnUpdate(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
+	if(!IsEnabled()) {
+		// If not enabled, don't update this sprite
 		return true;
 	}
 
-	bool SpriteFader::OnUpdate(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
-		float dt = ITimeSystem::Get()->GetDeltaTimeSec();
-		currentTime += dt;
+	// Compute the current time
+	float dt = ITimeSystem::Get()->GetDeltaTimeSec();
+	currentTime += dt;
 
-		Sprite *spr = Parent()->Get<Sprite>();
-		if(spr) {
-			float alpha = std::clamp(currentTime / fadeDuration, 0.0f, 1.0f);
-			spr->Alpha(alpha);
-		}
-
-		return true;
+	// Update the alpha to the curve's value
+	if(GetSprite()) {
+		GetSprite()->Alpha(curve.Calculate(currentTime));
 	}
+
+	// Auto-disable this component to save processing
+	if(autoDisable && (currentTime > fadeDuration)) {
+		SetEnabled(false);
+	}
+	return true;
+}
+
+Sprite *SpriteFader::GetSprite() const {
+	if(spriteCache == nullptr) {
+		spriteCache = Parent()->Get<Sprite>();
+	}
+	return spriteCache;
+}
 }

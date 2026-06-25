@@ -104,7 +104,7 @@ float TweenCurve::Calculate(float time) const {
 	auto nextKeyFrame = keyFrames.begin();
 
 	// Find a keyframe time is on
-	while((nextKeyFrame->time < time) && (nextKeyFrame != keyFrames.end())) {
+	while((nextKeyFrame != keyFrames.end()) && (nextKeyFrame->time < time)) {
 		// Grab this keyframe's stats
 		startTime = nextKeyFrame->time;
 		startValue = nextKeyFrame->value;
@@ -115,8 +115,8 @@ float TweenCurve::Calculate(float time) const {
 
 	// Check if we're on the last keyframe
 	if(nextKeyFrame == keyFrames.end()) {
-		// If so, just return the keyframe's value
-		return nextKeyFrame->value;
+		// If so, just return the last keyframe's value
+		return GetEndingValue();
 	}
 
 	// Normalize the time between startTime and nextKeyFrame->time
@@ -124,6 +124,32 @@ float TweenCurve::Calculate(float time) const {
 
 	// Choose a tweening algorithm
 	return Calculate(nextKeyFrame->type, startValue, nextKeyFrame->value, time);
+}
+
+float TweenCurve::GetTotalDuration() const {
+	// Check if there are any keyframes
+	float toReturn = 0.0f;
+	if(keyFrames.size() == 0) {
+		// If not, return 0
+		return toReturn;
+	}
+
+	// Sum the times of all keyframes
+	for(const KeyFrame &key : keyFrames) {
+		toReturn += key.time;
+	}
+	return toReturn;
+}
+
+float TweenCurve::GetEndingValue() const {
+	// Check if there are any keyframes
+	if(keyFrames.size() == 0) {
+		// If not, just return the starting value
+		return startingValue;
+	}
+
+	// Otherwise, grab the last keyframe, and return its value
+	return keyFrames[keyFrames.size() - 1].value;
 }
 
 bool TweenCurve::Read(Stream &stream) {

@@ -51,8 +51,8 @@ public:
 		return isEnabled;
 	}
 
-	inline bool SetEnabled(bool flag) {
-		return isEnabled = flag;
+	inline virtual void SetEnabled(bool flag) {
+		isEnabled = flag;
 	}
 
 private:

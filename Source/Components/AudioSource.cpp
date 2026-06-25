@@ -17,7 +17,7 @@ namespace RassEngine::Components {
 	AudioSource::AudioSource() : Cloneable<Component, AudioSource>{} {}
 
 	AudioSource::AudioSource(const AudioSource &other)
-		: Cloneable<Component, AudioSource>{}
+		: Cloneable<Component, AudioSource>{other}
 		, fileName{other.fileName}
 		, volume{other.volume}
 		, pitch{other.pitch}

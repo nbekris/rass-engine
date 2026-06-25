@@ -23,6 +23,7 @@
 #include <windows.h>
 
 #include "resource.h"
+
 #include <Engine.h>
 #include <Systems/Audio/AudioSystem.h>
 #include <Systems/Audio/IAudioSystem.h>
@@ -74,6 +75,7 @@
 #include "Components/FlipOrigin.h"
 #include "Components/Flippable.h"
 #include "Components/Flipper.h"
+#include "Components/GameFeelEvents.h"
 #include "Components/IsKinematicMidFlip.h"
 #include "Components/ParallaxController.h"
 #include "Components/ParentTo.h"
@@ -91,11 +93,16 @@
 #include "Components/TimedSceneTransition.h"
 #include "Components/WeaponUnlocker.h"
 #include "Components/ZoomOutArea.h"
+#include "Systems/GameFeel/GameFeelFactory.h"
+#include "Systems/GameFeel/IGameFeelFactory.h"
+#include "Systems/ScreenFlash/IScreenFlashSystem.h"
+#include "Systems/ScreenFlash/ScreenFlashSystem.h"
 
 using namespace gl;
 using namespace RassEngine;
 using namespace RassEngine::Systems;
 using namespace RassGame::Components;
+using namespace RassGame::Systems;
 
 static constexpr std::string_view DEFAULT_SCENE_NAME = "DigiSplash";
 
@@ -153,9 +160,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		.Register<ICameraSystem, CameraSystem>()
 		.Register<IUiSystem, UiSystem>()
 		.Register<IParticleSystem, ParticleSystem>()
-		.Register<IDebugDrawSystem, DebugDrawSystem>();
+		.Register<IDebugDrawSystem, DebugDrawSystem>()
+		.Register<IScreenFlashSystem, ScreenFlashSystem>()
+		.Register<IGameFeelFactory, GameFeelFactory>();
 
 	// Register new components here
+#pragma region Component Factory Registration
 	IComponentFactory::Get()->Register(NAMEOF(FlipOrigin), [] () -> Component* {
 		return new FlipOrigin();
 	});
@@ -231,6 +241,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	IComponentFactory::Get()->Register(NAMEOF(ParentTo), [] () -> Component * {
 		return new ParentTo();
 	});
+	IComponentFactory::Get()->Register(NAMEOF(GameFeelEvents), [] () -> Component * {
+		return new GameFeelEvents();
+	});
+#pragma endregion
 
 	//#ifdef _DEBUG
 	// Only register the cheats if in debug mode
