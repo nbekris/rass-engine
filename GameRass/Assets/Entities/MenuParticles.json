@@ -11,7 +11,8 @@
 				"ParticleMax": 50.0,
 				"IsLooping": true,
 				"SimSpace": "Global",
-				"Texture": "Assets/Textures/GlowParticle.png"
+				"Texture": "Assets/Textures/GlowParticle.png",
+				"BlendMode": "Additive"
 			},
 			"ParticleEmitter": {
 				"EmitRate": 20.0,

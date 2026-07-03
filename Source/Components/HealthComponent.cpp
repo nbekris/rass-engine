@@ -17,6 +17,8 @@
 #include "Entity.h"
 #include "Events/Global.h"
 #include "Events/GlobalEventArgs.h"
+//#include "Components/GameFeelEvents.h"
+#include "IFeelTrigger.h"
 #include "IEvent.h"
 #include "Cloneable.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
@@ -94,18 +96,9 @@ bool HealthComponent::TakeDamage(int damage) {
 		isInvincible = true;
 		invincibilityTimer = invincibilityDuration;
 
-		auto *cameraSys = RassEngine::Systems::ICameraSystem::Get();
-		if(cameraSys) {
-			RassEngine::Components::CameraShakeParams hitShake;
-			hitShake.shakeDuration = 0.35f;
-			hitShake.vibrationSpeed = 35.0f;
-			hitShake.maxTranslation = glm::vec3(0.4f, 0.4f, 0.0f);
-			hitShake.maxZRotation = 4.0f;
-			hitShake.easeType = RassEngine::Components::CameraShakeEase::EaseOut;
-
-			static_cast<RassEngine::Systems::CameraSystem *>(cameraSys)->ShakeCamera(hitShake);
+		if(auto *feel = Parent()->GetInterface<IFeelTrigger>()) {
+			feel->Play("OnHit");
 		}
-
 	}
 	if(health == 0) {
 		OnDeath();
@@ -205,7 +198,12 @@ void HealthComponent::UpdateHeartSprites() {
 void HealthComponent::OnDeath() {
 	LOG_INFO("{}: Died", NameClass());
 	if(!isPlayer)
+	{
 		Parent()->Destroy();
+		if(auto *feel = Parent()->GetInterface<IFeelTrigger>()) {
+			feel->PlayDetached("OnDeath");
+		}
+	}
 	else
 	{
 		auto* movement = Parent()->Get<Movement>();

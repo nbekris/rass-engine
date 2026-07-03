@@ -95,6 +95,7 @@ private:
 	uint32_t tileStateTexture = 0;
 	// Cached tile size in world units, set during LoadResources
 	float cachedTileSize = 1.0f;
+	std::string tileDestroyFeelEvent{};
 	// Event listener
 	Events::GlobalEventListener<TileMap> onRenderListener;
 };

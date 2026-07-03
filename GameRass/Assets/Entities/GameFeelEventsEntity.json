@@ -1,0 +1,25 @@
+{
+	"Entity": {
+		"Name": "GameFeelEventsEntity",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+  "GameFeelEvents": {
+    "Events": {
+      "OnHit": {
+        "Actions": [
+          { "Type": "ScreenShake", "TriggerTime": 0.0,  "Duration": 0.3, "VibrationSpeed": 25.0, "MaxTranslation": [0.4, 0.4, 0.0], "MaxZRotation": 4.0, "Ease": "EaseOut" },
+          { "Type": "ScreenFlash", "TriggerTime": 0.05, "Color": [1.0, 0.2, 0.2] }
+        ]
+      }
+    }
+  }
+}
+	}
+}
+
+
+

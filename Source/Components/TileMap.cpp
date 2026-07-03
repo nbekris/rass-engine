@@ -30,6 +30,7 @@
 #include "Systems/Physics/IPhysicsSystem.h"
 #include "TileMapData.h"
 #include "TileSet.h"
+#include <IFeelTrigger.h>
 
 namespace RassEngine::Components {
 
@@ -52,6 +53,7 @@ TileMap::TileMap(const TileMap &other)
 	, usePhysicsCollider{other.usePhysicsCollider}
 	, renderOrder{other.renderOrder}
 	, onRenderListener{this, &TileMap::Render}
+	, tileDestroyFeelEvent{other.tileDestroyFeelEvent}
 {
 }
 
@@ -102,6 +104,7 @@ bool TileMap::Read(Stream &stream) {
 	stream.Read("FilterLinear", filterLinear);
 	stream.Read("UsePhysicsCollider", usePhysicsCollider);
 	stream.Read("RenderOrder", renderOrder);
+	stream.Read("TileDestroyFeelEvent", tileDestroyFeelEvent);
 	//stream.Read("UsePhysicsTrigger", usePhysicsTrigger);
 	return true;
 }
@@ -199,12 +202,42 @@ void TileMap::InitTileStateTexture() {
 void TileMap::NotifyTileDestroyed(unsigned short row, unsigned short col) {
 	if(!tileMapData || tileStateTexture == 0) return;
 
-	// Physics stops checking this tile immediately (visual dissolve is decoupled).
 	tileMapData->SetTileAt(row, col, 0);
 
-	// Start the time-based dissolve; Render() ramps the texel 0 -> 255 over dissolveDuration_.
 	const unsigned short idx = row * tileMapData->GetCols() + col;
 	dissolvingTiles_.push_back({idx, 0.0f});
+
+	// ---- GameFeel: spawn particles at the destroyed tile's world center ----
+	if(tileDestroyFeelEvent.empty()) {
+		return;
+	}
+	auto *feel = Parent() ? Parent()->GetInterface<RassEngine::IFeelTrigger>() : nullptr;
+	if(feel == nullptr) {
+		return;
+	}
+
+	// TileToWorld returns the tile's LOCAL bottom-left (NOT world, NOT center).
+	// Reconstruct world center symmetrically to PhysicsSystem::DestroyTileAtWorldPos:
+	//   world = entityPos + local * entityScale
+	float localX = 0.0f, localY = 0.0f;
+	tileMapData->TileToWorld(row, col, localX, localY);   // local bottom-left corner
+
+	glm::vec3 entityPos(0.0f);
+	glm::vec3 entityScale(1.0f);
+	if(auto *t = Parent()->Get<Components::Transform>()) {
+		entityPos = t->GetPosition();
+		entityScale = t->GetLocalScale();
+	}
+
+	// Shift by half a tile (in LOCAL units) to hit the center before scaling to world.
+	const float halfTile = 0.5f * cachedTileSize;   // cachedTileSize is local tile size (see LoadResources)
+	glm::vec3 worldPos{
+		entityPos.x + (localX + halfTile) * entityScale.x,
+		entityPos.y + (localY + halfTile) * entityScale.y,
+		entityPos.z
+	};
+
+	feel->PlayDetachedAt(tileDestroyFeelEvent, worldPos);
 }
 
 void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open) {

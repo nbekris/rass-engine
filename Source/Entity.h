@@ -99,6 +99,20 @@ public:
 	T *Get() const;
 
 	/// <summary>
+/// Retrieves the first component implementing interface I (cross-cast).
+/// Unlike Get&lt;T&gt;, I does not have to derive from Component.
+/// </summary>
+	template<class I>
+	inline I *GetInterface() const {
+		for(const auto &component : components) {
+			if(I *result = dynamic_cast<I *>(component.get())) {
+				return result;
+			}
+		}
+		return nullptr;
+	}
+
+	/// <summary>
 	/// Retrieves all the components attached to this entity,
 	/// based on type.
 	/// Note: due to constant <c>dynamic_cast</c>-ing,

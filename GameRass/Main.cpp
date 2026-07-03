@@ -93,6 +93,7 @@
 #include "Components/TimedSceneTransition.h"
 #include "Components/WeaponUnlocker.h"
 #include "Components/ZoomOutArea.h"
+#include "Components/GameFeelEvents.h"
 #include "Systems/GameFeel/GameFeelFactory.h"
 #include "Systems/GameFeel/IGameFeelFactory.h"
 #include "Systems/ScreenFlash/IScreenFlashSystem.h"

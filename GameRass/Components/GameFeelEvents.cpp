@@ -1,31 +1,27 @@
-// File Name:    GameFeelEvents.cpp
-// Author(s):    main Taro Omiya
-// Course:       GAM541
-// Project:      RASS
-// Purpose:      Component controlling GameFeelEvents.
-//
-// Copyright © 2026 DigiPen (USA) Corporation.
-
 #include "pch.h"
 #include "GameFeelEvents.h"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <string_view>
 
-#include <Cloneable.h>
-#include <Component.h>
 #include <Entity.h>
-#include <Events/EventArgs.h>
-#include <IEventListener.h>
+#include <IEvent.h>
 #include <Stream.h>
-#include <Systems/Logging/ILoggingSystem.h>
 #include <Utils.h>
+#include <Events/Global.h>
+#include <Events/GlobalEventArgs.h>
+#include <Systems/GlobalEvents/IGlobalEventsSystem.h>
+#include <Systems/Time/ITimeSystem.h>
+#include <Systems/Logging/ILoggingSystem.h>
+#include <Components/Transform.h>
 
 #include "../Systems/GameFeel/IGameFeelAction.h"
+#include "../Systems/GameFeel/GameFeelActionFactory.h"
+#include "../Systems/GameFeel/IGameFeelFactory.h"
 
 using namespace RassEngine;
-using namespace RassEngine::Components;
 using namespace RassEngine::Events;
 using namespace RassEngine::Systems;
 using namespace RassGame::Systems;
@@ -34,48 +30,51 @@ namespace RassGame::Components {
 
 GameFeelEvents::GameFeelEvents()
 	: Cloneable<Component, GameFeelEvents>{}
-{}
+	, onUpdateListener{this, &GameFeelEvents::Update} {}
 
 GameFeelEvents::GameFeelEvents(const GameFeelEvents &other)
 	: Cloneable<Component, GameFeelEvents>{other}
 	, allActionLists{other.allActionLists}
-{}
+	, onUpdateListener{this, &GameFeelEvents::Update} {}
+
+GameFeelEvents::~GameFeelEvents() {
+	if(IGlobalEventsSystem::Get() != nullptr) {
+		IGlobalEventsSystem::Get()->unbind(Global::Update, &onUpdateListener);
+	}
+	isInitialized = false;
+}
 
 bool GameFeelEvents::Initialize() {
 	if(Parent() == nullptr) {
 		LOG_ERROR("{}: Parent {} not found", NameClass(), NAMEOF(Entity));
 		return false;
 	}
-
-	// Bind everything
-	for(const auto &event : allActionLists) {
-		for(const auto &action : event.second.actions) {
-			Parent()->BindEvent(event.second.id, action->GetListener());
-		}
+	if(IGlobalEventsSystem::Get() != nullptr) {
+		IGlobalEventsSystem::Get()->bind(Global::Update, &onUpdateListener);
 	}
-
-	// Indicate initialization is done
 	isInitialized = true;
 	return true;
 }
 
-GameFeelEvents::~GameFeelEvents() {
-	if(Parent() == nullptr) {
-		LOG_ERROR("{}: Parent {} not found", NameClass(), NAMEOF(Entity));
-		return;
+bool GameFeelEvents::Update(const IEvent<GlobalEventArgs> *, const GlobalEventArgs &) {
+	if(ITimeSystem::Get() == nullptr) {
+		return true;
 	}
+	// Unscaled: a hit-stop action setting timeScale=0 must not freeze the timeline.
+	const float dt = ITimeSystem::Get()->GetUnscaledDeltaTime();
 
-	isInitialized = false;
-
-	// Unbind everything
-	for(const auto &event : allActionLists) {
-		for(const auto &action : event.second.actions) {
-			Parent()->UnbindEvent(event.second.id, action->GetListener());
+	for(auto &pb : activePlaybacks) {
+		pb.elapsed += dt;
+		const auto &actions = pb.list->actions;
+		while(pb.cursor < actions.size() && actions[pb.cursor]->triggerTime <= pb.elapsed) {
+			actions[pb.cursor]->Execute(pb.context);
+			++pb.cursor;
 		}
 	}
-
-	// Clear everything
-	allActionLists.clear();
+	std::erase_if(activePlaybacks, [] (const Playback &pb) {
+		return pb.list == nullptr || pb.cursor >= pb.list->actions.size();
+		});
+	return true;
 }
 
 const std::string_view &GameFeelEvents::NameClass() const {
@@ -87,66 +86,91 @@ bool GameFeelEvents::Read(Stream &stream) {
 	if(!Component::Read(stream)) {
 		return false;
 	}
-
 	allActionLists.clear();
+
 	stream.ReadObject("Events", [this, &stream] (const std::string &eventName) {
-		// FIXME: make a factory method to generate action lists, here
-		//Settings settings;
-		//if(!settings.Read(stream)) {
-		//	LOG_WARNING("{}: Failed to read settings for event '{}'", NameClass(), eventName);
-		//	return;
-		//}
-		//AddAction(eventName, settings);
-	});
+		// ReadObject does NOT descend into each item, so push the event node first.
+		if(!stream.PushNode(eventName)) {
+			return;
+		}
+		stream.ReadArray("Actions", [this, &stream, &eventName] () {
+			std::string type;
+			if(!stream.Read("Type", type)) {
+				LOG_WARNING("{}: action missing 'Type' in event '{}'", NameClass(), eventName);
+				return;
+			}
+			auto action = GameFeelActionFactory::Create(type);
+			if(action == nullptr) {
+				LOG_WARNING("{}: unknown action type '{}'", NameClass(), type);
+				return;
+			}
+			stream.Read("TriggerTime", action->triggerTime);  // Delay baked at parse time
+			action->Read(stream);
+			AddAction(eventName, action);
+			});
+		stream.PopNode();
+		});
+
+	// Cursor logic requires actions sorted by triggerTime.
+	for(auto &[name, list] : allActionLists) {
+		std::sort(list.actions.begin(), list.actions.end(),
+			[] (const std::shared_ptr<IGameFeelAction> &a, const std::shared_ptr<IGameFeelAction> &b) {
+				return a->triggerTime < b->triggerTime;
+			});
+	}
 	return true;
 }
 
-void GameFeelEvents::AddAction(const std::string_view &name, const std::shared_ptr<IGameFeelAction> &eventSetting) {
-	// Convert string_view
-	std::string eventName{name};
-
-	// Attempt to find the appropriate ActionList
-	ActionList *list{nullptr};
-	const auto &it = allActionLists.find(eventName);
-	if(it != allActionLists.end()) {
-		// Action list found, just add the event settings
-		list = &(it->second);
-	} else {
-		// Create a new entry
-		allActionLists.emplace(eventName, ActionList{eventName});
-		list = &allActionLists.at(eventName);
-	}
-
-	// Queue the event setting
-	list->actions.emplace_back(eventSetting);
-
-	// Bind this action if already initialized
-	if(isInitialized) {
-		if(Parent() == nullptr) {
-			LOG_ERROR("{}: Parent {} not found", NameClass(), NAMEOF(Entity));
-			return;
-		}
-
-		Parent()->BindEvent(list->id, eventSetting->GetListener());
-	}
+void GameFeelEvents::AddAction(const std::string_view &name,
+	const std::shared_ptr<IGameFeelAction> &action) {
+	allActionLists[std::string{name}].actions.emplace_back(action);
 }
 
-bool GameFeelEvents::Play(const std::string_view &eventName, RassEngine::Events::EventArgs &args) const {
-	// Attempt to find the event ID
-	const auto &it = allActionLists.find(std::string{eventName});
+bool GameFeelEvents::Play(const std::string_view &eventName) {
+	const auto it = allActionLists.find(std::string{eventName});
 	if(it == allActionLists.end()) {
 		return false;
 	}
+	activePlaybacks.push_back(Playback{&it->second, 0.0f, 0, CaptureContext()});
+	return true;
+}
 
-	// Make sure parent is available as well
-	if(Parent() == nullptr) {
-		LOG_ERROR("{}: Parent {} not found", NameClass(), NAMEOF(Entity));
+bool GameFeelEvents::PlayDetached(const std::string_view &eventName) {
+	const auto it = allActionLists.find(std::string{eventName});
+	if(it == allActionLists.end()) {
 		return false;
 	}
-
-	// Run event
-	Parent()->DispatchEntityEvent(it->second.id, args);
+	auto *factory = RassGame::Systems::IGameFeelFactory::Get();
+	if(factory == nullptr) {
+		return false;
+	}
+	factory->PlayActions(it->second.actions, CaptureContext());   // capture BEFORE Destroy()
 	return true;
+}
+bool GameFeelEvents::PlayDetachedAt(const std::string_view &eventName, const glm::vec3 &worldPos) {
+	const auto it = allActionLists.find(std::string{eventName});
+	if(it == allActionLists.end()) {
+		return false;
+	}
+	auto *factory = RassGame::Systems::IGameFeelFactory::Get();
+	if(factory == nullptr) {
+		return false;
+	}
+	// Explicit position: don't capture from Parent() — the effect origin is the tile, not this entity.
+	Systems::FeelContext ctx;
+	ctx.position = worldPos;
+	factory->PlayActions(it->second.actions, ctx);
+	return true;
+}
+RassGame::Systems::FeelContext GameFeelEvents::CaptureContext() const {
+	Systems::FeelContext ctx;
+	if(Parent() != nullptr) {
+		if(auto *t = Parent()->GetTransform()) {
+			ctx.position = t->GetPosition();
+			ctx.rotationRad = t->GetRotationRad();
+		}
+	}
+	return ctx;
 }
 
 }

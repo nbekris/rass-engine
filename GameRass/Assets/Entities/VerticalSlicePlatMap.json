@@ -11,7 +11,8 @@
 				"TileMapData": "verticalSlicePlat_Collision",
 				"FilterLinear": false,
 				"UsePhysicsCollider": true,
-				"RenderOrder": 0
+				"RenderOrder": 0,
+				"TileDestroyFeelEvent":"OnTileDestroyed"
 			},
 			"TileDoor": {
 				"Doors": [
@@ -116,6 +117,15 @@
 			},
 			"Flippable": {
 				"AnimateScaling": true
+			},
+			"GameFeelEvents": {
+				"Events": {
+				"OnTileDestroyed": {
+					"Actions": [
+					{ "Type": "SpawnParticles", "TriggerTime": 0.0, "Prefab": "TileParticles", "Offset": [ 0.0, 0.0, 0.0 ] }
+					]
+				}
+				}
 			}
 		}
 	}

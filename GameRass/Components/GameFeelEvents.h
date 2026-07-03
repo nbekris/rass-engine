@@ -1,13 +1,5 @@
-// File Name:    GameFeelEvents.h
-// Author(s):    main Taro Omiya
-// Course:       GAM541
-// Project:      RASS
-// Purpose:      Component controlling GameFeelEvents open and close behavior.
-//
-// Copyright © 2026 DigiPen (USA) Corporation.
-
 #pragma once
-
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -16,20 +8,22 @@
 
 #include <Cloneable.h>
 #include <Component.h>
-#include <Events/EntityEventID.h>
-#include <Events/EventArgs.h>
+#include <IEvent.h>
+#include <IFeelTrigger.h>
+#include <Events/GlobalEventArgs.h>
+#include <Events/GlobalEventListener.h>
 #include <Stream.h>
 
+#include "../Systems/GameFeel/FeelContext.h"
+
 namespace RassGame::Systems {
-// Forward declarations
 class IGameFeelAction;
 }
 
 namespace RassGame::Components {
-
-class GameFeelEvents : public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents> {
-	// Forward declare helper container
-	struct ActionList;
+class GameFeelEvents
+	: public RassEngine::Cloneable<RassEngine::Component, GameFeelEvents>
+	, public RassEngine::IFeelTrigger {
 public:
 	GameFeelEvents();
 	GameFeelEvents(const GameFeelEvents &other);
@@ -39,28 +33,30 @@ public:
 	virtual const std::string_view &NameClass() const override;
 	virtual bool Read(RassEngine::Stream &stream) override;
 
-	void AddAction(const std::string_view &eventName, const std::shared_ptr<Systems::IGameFeelAction> &eventSetting);
-	bool Play(const std::string_view &eventName, RassEngine::Events::EventArgs &args) const;
-
+	// IFeelTrigger
+	virtual bool Play(const std::string_view &eventName) override;
+	virtual bool PlayDetached(const std::string_view &eventName) override;
+	// For sources without an entity (e.g. a destroyed tile): caller supplies the world position.
+	virtual bool PlayDetachedAt(const std::string_view &eventName, const glm::vec3 &worldPos) override;
+	void AddAction(const std::string_view &eventName,
+		const std::shared_ptr<Systems::IGameFeelAction> &action);
 private:
-	bool isInitialized{false};
-	std::unordered_map<std::string, ActionList> allActionLists{};
-
+	bool Update(const RassEngine::IEvent<RassEngine::Events::GlobalEventArgs> *,
+		const RassEngine::Events::GlobalEventArgs &);
+	RassGame::Systems::FeelContext CaptureContext() const;
 	struct ActionList {
-		inline ActionList(const std::string_view &name)
-			: id{std::string{name}}
-		{}
-		inline ActionList(const ActionList &other)
-			: id{std::string{other.id.GetName()}}
-			, actions{other.actions}
-		{}
-		inline ~ActionList() {
-			actions.clear();
-		}
-
-		RassEngine::Events::EntityEventID id;
 		std::vector<std::shared_ptr<Systems::IGameFeelAction>> actions{};
 	};
-};
+	struct Playback {
+		const ActionList *list{nullptr};
+		float elapsed{0.0f};
+		std::size_t cursor{0};
+		Systems::FeelContext context{};
+	};
 
+	std::unordered_map<std::string, ActionList> allActionLists{};
+	std::vector<Playback> activePlaybacks{};
+	RassEngine::Events::GlobalEventListener<GameFeelEvents> onUpdateListener;
+	bool isInitialized{false};
+};
 }

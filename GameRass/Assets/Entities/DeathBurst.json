@@ -1,0 +1,58 @@
+{
+  "Entity": {
+  "Name": "DeathBurst",
+  "Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+    "ParticleManager": {
+      "ParticleMax": 40.0,
+      "IsLooping": false,
+      "SimSpace": "Global",
+			"Texture": "Assets/Textures/GlowParticle.png",
+			"BlendMode": "Additive"
+    },
+    "ParticleEmitter": {
+      "EmitOnStart": true,
+      "EmitRate": 400.0,
+      "LifeTimeMin": 0.25,
+      "LifeTimeMax": 0.5,
+      "ScaleMin": [0.15, 0.15, 1.0],
+      "ScaleMax": [0.35, 0.35, 1.0],
+      "TintColorMin": [1.0, 0.6, 0.1, 1.0],
+      "TintColorMax": [1.0, 0.9, 0.3, 1.0],
+      "Shape": {
+        "EmitterCone": {
+          "StartAngle": 0.0,
+          "EndAngle": 360.0,
+          "MinRadius": 0.0,
+          "MaxRadius": 0.2
+        }
+      }
+    },
+			"ParticleMover": {},
+			"ParticleSizeUpdater": {
+				"Start": 0.0,
+				"KeyFrames": [
+					{
+						"Type": 2,
+						"Time": 0.3,
+						"Value": 1.0
+					},
+					{
+						"Type": 0,
+						"Time": 0.7,
+						"Value": 1.0
+					},
+					{
+						"Type": 1,
+						"Time": 1.0,
+						"Value": 0.0
+					}
+				]
+			}
+  }
+}
+}
