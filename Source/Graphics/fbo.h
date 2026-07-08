@@ -18,6 +18,15 @@ public:
 	bool hdr = false;   // false = RGBA8 (LDR), true = RGBA16F (HDR)
 
 	FBO() = default;
+	~FBO() {
+		Destroy();
+	}
+
+	FBO(const FBO &) = delete;
+	FBO &operator=(const FBO &) = delete;
+
+	FBO(FBO &&other) noexcept;
+	FBO &operator=(FBO &&other) noexcept;
 
 	void CreateFBO(int w, int h);
 	void Resize(int w, int h);

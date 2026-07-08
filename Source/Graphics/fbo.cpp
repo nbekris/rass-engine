@@ -6,6 +6,25 @@ using namespace gl;
 #include "Graphics/fbo.h"
 #include "Systems/Logging/ILoggingSystem.h"
 namespace RassEngine::Graphics {
+
+FBO::FBO(FBO &&o) noexcept
+	: fboID(o.fboID), textureID(o.textureID), depthRBO(o.depthRBO)
+	, width(o.width), height(o.height), hdr(o.hdr) {
+	o.fboID = o.textureID = o.depthRBO = 0;
+	o.width = o.height = 0;
+}
+
+FBO &FBO::operator=(FBO &&o) noexcept {
+	if(this != &o) {
+		Destroy();
+		fboID = o.fboID; textureID = o.textureID; depthRBO = o.depthRBO;
+		width = o.width; height = o.height; hdr = o.hdr;
+		o.fboID = o.textureID = o.depthRBO = 0;
+		o.width = o.height = 0;
+	}
+	return *this;
+}
+
 void FBO::CreateFBO(int w, int h) {
 	if(w <= 0 || h <= 0) {
 		LOG_DEBUG("Invalid FBO size: {}x{}", w, h);
