@@ -127,18 +127,15 @@ float TweenCurve::Calculate(float time) const {
 }
 
 float TweenCurve::GetTotalDuration() const {
-	// Check if there are any keyframes
-	float toReturn = 0.0f;
-	if(keyFrames.size() == 0) {
-		// If not, return 0
-		return toReturn;
+	if(keyFrames.empty()) {
+		return 0.0f;
 	}
 
-	// Sum the times of all keyframes
+	float maxTime = 0.0f;
 	for(const KeyFrame &key : keyFrames) {
-		toReturn += key.time;
+		maxTime = std::max(maxTime, key.time);
 	}
-	return toReturn;
+	return maxTime;
 }
 
 float TweenCurve::GetEndingValue() const {

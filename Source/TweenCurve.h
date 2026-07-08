@@ -77,14 +77,8 @@ inline void TweenCurve::Set(float startValue, T begin, T end) {
 	// Update starting value
 	startingValue = startValue;
 
-	// Empty key frames
-	this->keyFrames.clear();
-	this->keyFrames.reserve(keyFrames.size());
-
-	// Populate it with the setter
-	std::for_each(begin, end, [this] (const KeyFrame &key) {
-		this->keyFrames.emplace_back(key);
-	});
+	// Copy keyframes from the provided range
+	keyFrames.assign(begin, end);
 }
 
 }	// namespace

@@ -207,7 +207,7 @@ namespace RassEngine::Systems {
 
 		camera->shakeOffset.x = shakeX * camera->shakeParams.maxTranslation.x * envelope;
 		camera->shakeOffset.y = shakeY * camera->shakeParams.maxTranslation.y * envelope;
-		camera->shakeOffset.z = shakeZ * camera->shakeParams.maxTranslation.y * envelope;
+		camera->shakeOffset.z = shakeZ * camera->shakeParams.maxTranslation.z * envelope;
 
 		camera->shakeZRotation = std::sin(timeFactor * 1.5f) * camera->shakeParams.maxZRotation * envelope;
 	}
