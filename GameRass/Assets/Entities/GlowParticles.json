@@ -1,6 +1,6 @@
 {
 	"Entity": {
-		"Name": "DeathBurst",
+		"Name": "GlowParticles",
 		"Components": {
 			"Transform": {
 				"Translation": [ 0.0, 0.0, 0.0 ],
