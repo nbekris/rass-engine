@@ -25,7 +25,7 @@
 #include <Systems/Scene/ISceneSystem.h>
 #include <Utils.h>
 #include <InputActions.h>
-
+#include "Components/Sprite.h"
 #include "Components/FlipOrigin.h"
 
 using namespace RassEngine;
@@ -154,6 +154,12 @@ bool Flipper::OnTriggerEnter(const IEvent<EventArgs> *, const EventArgs &args) {
 	if(entitiesLinked_) {
 		if(text != nullptr) {
 			//if(((type == Type::UpsideDown) && flipOrigin->IsRightSideUp())||((type == Type::RightSideUp) && !flipOrigin->IsRightSideUp()))
+			if(IInputSystem::Get()->IsGamepadConnected() != usingGamepad) {
+								usingGamepad = !usingGamepad;
+								if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
+									sprite->SetText(usingGamepad ? "Press #94#" : "Press Shift");
+								}
+			}
 			text->GetTransform()->SetLocalPosition(Parent()->GetTransform()->GetLocalPosition() + glm::vec3(-0.5f, 0.2f, 0.5f));
 		}
 	}
@@ -215,6 +221,10 @@ void Flipper::LinkTextEntity() {
 	if(text == nullptr) {
 		LOG_WARNING("{}: {} with name '{}' was not found", NameClass(), NAMEOF(Entity), textEntityName);
 		return;
+	}
+	usingGamepad = IInputSystem::Get()->IsGamepadConnected();
+	if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
+		sprite->SetText(usingGamepad ? "Press #94#" : "Press Shift");
 	}
 	entitiesLinked_ = true;
 }

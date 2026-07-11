@@ -69,8 +69,14 @@ namespace RassEngine::Systems {
 
 	glm::mat4 CameraSystem::GetViewMatrix() const {
 		if(camera) {
+			glm::mat4 view = glm::scale(glm::mat4(1.0f), glm::vec3(camera->zoom));
+
+			if(camera->isShaking && camera->shakeZRotation != 0.0f) {
+				view = glm::rotate(view, glm::radians(camera->shakeZRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+
 			// aimOffset is added here for rendering only; it does NOT affect the window calculation
-			return glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(camera->zoom)), glm::vec3(-(camera->position + camera->aimOffset)));
+			return glm::translate(view, glm::vec3(-(camera->position + camera->aimOffset + camera->shakeOffset)));
 		} else {
 			return glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f));
 		}
@@ -138,6 +144,74 @@ namespace RassEngine::Systems {
 		return glm::vec2(ndc.x, ndc.y);
 	}
 
+	void CameraSystem::ShakeCamera(const Components::CameraShakeParams &params) {
+		if(camera == nullptr) {
+			return;
+		}
+
+		camera->isShaking = true;
+		camera->shakeTimer = 0.0f;
+		camera->shakeParams = params;
+		camera->shakeOffset = glm::vec3(0.0f);
+		camera->shakeZRotation = 0.0f;
+	}
+
+	float CameraSystem::EvaluateShakeEase(Components::CameraShakeEase ease, float t) const {
+		t = glm::clamp(t, 0.0f, 1.0f);
+
+		switch(ease) {
+		case Components::CameraShakeEase::Linear:
+			return t;
+		case Components::CameraShakeEase::EaseIn:
+			return t * t * t;
+		case Components::CameraShakeEase::EaseOut:
+			return 1.0f - ((1.0f - t) * (1.0f - t) * (1.0 - t));
+		case Components::CameraShakeEase::EaseInOut:
+			return t < 0.5f ? 4.0f * t * t * t : 1.0 - std::pow(-2.0f * t + 2.0f, 3.0f) * 0.5f;
+		case Components::CameraShakeEase::EaseOutIn:
+			if(t < 0.5f) {
+				float t2 = t * 2.0f;
+				return 0.5f * (1.0f - (1.0f - t2) * (1.0f - t2));
+			}
+			else {
+				float t2 = (t - 0.5f) * 2.0f;
+				return 0.5f + 0.5f * (t2 * t2);
+			}
+		}
+		return t;
+	}
+
+	void CameraSystem::UpdateCameraShake(float dt) {
+		if(camera == nullptr || !camera->isShaking) {
+			return;
+		}
+
+		camera->shakeTimer += dt;
+		float duration = camera->shakeParams.shakeDuration;
+
+		if(camera->shakeTimer >= duration) {
+			camera->isShaking = false;
+			camera->shakeTimer = 0.0f;
+			camera->shakeOffset = glm::vec3(0.0f);
+			camera->shakeZRotation = 0.0f;
+			return;
+		}
+
+		float progression = camera->shakeTimer / duration;
+		float envelope = 1.0f - EvaluateShakeEase(camera->shakeParams.easeType, progression);
+		float timeFactor = camera->shakeTimer * camera->shakeParams.vibrationSpeed;
+
+		float shakeX = std::sin(timeFactor * 1.1f) * std::cos(timeFactor * 0.8f);
+		float shakeY = std::cos(timeFactor * 0.9f) * std::sin(timeFactor * 1.2f);
+		float shakeZ = std::sin(timeFactor * 1.3f);
+
+		camera->shakeOffset.x = shakeX * camera->shakeParams.maxTranslation.x * envelope;
+		camera->shakeOffset.y = shakeY * camera->shakeParams.maxTranslation.y * envelope;
+		camera->shakeOffset.z = shakeZ * camera->shakeParams.maxTranslation.z * envelope;
+
+		camera->shakeZRotation = std::sin(timeFactor * 1.5f) * camera->shakeParams.maxZRotation * envelope;
+	}
+
 	bool CameraSystem::Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
 		float dt = Systems::ITimeSystem::Get()->GetDeltaTimeSec();
 
@@ -148,6 +222,9 @@ namespace RassEngine::Systems {
 #endif // _DEBUG
 		LerpZoom(dt);
 		LerpWindowOffset(dt);
+
+		UpdateCameraShake(dt);
+
 		return true;
 	}
 

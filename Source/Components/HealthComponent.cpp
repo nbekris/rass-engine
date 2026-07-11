@@ -12,9 +12,13 @@
 #include "Component.h"
 #include "Components/Sprite.h"
 #include "Components/Movement.h"
+#include "Components/Camera.h"
+#include "Systems/Camera/CameraSystem.h"
 #include "Entity.h"
 #include "Events/Global.h"
 #include "Events/GlobalEventArgs.h"
+//#include "Components/GameFeelEvents.h"
+#include "IFeelTrigger.h"
 #include "IEvent.h"
 #include "Cloneable.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
@@ -91,6 +95,10 @@ bool HealthComponent::TakeDamage(int damage) {
 		UpdateHeartSprites();
 		isInvincible = true;
 		invincibilityTimer = invincibilityDuration;
+
+		if(auto *feel = Parent()->GetInterface<IFeelTrigger>()) {
+			feel->Play("OnHit");
+		}
 	}
 	if(health == 0) {
 		OnDeath();
@@ -190,7 +198,12 @@ void HealthComponent::UpdateHeartSprites() {
 void HealthComponent::OnDeath() {
 	LOG_INFO("{}: Died", NameClass());
 	if(!isPlayer)
+	{
 		Parent()->Destroy();
+		if(auto *feel = Parent()->GetInterface<IFeelTrigger>()) {
+			feel->PlayDetached("OnDeath");
+		}
+	}
 	else
 	{
 		auto* movement = Parent()->Get<Movement>();

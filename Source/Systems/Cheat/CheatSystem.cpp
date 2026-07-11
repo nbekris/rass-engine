@@ -40,7 +40,7 @@ namespace RassEngine::Systems {
 
 using namespace RassEngine::Scenes;
 
-CheatSystem::CheatSystem(const std::initializer_list<std::string_view> &scenePaths) :
+CheatSystem::CheatSystem(std::initializer_list<std::string_view> scenePaths) :
 	updateListener{this, &CheatSystem::Update},
 	renderListener{this, &CheatSystem::Render},
 	scenePaths{} {

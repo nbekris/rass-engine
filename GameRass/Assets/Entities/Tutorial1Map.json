@@ -11,10 +11,20 @@
 				"TileMapData": "tutorial1_Tile_Layer_1",
 				"FilterLinear": false,
 				"UsePhysicsCollider": true,
-				"RenderOrder": 0
+				"RenderOrder": 0,
+				"TileDestroyFeelEvent":"OnTileDestroyed"
 			},
 			"Flippable": {
 				"AnimateScaling": true
+			},
+			"GameFeelEvents": {
+				"Events": {
+				"OnTileDestroyed": {
+					"Actions": [
+					{ "Type": "SpawnParticles", "TriggerTime": 0.0, "Prefab": "TileParticles", "Offset": [ 0.0, 0.0, 0.0 ] }
+					]
+				}
+				}
 			}
 		}
 	}

@@ -15,6 +15,15 @@
 			},
 			"Flippable": {
 				"AnimateScaling": true
+			},
+			"GameFeelEvents": {
+				"Events": {
+				"OnTileDestroyed": {
+					"Actions": [
+					{ "Type": "SpawnParticles", "TriggerTime": 0.0, "Prefab": "TileParticles", "Offset": [ 0.0, 0.0, 0.0 ] }
+					]
+				}
+				}
 			}
 		}
 	}

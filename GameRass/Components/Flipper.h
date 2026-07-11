@@ -65,6 +65,7 @@ private:
 	RassEngine::Systems::IInputSystem *inputSystem{nullptr};
 	bool playerInZone{false};
 	bool entitiesLinked_{false};
+	bool usingGamepad{false};
 	RassEngine::Events::EventListenerMethod<Flipper, RassEngine::Events::EventArgs> onTriggerEnter;
 	RassEngine::Events::EventListenerMethod<Flipper, RassEngine::Events::EventArgs> onTriggerExit;
 	RassEngine::Events::GlobalEventListener<Flipper> onUpdateListener;

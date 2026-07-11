@@ -11,7 +11,8 @@
 				"TileMapData": "level1Puzzle_Level",
 				"FilterLinear": false,
 				"UsePhysicsCollider": true,
-				"RenderOrder": -1
+				"RenderOrder": -1,
+				"TileDestroyFeelEvent":"OnTileDestroyed"
 			},
 			"TileDoor": {
 				"Doors": [
@@ -58,6 +59,15 @@
 			},
 			"Flippable": {
 				"AnimateScaling": true
+			},
+			"GameFeelEvents": {
+				"Events": {
+				"OnTileDestroyed": {
+					"Actions": [
+					{ "Type": "SpawnParticles", "TriggerTime": 0.0, "Prefab": "TileParticles", "Offset": [ 0.0, 0.0, 0.0 ] }
+					]
+				}
+				}
 			}
 		}
 	}

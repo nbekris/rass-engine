@@ -25,13 +25,13 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
+#include "Graphics/fbo.h"
 #include "Systems/ImGui/IImGuiSystem.h"
 #include "Systems/DebugDraw/IDebugDrawSystem.h"
 #include "Systems/Resource/IResourceSystem.h"
 #include "Utils.h"
 
 using namespace RassEngine::Graphics;
-
 namespace RassEngine::Systems {
 
 //using namespace gl;
@@ -71,11 +71,36 @@ RenderSystemOpenGl::~RenderSystemOpenGl() {
 bool RenderSystemOpenGl::Initialize() {
 	// Create and compile shaders
 	shader = std::make_unique<Shader>();
+	sceneFBO = std::make_unique<Graphics::FBO>();
 	std::string filePath = IResourceSystem::Path(SHADER_FOLDER, VERT_SHADER_FILENAME, VERT_SHADER_EXTENSION);
 	shader->AddShader(filePath, gl::GL_VERTEX_SHADER);
 	filePath = IResourceSystem::Path(SHADER_FOLDER, FRAG_SHADER_FILENAME, FRAG_SHADER_EXTENSION);
 	shader->AddShader(filePath, gl::GL_FRAGMENT_SHADER);
 	shader->LinkProgram();
+
+	// post-process passthrough shader
+	postShader = std::make_unique<Shader>();
+	postShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "post", VERT_SHADER_EXTENSION), gl::GL_VERTEX_SHADER);
+	postShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "post", FRAG_SHADER_EXTENSION), gl::GL_FRAGMENT_SHADER);
+	postShader->LinkProgram();
+
+	// --- Bloom shaders ---
+	brightShader = std::make_unique<Shader>();
+	brightShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "post", VERT_SHADER_EXTENSION), gl::GL_VERTEX_SHADER);
+	brightShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "bloom_bright", FRAG_SHADER_EXTENSION), gl::GL_FRAGMENT_SHADER);
+	brightShader->LinkProgram();
+
+	blurShader = std::make_unique<Shader>();
+	blurShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "post", VERT_SHADER_EXTENSION), gl::GL_VERTEX_SHADER);
+	blurShader->AddShader(IResourceSystem::Path(SHADER_FOLDER, "bloom_blur", FRAG_SHADER_EXTENSION), gl::GL_FRAGMENT_SHADER);
+	blurShader->LinkProgram();
+
+	brightFBO = std::make_unique<Graphics::FBO>();
+	blurFBO[0] = std::make_unique<Graphics::FBO>();
+	blurFBO[1] = std::make_unique<Graphics::FBO>();
+
+	// empty VAO required by core profile even when drawing without vertex attributes
+	gl::glGenVertexArrays(1, &emptyVAO);
 
 	// Get uniform locations
 	projectionLoc = gl::glGetUniformLocation(shader->GetProgramId(), PROJ_LOCATION);
@@ -130,10 +155,14 @@ void RenderSystemOpenGl::drawMesh(Mesh *mesh, Texture *texture) const {
 	// Draw mesh
 	mesh->Render();
 }
-
+void RenderSystemOpenGl::DrawFullscreenTriangle() {
+	gl::glBindVertexArray(emptyVAO);
+	gl::glDrawArrays(static_cast<gl::GLenum>(GL_TRIANGLES), 0, 3);
+	gl::glBindVertexArray(0);
+}
 void RenderSystemOpenGl::UpdateProjection() {
 	// Update viewport
-	gl::glViewport(0, 0, width, height);
+	//gl::glViewport(0, 0, width, height);
 
 	// Calculate aspect ratio and update projection matrix
 	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
@@ -141,11 +170,14 @@ void RenderSystemOpenGl::UpdateProjection() {
 }
 
 void RenderSystemOpenGl::BeginFrame() {
-	// Clear the screen
+	// Depth writes MUST be enabled for glClear(GL_DEPTH_BUFFER_BIT) to take effect.
+	// The previous frame's bloom/composite pass left glDepthMask(GL_FALSE),
+	// which would otherwise silently mask out the depth clear.
+	gl::glDepthMask(GL_TRUE);
+
 	gl::glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	gl::glClear(static_cast<gl::ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-	// Activate shader and set uniforms
 	shader->UseShader();
 	gl::glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -162,14 +194,24 @@ void RenderSystemOpenGl::EndFrame() {
 }
 
 bool RenderSystemOpenGl::BeginRender() {
-	// If before render begins, setup the frame.
+	// 1. Query the current framebuffer size FIRST, so Resize/viewport use fresh values.
 	glfwGetFramebufferSize(window, &width, &height);
+
+	// 2. Match the offscreen target to the window, then render the scene into it.
+	sceneFBO->SetHdr(bloom_.hdr);
+	sceneFBO->Resize(width, height);
+	sceneFBO->BindFBO();
+	gl::glViewport(0, 0, width, height);
+
+	// 3. Re-enable depth test (the previous frame's composite pass disabled it).
+	gl::glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
+
 	UpdateProjection();
-	BeginFrame();
+	BeginFrame();   // clears sceneFBO + binds scene shader
 
 	auto *imguiSystem = IImGuiSystem::Get();
 	if(imguiSystem && imguiSystem->IsReady()) {
-		imguiSystem->BeginFrame();
+		imguiSystem->BeginFrame();   // only starts ImGui frame; draws later in EndFrame
 	}
 	return true;
 }
@@ -188,9 +230,9 @@ static void ApplyBlendMode(IRenderSystem::BlendMode mode) {
 		//gl::glBlendFunc(static_cast<gl::GLenum>(GL_DST_COLOR), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_ALPHA));
 		gl::glBlendFunc(static_cast<gl::GLenum>(GL_DST_COLOR), static_cast<gl::GLenum>(GL_ZERO));
 		break;
-	//case RassEngine::Systems::IRenderSystem::BlendMode::Screen:
-	//	gl::glBlendFunc(static_cast<gl::GLenum>(GL_ONE), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_COLOR));
-	//	break;
+		//case RassEngine::Systems::IRenderSystem::BlendMode::Screen:
+		//	gl::glBlendFunc(static_cast<gl::GLenum>(GL_ONE), static_cast<gl::GLenum>(GL_ONE_MINUS_SRC_COLOR));
+		//	break;
 	default:
 		break;
 	}
@@ -341,23 +383,55 @@ bool RenderSystemOpenGl::DrawRenderables() {
 }
 
 bool RenderSystemOpenGl::EndRender() {
+	// Scene is captured in sceneFBO. Switch to post-processing state.
+	gl::glDisable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
+	gl::glDepthMask(GL_FALSE);
+	gl::glDisable(static_cast<gl::GLenum>(GL_BLEND));
 
+	// 1. Build the bloom texture (bright + blur), result in finalBloomFBO.
+	RenderBloom();
+
+	// 2. Composite scene + bloom into the default framebuffer.
+	sceneFBO->UnbindFBO();                  // bind FB 0
+	gl::glViewport(0, 0, width, height);
+	gl::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	gl::glClear(static_cast<gl::ClearBufferMask>(GL_COLOR_BUFFER_BIT));
+	CompositeToScreen();
+
+	gl::glEnable(static_cast<gl::GLenum>(GL_BLEND));
+
+	// UI / debug straight to default FB (not bloomed).
 	auto *debugSystem = IDebugDrawSystem::Get();
 	if(debugSystem) {
 		debugSystem->RenderDebugVisualization();
 	}
-
 	auto *imguiSystem = IImGuiSystem::Get();
 	if(imguiSystem && imguiSystem->IsReady()) {
 		imguiSystem->EndFrame();
 	}
 
-	// Clear the render queue after drawing
 	renderQueue.clear();
-
-	// End the frame
 	EndFrame();
+
+	// Bloom/composite passes dirtied these; restore so nothing leaks into next frame.
+	gl::glDepthMask(GL_TRUE);
+	gl::glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
 	return true;
+}
+
+void RenderSystemOpenGl::CompositeToScreen() {
+	postShader->UseShader();
+	sceneFBO->BindTexture(0, postShader->GetProgramId(), "uScene");
+
+	float intensity = 0.0f;
+	if(bloom_.enabled && finalBloomFBO) {
+		finalBloomFBO->BindTexture(1, postShader->GetProgramId(), "uBloom");
+		intensity = bloom_.intensity;
+	}
+	gl::glUniform1f(gl::glGetUniformLocation(postShader->GetProgramId(), "uBloomIntensity"), intensity);
+	gl::glUniform1i(gl::glGetUniformLocation(postShader->GetProgramId(), "uHdr"), bloom_.hdr ? 1 : 0);
+	DrawFullscreenTriangle();
+	postShader->UnuseShader();
 }
 
 void RenderSystemOpenGl::SubmitRenderable(const Renderable &renderable) {
@@ -392,5 +466,67 @@ void RenderSystemOpenGl::ToggleFullscreen() {
 
 bool RenderSystemOpenGl::IsFullscreen() const {
 	return isFullscreen_;
+}
+
+void RenderSystemOpenGl::RenderBloom() {
+	if(!bloom_.enabled) {
+		finalBloomFBO = nullptr;
+		return;
+	}
+	const int safeW = std::max(width, 1);
+	const int safeH = std::max(height, 1);
+	const int bloomW = std::max(safeW / 2, 1);
+	const int bloomH = std::max(safeH / 2, 1);
+
+	brightFBO->SetHdr(bloom_.hdr);
+	blurFBO[0]->SetHdr(bloom_.hdr);
+	blurFBO[1]->SetHdr(bloom_.hdr);
+
+	// Keep bloom targets sized to half the window.
+	brightFBO->Resize(bloomW, bloomH);
+	blurFBO[0]->Resize(bloomW, bloomH);
+	blurFBO[1]->Resize(bloomW, bloomH);
+
+	// Bloom passes are full-screen overwrites: no blend, no depth.
+	// (EndRender already disabled depth test / blend before calling this.)
+
+	// ---- 1. Bright pass: sceneFBO -> brightFBO (downsample + threshold) ----
+	brightFBO->BindFBO();
+	gl::glViewport(0, 0, bloomW, bloomH);
+	brightShader->UseShader();
+	sceneFBO->BindTexture(0, brightShader->GetProgramId(), "uScene");
+	gl::glUniform1f(gl::glGetUniformLocation(brightShader->GetProgramId(), "uThreshold"), bloom_.threshold);
+	gl::glUniform1f(gl::glGetUniformLocation(brightShader->GetProgramId(), "uKnee"), 0.1f);
+	DrawFullscreenTriangle();
+
+	// ---- 2. Separable Gaussian blur, ping-pong ----
+	blurShader->UseShader();
+	Graphics::FBO *lastWritten = brightFBO.get();
+	bool horizontal = true;
+	const int blurLoc = gl::glGetUniformLocation(blurShader->GetProgramId(), "uDirection");
+
+	for(int i = 0; i < bloom_.blurPasses * 2; ++i) {
+		Graphics::FBO *dst = blurFBO[horizontal ? 0 : 1].get();
+		dst->BindFBO();
+		gl::glViewport(0, 0, bloomW, bloomH);
+
+		lastWritten->BindTexture(0, blurShader->GetProgramId(), "uImage");
+
+		const float dx = horizontal ? (1.0f / static_cast<float>(bloomW)) : 0.0f;
+		const float dy = horizontal ? 0.0f : (1.0f / static_cast<float>(bloomH));
+		gl::glUniform2f(blurLoc, dx, dy);
+
+		DrawFullscreenTriangle();
+
+		lastWritten = dst;
+		horizontal = !horizontal;
+	}
+
+	// lastWritten now holds the final blurred bloom; remember it for compositing.
+	finalBloomFBO = lastWritten;
+}
+
+void RenderSystemOpenGl::SetBloomSettings(const BloomSettings &settings) {
+	bloom_ = settings;
 }
 }

@@ -24,7 +24,7 @@ namespace RassEngine::Systems {
 
 class CheatSystem : public ICheatSystem {
 public:
-	CheatSystem(const std::initializer_list<std::string_view> &scenePaths);
+	CheatSystem(std::initializer_list<std::string_view> scenePaths);
 	virtual ~CheatSystem() override;
 
 	// Inherited via ICheatSystem

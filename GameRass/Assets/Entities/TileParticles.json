@@ -1,0 +1,50 @@
+{
+	"Entity": {
+		"Name": "TileParticles",
+		"Components": {
+			"Transform": {
+				"Translation": [ 0.0, 0.0, 0.0 ],
+				"Rotation": 0.0,
+				"Scale": [ 1.0, 1.0, 1.0 ]
+			},
+			"ParticleManager": {
+				"ParticleMax": 24,
+				"IsLooping": false,
+				"SimSpace": "Global",
+				"Texture": "Assets/Textures/GlowParticle.png",
+				"BlendMode": "Additive"
+			},
+			"ParticleEmitter": {
+				"EmitRate": 300.0,
+				"LifeTimeMin": 0.15,
+				"LifeTimeMax": 0.35,
+				"ScaleMin": [ 0.12, 0.12, 1.0 ],
+				"ScaleMax": [ 0.22, 0.22, 1.0 ],
+				"TintColorMin": [ 0.7, 0.7, 0.8, 0.5 ],
+				"TintColorMax": [ 1.0, 1.0, 1.0, 0.9 ],
+				"Shape": {
+					"Box": {
+						"Width": 1.0,
+						"Height": 1.0,
+						"RandomizeRotation": true,
+						"SpeedMin": 0.5,
+						"SpeedMax": 1.5,
+						"TurnSpeedMin": -1.0,
+						"TurnSpeedMax": 1.0
+					}
+				}
+			},
+			"ParticleMover": {},
+			"ParticleSizeUpdater": {
+				"Start": 1.0,
+				"KeyFrames": [
+					{
+						"Type": 1,
+						"Time": 1.0,
+						"Value": 0.0
+					}
+				]
+			}
+		}
+	}
+}

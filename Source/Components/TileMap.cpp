@@ -25,10 +25,12 @@
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Systems/Render/IRenderSystem.h"
+#include "Systems/Time/ITimeSystem.h"
 #include "Systems/Resource/IResourceSystem.h"
 #include "Systems/Physics/IPhysicsSystem.h"
 #include "TileMapData.h"
 #include "TileSet.h"
+#include <IFeelTrigger.h>
 
 namespace RassEngine::Components {
 
@@ -51,6 +53,7 @@ TileMap::TileMap(const TileMap &other)
 	, usePhysicsCollider{other.usePhysicsCollider}
 	, renderOrder{other.renderOrder}
 	, onRenderListener{this, &TileMap::Render}
+	, tileDestroyFeelEvent{other.tileDestroyFeelEvent}
 {
 }
 
@@ -101,6 +104,7 @@ bool TileMap::Read(Stream &stream) {
 	stream.Read("FilterLinear", filterLinear);
 	stream.Read("UsePhysicsCollider", usePhysicsCollider);
 	stream.Read("RenderOrder", renderOrder);
+	stream.Read("TileDestroyFeelEvent", tileDestroyFeelEvent);
 	//stream.Read("UsePhysicsTrigger", usePhysicsTrigger);
 	return true;
 }
@@ -165,10 +169,10 @@ void TileMap::InitTileStateTexture() {
 	const unsigned total = tileMapData->GetRows() * tileMapData->GetCols();
 	const auto &tiles = tileMapData->GetTileData();
 
-	// 1 byte per tile: 255 = alive, 0 = destroyed/empty
+	// 1 byte per tile: 0 = alive, 255 = destroyed/empty
 	std::vector<uint8_t> states(total);
 	for(unsigned i = 0; i < total; ++i) {
-		states[i] = (tiles[i] != 0) ? 255u : 0u;
+		states[i] = (tiles[i] != 0) ? 0u : 255u;
 	}
 
 	if(tileStateTexture != 0) {
@@ -198,22 +202,42 @@ void TileMap::InitTileStateTexture() {
 void TileMap::NotifyTileDestroyed(unsigned short row, unsigned short col) {
 	if(!tileMapData || tileStateTexture == 0) return;
 
-	// Update logic/physics data
 	tileMapData->SetTileAt(row, col, 0);
 
-	// Partial GPU texture update — only 1 texel, very cheap
 	const unsigned short idx = row * tileMapData->GetCols() + col;
-	const uint8_t dead = 0u;
+	dissolvingTiles_.push_back({idx, 0.0f});
 
-	gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
-	gl::glTexSubImage1D(
-		gl::GL_TEXTURE_1D, 0,
-		static_cast<gl::GLint>(idx), 1,
-		gl::GL_RED_INTEGER,
-		gl::GL_UNSIGNED_BYTE,
-		&dead
-	);
-	gl::glBindTexture(gl::GL_TEXTURE_1D, 0);
+	// ---- GameFeel: spawn particles at the destroyed tile's world center ----
+	if(tileDestroyFeelEvent.empty()) {
+		return;
+	}
+	auto *feel = Parent() ? Parent()->GetInterface<RassEngine::IFeelTrigger>() : nullptr;
+	if(feel == nullptr) {
+		return;
+	}
+
+	// TileToWorld returns the tile's LOCAL bottom-left (NOT world, NOT center).
+	// Reconstruct world center symmetrically to PhysicsSystem::DestroyTileAtWorldPos:
+	//   world = entityPos + local * entityScale
+	float localX = 0.0f, localY = 0.0f;
+	tileMapData->TileToWorld(row, col, localX, localY);   // local bottom-left corner
+
+	glm::vec3 entityPos(0.0f);
+	glm::vec3 entityScale(1.0f);
+	if(auto *t = Parent()->Get<Components::Transform>()) {
+		entityPos = t->GetPosition();
+		entityScale = t->GetLocalScale();
+	}
+
+	// Shift by half a tile (in LOCAL units) to hit the center before scaling to world.
+	const float halfTile = 0.5f * cachedTileSize;   // cachedTileSize is local tile size (see LoadResources)
+	glm::vec3 worldPos{
+		entityPos.x + (localX + halfTile) * entityScale.x,
+		entityPos.y + (localY + halfTile) * entityScale.y,
+		entityPos.z
+	};
+
+	feel->PlayDetachedAt(tileDestroyFeelEvent, worldPos);
 }
 
 void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open) {
@@ -224,7 +248,8 @@ void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open)
 
 	// open=invisible(0), closed=visible(255)
 	const unsigned short idx = row * tileMapData->GetCols() + col;
-	const uint8_t state = open ? 0u : (tileMapData->GetTileAt(row, col) != 0 ? 255u : 0u);
+	// New semantics: 0 = whole/visible, 255 = dissolved/invisible
+	const uint8_t state = open ? 255u : (tileMapData->GetTileAt(row, col) != 0 ? 0u : 255u);
 
 	gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
 	gl::glTexSubImage1D(
@@ -240,6 +265,21 @@ bool TileMap::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Glob
 	// Early exit if resources not loaded
 	if(!mesh || !texture || !tileMapData) {
 		return false;
+	}
+	if(!dissolvingTiles_.empty()) {
+		float dt = ITimeSystem::Get()->GetDeltaTimeSec();
+		gl::glBindTexture(gl::GL_TEXTURE_1D, static_cast<gl::GLuint>(tileStateTexture));
+		for(auto it = dissolvingTiles_.begin(); it != dissolvingTiles_.end();) {
+			it->elapsed += dt;
+			float t = glm::clamp(it->elapsed / dissolveDuration_, 0.0f, 1.0f);
+			uint8_t amount = static_cast<uint8_t>(t * 255.0f);
+			gl::glTexSubImage1D(gl::GL_TEXTURE_1D, 0,
+				static_cast<gl::GLint>(it->idx), 1,
+				gl::GL_RED_INTEGER, gl::GL_UNSIGNED_BYTE, &amount);
+			if(t >= 1.0f) it = dissolvingTiles_.erase(it);
+			else          ++it;
+		}
+		gl::glBindTexture(gl::GL_TEXTURE_1D, 0);
 	}
 	/*InitTileStateTexture();*/
 	// Get transform (same as Sprite)

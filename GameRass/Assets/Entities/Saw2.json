@@ -56,7 +56,25 @@
 				"ForceX": 5.0,
 				"ForceY": 3.0
 			},
-			"DisableTriggerMidFlip": {}
+			"DisableTriggerMidFlip": {},
+						"GameFeelEvents": {
+				"Events": {
+					"OnHit": {
+						"Actions": [
+						{ "Type": "HitStop", "TriggerTime": 0.0, "Duration": 0.06, "TimeScale": 0.0 },
+						{ "Type": "ScreenShake", "TriggerTime": 0.0, "Duration": 0.25, "VibrationSpeed": 25.0, "MaxTranslation": [0.3, 0.3, 0.0], "MaxZRotation": 3.0, "Ease": "EaseOut" },
+						{ "Type": "ScreenFlash", "TriggerTime": 0.0, "Color": [1.0, 0.2, 0.2], "Start": 0.5, "KeyFrames": [ { "Type": 0, "Time": 0.15, "Value": 0.0 } ] }
+						]
+					},
+					"OnDeath": {
+						"Actions": [
+						{ "Type": "HitStop", "TriggerTime": 0.0, "Duration": 0.12, "TimeScale": 0.0 },
+						{ "Type": "ScreenShake", "TriggerTime": 0.0, "Duration": 0.5, "VibrationSpeed": 30.0, "MaxTranslation": [0.6, 0.6, 0.0], "MaxZRotation": 5.0, "Ease": "EaseOut" },
+						{ "Type": "SpawnParticles", "TriggerTime": 0.0, "Prefab": "DeathBurst", "Offset": [0.0, 0.0, 0.0] }
+						]
+					}
+				}
+			}
 		}
 	}
 }

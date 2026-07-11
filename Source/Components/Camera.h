@@ -16,6 +16,21 @@
 #include "Systems/Camera/ICameraSystem.h"
 
 namespace RassEngine::Components {
+enum class CameraShakeEase {
+	Linear,
+	EaseIn,
+	EaseOut,
+	EaseInOut,
+	EaseOutIn
+};
+struct CameraShakeParams {
+	float shakeDuration = 0.5f;
+	float vibrationSpeed = 20.0f;
+	glm::vec3 maxTranslation{0.5f, 0.5f, 0.0f};
+	float maxZRotation = 5.0f; //this is the maximum for a Dutch Angle
+	CameraShakeEase easeType = CameraShakeEase::EaseOut;
+};
+
 class Camera : public Cloneable<Component, Camera> {
 public:
 	enum class CameraFollowMode {
@@ -53,6 +68,13 @@ public:
 	float cameraWindowOffsetLerpSpeed{2.0f};
 	float windowOffsetRange{2.0f};
 	CameraFollowMode followMode = CameraFollowMode::Push;
+
+	glm::vec3 shakeOffset{0.0f, 0.0f, 0.0f};
+	float shakeZRotation = 0.0f;
+	bool isShaking = false;
+	float shakeTimer = 0.0f;
+	CameraShakeParams shakeParams;
+
 private:
 	RassEngine::Systems::ICameraSystem *cameraSystem{nullptr};
 };

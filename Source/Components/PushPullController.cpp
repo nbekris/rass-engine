@@ -23,6 +23,7 @@
 #include "Components/PhysicsBody.h"
 #include "Components/Movement.h"
 #include "Components/Pushable.h"
+#include "Components/Sprite.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
 #include "Events/AudioEvents.h"
 #include "Systems/Input/IInputSystem.h"
@@ -83,6 +84,10 @@ void PushPullController::LinkTextEntity() {
 	if(!text) {
 		LOG_WARNING("{}: Text entity '{}' not found", NameClass(), textEntityName);
 		return;
+	}
+	usingGamepad = Systems::IInputSystem::Get()->IsGamepadConnected();
+	if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
+		sprite->SetText(usingGamepad ? "Hold #94# to pull" : "Hold Shift to pull");
 	}
 	entityLinked = true;
 }
@@ -153,6 +158,12 @@ bool PushPullController::OnFixedUpdate(const IEvent<Events::GlobalEventArgs> *, 
 	if(!nearbyPushables.empty() && !InputActions::IsGrabBoxHeld()) {
 		if(entityLinked) {
 			if(text != nullptr) {
+				if(IInputSystem::Get()->IsGamepadConnected() != usingGamepad) {
+					usingGamepad = !usingGamepad;
+					if(auto *sprite = text->Get<RassEngine::Components::Sprite>()) {
+						sprite->SetText(usingGamepad ? "Hold #94# to pull" : "Hold Shift to pull");
+					}
+				}
 				text->GetTransform()->SetLocalPosition(Parent()->GetTransform()->GetLocalPosition() + glm::vec3(-1.0f, 0.5f, 0.5f));
 			}
 		}

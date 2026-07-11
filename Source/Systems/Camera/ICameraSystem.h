@@ -20,6 +20,7 @@
 namespace RassEngine::Components {
 class Transform;
 class Camera;
+struct CameraShakeParams;
 }
 
 namespace RassEngine::Systems {
@@ -34,6 +35,7 @@ public:
 	virtual void RegisterCamera(Components::Camera *camera) = 0;
 	virtual void UnregisterCamera(Components::Camera *camera) = 0;
 	virtual void SetCameraWindowOffset(const glm::vec3 &offset) = 0;
+	virtual void ShakeCamera(const Components::CameraShakeParams &params) = 0;
 	virtual glm::vec2 ViewportToWorld(const glm::vec2 &ndcPos) const = 0;
 	virtual std::pair<glm::vec3, glm::vec3> GetCameraWindowPosSize() const = 0;
 	virtual glm::vec2 WorldToScreenPixels(const glm::vec3 &worldPos) const = 0;
