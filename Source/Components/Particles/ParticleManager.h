@@ -22,6 +22,7 @@
 #include "IEvent.h"
 #include "Particle.h"
 #include "Systems/Render/IRenderSystem.h"
+#include "Systems/Resource/IResourceSystem.h"
 
 // Forward Declarations:
 namespace RassEngine {
@@ -140,7 +141,7 @@ private:
 	std::string meshName{""};
 	std::string texturePath{""};
 	bool filterLinear{false};  // false=GL_NEAREST,true=GL_LINEAR
-
+	Systems::TextureHandle textureHandle{};
 	Events::GlobalEventListener<ParticleManager> updateListener;
 	Events::GlobalEventListener<ParticleManager> renderListener;
 };

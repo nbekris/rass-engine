@@ -70,7 +70,46 @@ Texture::Texture(const std::string &path, bool useLinear) : textureId(0) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image);
 }
+bool Texture::LoadCPU(const std::string &path) {
+	if(path.empty()) {
+		LOG_ERROR("{}: Empty path provided. Returning false.");
+		return false;
+	}
 
+	sourcePath = path;
+	stbi_set_flip_vertically_on_load(true);
+	image = stbi_load(path.c_str(), &width, &height, &depth, 4);  //still load whole image per frame in async loading
+	if(!image) {
+		LOG_ERROR("Decode failed {}: {}", path, stbi_failure_reason());
+		return false;
+	}
+	return true;
+}
+
+bool Texture::IntegrateGPU(bool useLinear) {
+	if(image == nullptr) return false;
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GL_RGBA, width, height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	if(useLinear) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (int)GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (int)GL_LINEAR_MIPMAP_LINEAR);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (int)GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (int)GL_NEAREST);
+	}
+	if(sourcePath.contains("Background")) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image);
+	image = nullptr;
+	return true;
+}
 // Make a texture availabe to a shader program.  The unit parameter is
 // a small integer specifying which texture unit should load the
 // texture.  The name parameter is the sampler2d in the shader program
