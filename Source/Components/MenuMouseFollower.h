@@ -16,7 +16,7 @@
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
 #include "IEvent.h"
-
+#include "Systems/Resource/IResourceSystem.h"
 namespace RassEngine::Graphics {
 class Texture;
 }
@@ -38,7 +38,7 @@ private:
 	            const Events::GlobalEventArgs &);
 
 	Events::GlobalEventListener<MenuMouseFollower> onUpdateListener;
-	Graphics::Texture *texture{nullptr};
+	Systems::TextureHandle textureHandle{};
 	std::string texturePath{"Assets/Textures/Crosshair.png"};
 	float cursorSize{32.0f};
 };

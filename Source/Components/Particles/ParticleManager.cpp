@@ -65,14 +65,16 @@ ParticleManager::ParticleManager(const ParticleManager &other)
 {}
 
 ParticleManager::~ParticleManager() {
+	// Release the particle texture reference (key must match Acquire: useLinear = false).
+	if(auto *res = IResourceSystem::Get(); res && textureHandle.IsValid()) {
+		res->ReleaseTexture(textureHandle);
+	}
+
 	if(IGlobalEventsSystem::Get() == nullptr) {
 		return;
 	}
-
 	IGlobalEventsSystem::Get()->unbind(Global::Update, &updateListener);
 	IGlobalEventsSystem::Get()->unbind(Global::Render, &renderListener);
-
-	// Reset everything
 	Reset();
 }
 
@@ -103,6 +105,9 @@ bool ParticleManager::Initialize() {
 	// Bind to events
 	IGlobalEventsSystem::Get()->bind(Global::Update, &updateListener);
 	IGlobalEventsSystem::Get()->bind(Global::Render, &renderListener);
+	if(!texturePath.empty() && IResourceSystem::Get()) {
+		textureHandle = IResourceSystem::Get()->AcquireTexture(texturePath);  // useLinear = false
+	}
 	return true;
 }
 
@@ -159,9 +164,10 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 	}
 
 	// Build the requested texture, if any
-	Texture *texture = nullptr;
+	//Texture *texture = nullptr;
+	Graphics::Texture *tex = nullptr;
 	if(!texturePath.empty()) {
-		texture = IResourceSystem::Get()->GetTexture(texturePath);
+		tex = IResourceSystem::Get()->Resolve(textureHandle);
 	}
 
 	// Render each active particle.
@@ -174,7 +180,7 @@ bool ParticleManager::Render(const IEvent<GlobalEventArgs> *, const GlobalEventA
 
 		IRenderSystem::Renderable particle;
 		particle.mesh = mesh;
-		particle.texture = texture;
+		particle.texture = tex;
 		particle.blendMode = blendMode;
 		// Pass the alpha value (1.0f) to the DGL.
 		particle.alpha = data.current.color.a;

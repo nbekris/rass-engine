@@ -17,6 +17,7 @@
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
 #include "Systems/Render/IRenderSystem.h"
+#include "Systems/Resource/IResourceSystem.h"
 
 // forward declaration
 namespace RassEngine {
@@ -87,7 +88,11 @@ public:
 	inline void TexturePath(const std::string &path) {
 		texturePath = path;
 	}
-
+	// Cached texture pointer resolved from texturePath (avoids per-frame map lookups).
+	//Graphics::Texture *cachedTexture = nullptr;
+	Systems::TextureHandle textureHandle{};
+	// Single entry point for switching textures: acquires the new one, releases the old.
+	void RebindTexture(const std::string &newPath, bool newLinear);
 	inline IRenderSystem::RenderLayer GetRenderLayer() const {
 		return renderLayer;
 	}

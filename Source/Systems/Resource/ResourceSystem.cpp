@@ -14,12 +14,13 @@
 #include <string>
 #include <string_view>
 #include <utility>
-
+#include "Events/Global.h"
 #include "Events/GlobalEventArgs.h"
 #include "Events/SceneChange.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Texture.h"
 #include "IEventListener.h"
+#include "Systems/Time/ITimeSystem.h"
 #include "Systems/GlobalEvents/IGlobalEventsSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Utils.h"
@@ -27,13 +28,15 @@
 namespace RassEngine::Systems {
 
 using namespace RassEngine::Graphics;
-
+//using TextureHandle = IResourceSystem::TextureHandle;
 static constexpr std::string_view RESOURCES_FOLDER = "./Assets";
 static constexpr char FOLDER_DIVIDER = '/';
 static constexpr char EXTENSION_DIVIDER = '.';
 
+// Constructor: drop pathToTextureMap from the init list.
 ResourceSystem::ResourceSystem()
-	: pathToTextureMap{}, quadMesh{nullptr}, textGridMeshMap{}, customMeshMap{}
+	: quadMesh{nullptr}, textGridMeshMap{}, customMeshMap{}
+	, updateListener{this, &ResourceSystem::Update}
 	, onSceneShutdown{[this](const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
 		CleanUp();
 		return true;
@@ -55,6 +58,8 @@ bool ResourceSystem::Initialize() {
 
 	// Bind to scene shutdown event
 	events->bind(Events::SceneChange::AfterShutdown, &onSceneShutdown);
+	// Bind to update event
+	events->bind(Events::Global::Update, &updateListener);
 	return true;
 }
 
@@ -66,6 +71,20 @@ void ResourceSystem::Shutdown() {
 
 	// Unbind to scene shutdown event
 	events->unbind(Events::SceneChange::AfterShutdown, &onSceneShutdown);
+	// Unbind to update event
+	events->unbind(Events::Global::Update, &updateListener);
+}
+bool ResourceSystem::Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
+	const float dt = ITimeSystem::Get()->GetUnscaledDeltaTime();
+	timeSinceLastEviction += dt;
+	//avoid frequently load&unload jittering
+	if(timeSinceLastEviction >= kEvictGracePeriod) {
+		timeSinceLastEviction = 0.0f;
+		PumpEvictions();
+	}
+
+	PumpLoads();
+	return true;
 }
 std::string ResourceSystem::GenerateTileMapKey(
 	const std::string &mapName,
@@ -138,24 +157,112 @@ std::string ResourceSystem::GetFilePath(const std::string_view &relativePath, co
 	return GetFilePath(relativePath, toReturn);
 }
 
-Texture *ResourceSystem::GetTexture(const std::string_view &path, bool useLinear) {
-	// Convert to string for map lookup, Cache pathkey with linear or nonelinear
-	std::string cacheKey = std::string(path) + (useLinear ? ":L" : ":N");
-
-	// Check if the texture has already been constructed
-	auto it = pathToTextureMap.find(cacheKey);
-	if(it != pathToTextureMap.end()) {
-		return it->second.get();
-	}
-
-	// Construct a new texture
-	std::unique_ptr<Texture> newTexture = std::make_unique<Texture>(std::string(path), useLinear);
-
-	// Add to the map and return
-	auto [inserted_it, success] = pathToTextureMap.emplace(cacheKey, std::move(newTexture));
-	return inserted_it->second.get();
+std::string ResourceSystem::MakeTextureKey(const std::string_view &path, bool useLinear) const {
+	// Same key scheme as before: distinguish linear vs. nearest filtering.
+	return std::string(path) + (useLinear ? ":L" : ":N");
 }
 
+//Texture *ResourceSystem::GetTexture(const std::string_view &path, bool useLinear) {
+//	// Temporary "borrow": looks up (or loads) without changing the reference count.
+//	std::string cacheKey = MakeTextureKey(path, useLinear);
+//
+//	auto it = pathToTextureMap.find(cacheKey);
+//	if(it != pathToTextureMap.end()) {
+//		return it->second.resource.get();
+//	}
+//
+//	auto newTexture = std::make_unique<Texture>(std::string(path), useLinear);
+//	auto [inserted_it, success] =
+//		pathToTextureMap.emplace(cacheKey, CachedResource<Texture>{std::move(newTexture), 0, false});
+//	return inserted_it->second.resource.get();
+//}
+TextureHandle ResourceSystem::AcquireTexture(const std::string_view &path, bool useLinear) {
+	std::string key = MakeTextureKey(path, useLinear);
+
+	if(auto it = keyToSlot.find(key); it != keyToSlot.end()) {
+		auto &slot = textureSlots[it->second];
+		++slot.refCount;
+		return TextureHandle{it->second, slot.generation};
+	}
+
+	// first try to get from freeSlots
+	std::uint32_t idx;
+	if(!freeSlots.empty()) {
+		idx = freeSlots.back();
+		freeSlots.pop_back();
+		// Reuse slot: generation was incremented during unload, so just read it here
+	} else {
+		idx = static_cast<std::uint32_t>(textureSlots.size());
+		textureSlots.emplace_back();
+	}
+	TextureSlot &slot = textureSlots[idx];
+	slot.cacheKey = key;
+	slot.path = std::string(path);
+	slot.useLinear = useLinear;
+	slot.texture = std::make_unique<Graphics::Texture>();
+	slot.state = LoadState::Queued;
+	slot.refCount = 1;
+	slot.pinned = false;
+	//textureSlots.push_back(std::move(slot));
+	keyToSlot.emplace(std::move(key), idx);
+	pendingQueue.push_back(idx);
+	return TextureHandle{idx, slot.generation};
+}
+
+Graphics::Texture *ResourceSystem::Resolve(TextureHandle handle) {
+	if(!handle.IsValid() || handle.index >= textureSlots.size()) {
+		return nullptr;
+	}
+	TextureSlot &slot = textureSlots[handle.index];
+	if(slot.generation != handle.generation) {
+		return nullptr;
+	}
+	if(slot.state != LoadState::Ready) {
+		return nullptr;   // still loading, or failed
+	}
+	return slot.texture.get();
+}
+
+void ResourceSystem::ReleaseTexture(TextureHandle handle) {
+	if(!handle.IsValid() || handle.index >= textureSlots.size()) {
+		return;
+	}
+	TextureSlot &slot = textureSlots[handle.index];
+	if(slot.generation != handle.generation) {
+		return;   //ignore old handle
+	}
+	if(slot.refCount <= 0) {
+		LOG_WARNING("{}: ReleaseTexture underflow on \"{}\"", NameClass(), slot.cacheKey);
+		return;
+	}
+	--slot.refCount;
+
+	if(slot.refCount == 0 && !slot.pinned) {
+		evictQueue.push_back(EvictEntry{handle.index, slot.generation});
+	}
+}
+
+void ResourceSystem::PinTexture(TextureHandle handle, bool pinned) {
+	if(!handle.IsValid() || handle.index >= textureSlots.size()) {
+		return;
+	}
+	TextureSlot &slot = textureSlots[handle.index];
+	if(slot.generation != handle.generation) {
+		return;
+	}
+	slot.pinned = pinned;
+}
+/*
+void ResourceSystem::UnloadTexture(
+	std::unordered_map<std::string, CachedResource<Texture>>::iterator it) {
+	// FUTURE async/eviction: instead of erasing here, enqueue it->first for deferred
+	// eviction and return. A later pass re-checks (refCount==0 && !pinned) before the
+	// real unload, so a texture re-Acquired while "pending eviction" is simply revived
+	// (lazy validation) — no unload/reload churn.
+	LOG_INFO("{}: Unloading texture \"{}\"", NameClass(), it->first);
+	pathToTextureMap.erase(it);
+}
+*/
 Graphics::Mesh *RassEngine::Systems::ResourceSystem::GetCustomMesh(const std::string_view &path) {
 	// Check the cache
 	std::string meshPath{path};
@@ -284,15 +391,99 @@ const std::string_view &ResourceSystem::NameClass() const {
 	return className;
 }
 
+
+void ResourceSystem::PumpLoads() {
+	constexpr int kMaxDecodePerFrame = 1;   // CPU decode budget (stbi_load is heavy)
+	constexpr int kMaxUploadPerFrame = 2;   // GPU upload budget (main thread only)
+
+	int decoded = 0, uploaded = 0;
+	std::vector<std::uint32_t> stillPending;
+	stillPending.reserve(pendingQueue.size());
+
+	for(std::uint32_t idx : pendingQueue) {
+		TextureSlot &slot = textureSlots[idx];
+
+		const bool isPending =
+			(slot.state == LoadState::Queued || slot.state == LoadState::DecodingDone);
+		if(!isPending || slot.path.empty()) {
+			continue;
+		}
+
+		if(slot.state == LoadState::Queued && decoded < kMaxDecodePerFrame) {
+			bool ok = slot.texture->LoadCPU(slot.path);
+			slot.state = ok ? LoadState::DecodingDone : LoadState::Failed;
+			++decoded;
+		}
+		if(slot.state == LoadState::DecodingDone && uploaded < kMaxUploadPerFrame) {
+			bool ok = slot.texture->IntegrateGPU(slot.useLinear);
+			slot.state = ok ? LoadState::Ready : LoadState::Failed;
+			++uploaded;
+		}
+		if(slot.state != LoadState::Ready && slot.state != LoadState::Failed) {
+			stillPending.push_back(idx);
+		}
+	}
+	pendingQueue.swap(stillPending);
+}
+
+void ResourceSystem::PumpEvictions() {
+	constexpr int kMaxEvictionPerFrame = 5;
+	int evicted = 0;
+	while(!evictQueue.empty() && evicted < kMaxEvictionPerFrame) {
+		EvictEntry e = evictQueue.front();
+		evictQueue.pop_front();
+		TextureSlot &slot = textureSlots[e.idx];
+
+		if(slot.generation != e.generation) {
+			continue;
+		}
+
+		if(slot.refCount > 0 || slot.pinned) {
+			continue;
+		}
+		UnloadSlot(e.idx);
+		++evicted;
+	}
+}
+
+void ResourceSystem::UnloadSlot(std::uint32_t idx) {
+	//LOG_WARNING("{}: Unloading texture slot {} (\"{}\")", NameClass(), idx, textureSlots[idx].cacheKey);
+	TextureSlot &slot = textureSlots[idx];
+	keyToSlot.erase(slot.cacheKey);       // make key no longer hit the old slot
+	slot.texture.reset();                  // release GPU/CPU
+	slot.state = LoadState::Free;
+	slot.cacheKey.clear();
+	slot.path.clear();
+	++slot.generation;                     // key: invalidate all old handles immediately
+	freeSlots.push_back(idx);
+}
+
 void ResourceSystem::CleanUp() {
-	// Clear textures
-	pathToTextureMap.clear();
-	//quadMesh.reset();
+	// Optional diagnostic: flag slots still referenced at scene shutdown.
+	// (Do NOT force-unload them — they may be legitimately cross-scene or pinned.)
+	for(std::uint32_t i = 0; i < textureSlots.size(); ++i) {
+		const TextureSlot &s = textureSlots[i];
+		if(s.refCount > 0 && !s.pinned) {
+			LOG_WARNING("{}: Texture \"{}\" still has {} ref(s) at scene shutdown (possible cross-scene leak)",
+				NameClass(), s.cacheKey, s.refCount);
+		}
+	}
+
+	while(!evictQueue.empty()) {
+		EvictEntry e = evictQueue.front();
+		evictQueue.pop_front();
+
+		TextureSlot &slot = textureSlots[e.idx];
+		if(slot.generation != e.generation) continue;   // stale entry, already reused
+		if(slot.refCount > 0 || slot.pinned)  continue;   // revived or pinned → keep
+		UnloadSlot(e.idx);                                 // free now, no grace period
+	}
+
+
 	textGridMeshMap.clear();
 	tileMapMeshMap.clear();
 	tileMapDataMap.clear();
 	tileSetMap.clear();
-	// Clear quad mesh
 	if(quadMesh != nullptr) {
 		quadMesh = nullptr;
 	}

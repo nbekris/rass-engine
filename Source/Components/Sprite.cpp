@@ -51,13 +51,25 @@ Sprite::Sprite(const Sprite &other)
 	, parallaxTiling{other.parallaxTiling}
 	, cachedCharUVs{other.cachedCharUVs}
 	, textDirty{other.textDirty}
-	, onRenderListener{this, &Sprite::Render} {}
-
+	, onRenderListener{this, &Sprite::Render} {
+	if(!texturePath.empty()) {
+		if(auto *res = IResourceSystem::Get()) {
+			textureHandle = res->AcquireTexture(texturePath, filterLinear);
+		}
+	}
+}
+	
 Sprite::~Sprite() {
+	// Release our texture reference.
+	if(!texturePath.empty()) {
+		if(auto *res = IResourceSystem::Get()) {
+			res->ReleaseTexture(textureHandle);
+		}
+	}
+
 	if(IGlobalEventsSystem::Get() == nullptr) {
 		return;
 	}
-
 	IGlobalEventsSystem::Get()->unbind(Events::Global::Render, &onRenderListener);
 }
 
@@ -83,13 +95,17 @@ bool Sprite::Read(Stream &stream) {
 
 	stream.Read("Alpha", alpha);
 	stream.ReadVec3("Color", color);
-	stream.Read("TexturePath", texturePath);
+	//stream.Read("TexturePath", texturePath);
 	stream.Read("NumCols", numCols);
 	stream.Read("NumRows", numRows);
 	stream.Read("DisplayText", displayText);
-	stream.Read("FilterLinear", filterLinear);
+	//stream.Read("FilterLinear", filterLinear);
 	stream.ReadVec2("ParallaxTiling", parallaxTiling);
-
+	std::string newPath;
+	bool newLinear = filterLinear;
+	stream.Read("TexturePath", newPath);
+	stream.Read("FilterLinear", newLinear);
+	RebindTexture(newPath, newLinear);  // acquires the texture
 	// Reading RenderLayer
 	auto readEnumLayer = static_cast<unsigned char>(IRenderSystem::RenderLayer::Transparent);
 	if(stream.Read<unsigned char>("RenderLayer", readEnumLayer)) {
@@ -110,7 +126,7 @@ void Sprite::SetColor(float r, float g, float b) {
 	color = glm::vec3(r, g, b);
 }
 void Sprite::SetText(const std::string &text) {
-	if(displayText == text) return;     // 文本没变直接跳过
+	if(displayText == text) return;     // skip if no change
 	displayText = text;
 	textDirty = true;
 
@@ -119,9 +135,31 @@ void Sprite::SetText(const std::string &text) {
 		LOG_WARNING("Rendering text longer than {} characters currently not supported", IRenderSystem::MAX_TEXT_LENGTH);
 	}
 }
+
+void Sprite::RebindTexture(const std::string &newPath, bool newLinear) {
+	auto *res = IResourceSystem::Get();
+	if(res == nullptr) {
+		return;
+	}
+	if(textureHandle.IsValid() && newPath == texturePath && newLinear == filterLinear) {
+		return;  // no change
+	}
+	// Acquire the new one before releasing the old (never drop the shared refcount to 0 mid-swap).
+	TextureHandle newHandle = newPath.empty()
+		? TextureHandle{}
+	: res->AcquireTexture(newPath, newLinear);
+	if(textureHandle.IsValid()) {
+		res->ReleaseTexture(textureHandle);
+	}
+	texturePath = newPath;
+	filterLinear = newLinear;
+	textureHandle = newHandle;
+}
+
 void Sprite::SetTexture(const std::string &texturePath, bool filterLinear) {
-	this->texturePath = texturePath;
-	this->filterLinear = filterLinear;
+	//this->texturePath = texturePath;
+	//this->filterLinear = filterLinear;
+	RebindTexture(texturePath, filterLinear);
 }
 void Sprite::SetOffset(float x, float y) {
 	parallaxOffset = glm::vec2(x, y);
@@ -178,7 +216,7 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 
 
 	if(!displayText.empty()) {
-		Texture *fontTexture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
+		//Texture *fontTexture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
 
 		// Make sure text length is within limits
 		if(displayText.length() > IRenderSystem::MAX_TEXT_LENGTH) {
@@ -198,7 +236,8 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 		// Retrieve a cached version of this mesh size from resource system
 		Mesh *textGridMesh = IResourceSystem::Get()->GetTextGridMesh(meshSize);
 
-		renderable.texture = fontTexture;
+		//renderable.texture = fontTexture;
+		renderable.texture = IResourceSystem::Get()->Resolve(textureHandle);
 		renderable.mesh = textGridMesh;
 		renderable.isTextMode = true;
 
@@ -225,9 +264,9 @@ bool Sprite::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Globa
 		renderable.charUVOffsets = cachedCharUVs;
 		renderable.charCount = static_cast<int>(cachedCharUVs.size());
 	} else {
-		Texture *texture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
+		//Texture *texture = IResourceSystem::Get()->GetTexture(texturePath, filterLinear);
 		Mesh *mesh = IResourceSystem::Get()->GetQuadMesh();
-		renderable.texture = texture;
+		renderable.texture = IResourceSystem::Get()->Resolve(textureHandle);
 		renderable.mesh = mesh;
 		renderable.blendMode = blendMode;
 		//
