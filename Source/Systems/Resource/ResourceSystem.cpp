@@ -447,7 +447,7 @@ void ResourceSystem::PumpEvictions() {
 }
 
 void ResourceSystem::UnloadSlot(std::uint32_t idx) {
-	LOG_WARNING("{}: Unloading texture slot {} (\"{}\")", NameClass(), idx, textureSlots[idx].cacheKey);
+	//LOG_WARNING("{}: Unloading texture slot {} (\"{}\")", NameClass(), idx, textureSlots[idx].cacheKey);
 	TextureSlot &slot = textureSlots[idx];
 	keyToSlot.erase(slot.cacheKey);       // make key no longer hit the old slot
 	slot.texture.reset();                  // release GPU/CPU
