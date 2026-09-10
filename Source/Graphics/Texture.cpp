@@ -70,6 +70,37 @@ Texture::Texture(const std::string &path, bool useLinear) : textureId(0) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image);
 }
+Texture::~Texture() {
+	if(textureId != 0) {
+		glDeleteTextures(1, &textureId);
+		textureId = 0;
+	}
+	if(image != nullptr) {
+		stbi_image_free(image);
+		image = nullptr;
+	}
+}
+
+Texture::Texture(Texture &&other) noexcept
+	: textureId{other.textureId}, width{other.width}, height{other.height}
+	, depth{other.depth}, image{other.image}, sourcePath{std::move(other.sourcePath)} {
+	other.textureId = 0;
+	other.image = nullptr;
+}
+
+Texture &Texture::operator=(Texture &&other) noexcept {
+	if(this != &other) {
+		if(textureId != 0) glDeleteTextures(1, &textureId);
+		if(image != nullptr) stbi_image_free(image);
+		textureId = other.textureId;
+		width = other.width; height = other.height; depth = other.depth;
+		image = other.image;
+		sourcePath = std::move(other.sourcePath);
+		other.textureId = 0;
+		other.image = nullptr;
+	}
+	return *this;
+}
 bool Texture::LoadCPU(const std::string &path) {
 	if(path.empty()) {
 		LOG_ERROR("{}: Empty path provided. Returning false.");

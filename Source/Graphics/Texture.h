@@ -27,6 +27,11 @@ class Texture {
 public:
 	Texture();
 	Texture(const std::string &path, bool useLinear = false);
+	~Texture();
+	Texture(const Texture &) = delete;
+	Texture &operator=(const Texture &) = delete;
+	Texture(Texture &&other) noexcept;
+	Texture &operator=(Texture &&other) noexcept;
 
 	void BindTexture(const int unit, const int programId, const std::string &name);
 	void UnbindTexture(const int unit);
