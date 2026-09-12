@@ -20,7 +20,7 @@
 #include "Systems/Input/IInputSystem.h"
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Systems/Render/IRenderSystem.h"
-#include "Systems/Resource/IResourceSystem.h"
+
 #include "Utils.h"
 
 #include <imgui.h>
@@ -40,6 +40,12 @@ MenuMouseFollower::MenuMouseFollower(const MenuMouseFollower &other) : Cloneable
 {}
 
 MenuMouseFollower::~MenuMouseFollower() {
+	// Release our texture reference (key must match Acquire: useLinear = true).
+	if(!texturePath.empty()) {
+		if(auto *res = IResourceSystem::Get()) {
+			res->ReleaseTexture(textureHandle);
+		}
+	}
 	if(IGlobalEventsSystem::Get() == nullptr) {
 		return;
 	}
@@ -57,14 +63,19 @@ bool MenuMouseFollower::Initialize() {
 		return false;
 	}
 
-	// Load the crosshair texture
-	if(IResourceSystem::Get()) {
-		texture = IResourceSystem::Get()->GetTexture(texturePath, true);
+	//// Load the crosshair texture
+	//if(IResourceSystem::Get()) {
+	//	texture = IResourceSystem::Get()->GetTexture(texturePath, true);
+	//}
+		// Load the crosshair texture (ref-counted)
+	if(!texturePath.empty() && IResourceSystem::Get()) {
+		textureHandle = IResourceSystem::Get()->AcquireTexture(texturePath, true);  // useLinear = true
 	}
 
-	if(!texture) {
-		LOG_WARNING("{}: Failed to load texture '{}'", NameClass(), texturePath);
-	}
+	// (Do not null-check readiness here; it loads over the next frames.)
+	//if(!textureHandle.IsValid()) {
+	//	LOG_WARNING("{}: Failed to load texture '{}'", NameClass(), texturePath);
+	//}
 
 	IGlobalEventsSystem::Get()->bind(Events::Global::Render, &onUpdateListener);
 	return true;
@@ -86,7 +97,9 @@ bool MenuMouseFollower::Read(Stream &stream) {
 }
 
 bool MenuMouseFollower::Update(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
-	if(!texture || !IInputSystem::Get() || !IRenderSystem::Get()) return true;
+	auto *res = IResourceSystem::Get();
+	Graphics::Texture *tex = res ? res->Resolve(textureHandle) : nullptr;
+	if(!tex || !IInputSystem::Get() || !IRenderSystem::Get()) return true;
 
 	float screenWidth = static_cast<float>(IRenderSystem::Get()->getScreenWidth());
 	float screenHeight = static_cast<float>(IRenderSystem::Get()->getScreenHeight());
@@ -104,7 +117,7 @@ bool MenuMouseFollower::Update(const IEvent<Events::GlobalEventArgs> *, const Ev
 	ImVec2 pMax(screenX + halfSize, screenY + halfSize);
 
 	ImDrawList *drawList = ImGui::GetForegroundDrawList();
-	ImTextureID texID = (ImTextureID)(intptr_t)texture->GetTextureID();
+	ImTextureID texID = (ImTextureID)(intptr_t)tex->GetTextureID();
 	drawList->AddImage(texID, pMin, pMax, ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
 
 	return true;

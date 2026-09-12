@@ -15,7 +15,7 @@
 #include "Cloneable.h"
 #include "Events/GlobalEventArgs.h"
 #include "Events/GlobalEventListener.h"
-
+#include "Systems/Resource/IResourceSystem.h"
 // Forward declarations
 namespace RassEngine {
 class Stream;
@@ -82,9 +82,11 @@ private:
 
 	// Member variables
 	std::string tileMapDataName;  // Name of TileMapData file (e.g., "Level1")
+	std::string acquiredTexturePath;
 	TileMapData *tileMapData = nullptr;
 	Graphics::Mesh *mesh = nullptr;
-	Graphics::Texture *texture = nullptr;
+	//Graphics::Texture *texture = nullptr;
+	Systems::TextureHandle textureHandle{};
 	bool filterLinear{false};
 	bool usePhysicsCollider{false};
 	//might be implemented in the future

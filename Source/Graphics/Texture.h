@@ -27,10 +27,16 @@ class Texture {
 public:
 	Texture();
 	Texture(const std::string &path, bool useLinear = false);
+	~Texture();
+	Texture(const Texture &) = delete;
+	Texture &operator=(const Texture &) = delete;
+	Texture(Texture &&other) noexcept;
+	Texture &operator=(Texture &&other) noexcept;
 
 	void BindTexture(const int unit, const int programId, const std::string &name);
 	void UnbindTexture(const int unit);
-
+	bool LoadCPU(const std::string &path);
+	bool IntegrateGPU(bool useLinear);
 	inline unsigned int GetTextureID() const { return textureId; }
 	inline int GetWidth() const { return width; }
 	inline int GetHeight() const { return height; }
@@ -39,6 +45,7 @@ private:
 	unsigned int textureId{0};
 	int width{0}, height{0}, depth{0};
 	unsigned char *image{nullptr};
+	std::string sourcePath;
 };
 
 }

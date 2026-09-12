@@ -26,7 +26,7 @@
 #include "Systems/Logging/ILoggingSystem.h"
 #include "Systems/Render/IRenderSystem.h"
 #include "Systems/Time/ITimeSystem.h"
-#include "Systems/Resource/IResourceSystem.h"
+
 #include "Systems/Physics/IPhysicsSystem.h"
 #include "TileMapData.h"
 #include "TileSet.h"
@@ -48,7 +48,8 @@ TileMap::TileMap(const TileMap &other)
 	, tileMapDataName{other.tileMapDataName}
 	, tileMapData{nullptr}
 	, mesh{nullptr}
-	, texture{nullptr}
+	//, texture{nullptr}
+	, textureHandle{other.textureHandle}
 	, filterLinear{other.filterLinear}
 	, usePhysicsCollider{other.usePhysicsCollider}
 	, renderOrder{other.renderOrder}
@@ -58,6 +59,11 @@ TileMap::TileMap(const TileMap &other)
 }
 
 TileMap::~TileMap() {
+	// Release our tileset texture reference (may trigger an immediate unload).
+	if(auto *res = IResourceSystem::Get(); res && textureHandle.IsValid()) {
+		res->ReleaseTexture(textureHandle);
+	}
+
 	if(tileStateTexture != 0) {
 		gl::GLuint handle = static_cast<gl::GLuint>(tileStateTexture);
 		gl::glDeleteTextures(1, &handle);
@@ -153,12 +159,17 @@ void TileMap::LoadResources() {
 
 	// Get texture directly from TileSet (same as Sprite's texturePath)
 	if(!tileSet->GetTexturePath().empty()) {
-		texture = resourceSystem->GetTexture(IResourceSystem::Path(tileSet->GetTexturePath()), filterLinear);
+		std::string fullPath{IResourceSystem::Path(tileSet->GetTexturePath())};
+		TextureHandle newHandle = resourceSystem->AcquireTexture(fullPath, filterLinear);
+		if(textureHandle.IsValid()) {
+			resourceSystem->ReleaseTexture(textureHandle);
+		}
+		textureHandle = newHandle;
 	}
 
-	if(!texture) {
-		LOG_WARNING("TileMap: No texture found for '{}'", tileMapDataName);
-	}
+	//if(!texture) {
+	//	LOG_WARNING("TileMap: No texture found for '{}'", tileMapDataName);
+	//}
 
 	// Upload initial tile alive/dead states to GPU
 	InitTileStateTexture();
@@ -263,8 +274,9 @@ void TileMap::SetTileDoorOpen(unsigned short row, unsigned short col, bool open)
 }
 bool TileMap::Render(const IEvent<Events::GlobalEventArgs> *, const Events::GlobalEventArgs &) {
 	// Early exit if resources not loaded
-	if(!mesh || !texture || !tileMapData) {
-		return false;
+	Graphics::Texture *tex = IResourceSystem::Get()->Resolve(textureHandle);
+	if(!mesh || !tex || !tileMapData) {
+		return true;
 	}
 	if(!dissolvingTiles_.empty()) {
 		float dt = ITimeSystem::Get()->GetDeltaTimeSec();
@@ -285,7 +297,7 @@ bool TileMap::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Glob
 	// Get transform (same as Sprite)
 	Transform *trans = Parent()->Get<Transform>();
 	if(!trans) {
-		return false;
+		return true;
 	}
 
 	// Build model matrix
@@ -301,7 +313,7 @@ bool TileMap::Render(const IEvent<Events::GlobalEventArgs> *, const Events::Glob
 	// Create renderable (same pattern as Sprite)
 	IRenderSystem::Renderable renderable;
 	renderable.modelMatrix = modelTransform;
-	renderable.texture = texture;
+	renderable.texture = tex;
 	renderable.mesh = mesh;
 	renderable.alpha = 1.0f;
 	renderable.color = glm::vec3(1.0f, 1.0f, 1.0f);
